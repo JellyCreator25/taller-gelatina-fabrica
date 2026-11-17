@@ -1,0 +1,26 @@
+{
+  "nota": "Reglas del sistema de métricas y de la recomendación de rumbo (herramientas/metricas.py y herramientas/rumbo.py). Los umbrales y los pesos son criterio mío, no resultado de datos: se ajustan aquí sin tocar código. Cambiarlos cambia lo que el motor recomienda, así que conviene hacerlo con el registro a la vista.",
+  "metricas": {
+    "vistas_juego": {"tipo": "conteo", "que": "Veces que se abrió la página donde se juega. Cloudflare las cuenta solo (fuente «cloudflare»); lo que reporten itch.io o un portal se anota a mano con su fuente."},
+    "vistas_ficha": {"tipo": "conteo", "que": "Veces que se abrió la página del juego en el sitio (título, portada, descripción). Mide cuánto atrae la presentación; no entra en el puntaje."},
+    "comentarios_pos": {"tipo": "conteo", "que": "Comentarios o reseñas favorables de personas reales (se cuentan a mano)."},
+    "comentarios_neg": {"tipo": "conteo", "que": "Comentarios o reseñas desfavorables de personas reales (se cuentan a mano)."},
+    "donaciones_usd": {"tipo": "dinero", "que": "Donaciones recibidas por ese juego en la semana, en dólares."},
+    "ingresos_usd": {"tipo": "dinero", "que": "Ingresos por anuncios o portales atribuibles a ese juego en la semana, en dólares."}
+  },
+  "rumbo": {
+    "ventana_semanas": 8,
+    "minimo_semanas": 3,
+    "minimo_vistas_juego": 200,
+    "minimo_juegos_medibles": 2,
+    "minimo_comentarios": 10,
+    "pesos": {"alcance": 0.5, "aceptacion": 0.3, "apoyo": 0.2},
+    "fuerza_previa": {"alcance": 2, "aceptacion": 10, "apoyo": 1, "rasgos": 2},
+    "exploracion": 0.25,
+    "peso_ejes": {"genero": 0.3, "verbo": 0.2, "objetivo": 0.2, "entrada": 0.1, "progresion": 0.1, "ambientacion": 0.1},
+    "factor_riesgo": {"bajo": 1.0, "medio": 0.9, "alto": 0.7},
+    "factor_costo": {"bajo": 1.0, "medio": 0.9, "alto": 0.75},
+    "factor_novedad": {"distinto": 1.0, "parecido": 0.6},
+    "canales_sin_empuje": ["sitio-propio", "indexnow"]
+  }
+}

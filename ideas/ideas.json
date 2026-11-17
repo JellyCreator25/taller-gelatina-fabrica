@@ -13,6 +13,7 @@
       },
       "referencias": ["Kingdom Rush", "Bloons TD"],
       "riesgo_estimado": "alto",
+      "costo_estimado": "alto",
       "brief": "Una defensa de torres que cabe en una pantalla de celular y se juega en 3 minutos por oleada.",
       "gancho": "Las oleadas se arman a partir de cómo defendiste la anterior (el enemigo se adapta). Si no se logra que eso se sienta distinto, es un clon de un género saturado y no debe ir a portales."
     },
@@ -28,6 +29,8 @@
       },
       "referencias": [],
       "riesgo_estimado": "bajo",
+      "costo_estimado": "medio",
+      "bloqueada_por": "Revisión del contenido en chino por una persona hablante nativa: sin ella el juego no debe salir.",
       "brief": "Se conectan caracteres chinos con su significado en español e inglés, y los niveles enseñan los componentes de cada carácter.",
       "gancho": "Usa lo que ya tiene el motor (tres idiomas y sistema de textos) para algo que casi no existe en juegos de navegador. El contenido en chino exige revisión de una persona hablante nativa antes de publicar."
     },
@@ -43,6 +46,7 @@
       },
       "referencias": ["Powder Game", "Sandspiel"],
       "riesgo_estimado": "medio",
+      "costo_estimado": "medio",
       "brief": "Se esparcen materiales (arena, agua, fuego, plantas) que reaccionan entre sí; descubrir una combinación desbloquea otro material.",
       "gancho": "Un cuaderno de descubrimientos con pistas que guíe al jugador sin decirle la respuesta; los sandbox de materiales existentes casi no tienen meta."
     },
@@ -58,6 +62,7 @@
       },
       "referencias": ["Rhythm Doctor"],
       "riesgo_estimado": "medio",
+      "costo_estimado": "bajo",
       "brief": "Una sola tecla y canciones cortas que el motor de audio genera por reglas, con un patrón distinto en cada partida.",
       "gancho": "La música se genera con el motor de audio de la fábrica (sin archivos externos); que suene bien es el riesgo real y se prueba con oídos humanos, no con pruebas automáticas."
     },
@@ -73,6 +78,7 @@
       },
       "referencias": ["Cookie Clicker", "A Dark Room"],
       "riesgo_estimado": "medio",
+      "costo_estimado": "medio",
       "brief": "Una colonia que crece sola mientras el jugador toma decisiones que cambian qué recursos importan.",
       "gancho": "Que las decisiones sean de verdad excluyentes (no solo «comprar lo más barato»); sin eso es un incremental más."
     },
@@ -88,6 +94,7 @@
       },
       "referencias": [],
       "riesgo_estimado": "medio",
+      "costo_estimado": "medio",
       "brief": "Se lanza una gelatina que se aplasta y rebota para llegar a la meta; cada material del nivel la trata distinto.",
       "gancho": "Aprovecha la física blanda que ya tiene el motor, que es lo más propio de la fábrica; el riesgo es parecerse a juegos de lanzamiento conocidos."
     }

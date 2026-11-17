@@ -21,6 +21,10 @@ Uso:
   python3 fabrica.py sitio                    (genera dist/sitio: el sitio propio en es/en/zh con los juegos de publicacion/sitio.json)
   python3 fabrica.py sitio --zip              (además deja dist/sitio.zip para arrastrarlo a Cloudflare Pages; se niega con datos de ejemplo)
   python3 fabrica.py perfiles [--texto]       (avatar, banner y textos de perfil de las cuentas de bot: difusion/perfiles/; --texto no usa navegador)
+  python3 fabrica.py metricas ver [JUEGO]     (lo que hay en metricas/registro.csv por juego y semana)
+  python3 fabrica.py metricas anotar JUEGO METRICA VALOR [--semana esta|pasada|AAAA-MM-DD] [--fuente F] [--nota T]   (agrega un dato al registro)
+  python3 fabrica.py metricas cloudflare [--dias N] [--opcional]   (importa las vistas de Cloudflare Web Analytics; --opcional: sin claves, se omite)
+  python3 fabrica.py rumbo [--detalle]        (qué construir después, según las métricas; con pocos datos explora; no construye ni publica nada)
   python3 fabrica.py huella ID [--solo canal,canal]       (la huella del plan de publicación, para aprobarlo)
   python3 fabrica.py publicar ID [--solo canal,canal]     (muestra el plan y las compuertas; no publica nada)
   python3 fabrica.py publicar ID --ejecutar --aprobar HUELLA   (publica EXACTAMENTE lo que esa huella cubre)
@@ -420,6 +424,65 @@ def configurar(que):
         sys.exit('[configurar] ' + red.redactar(e, [ent.env.get(x) for x in secretos]))
 
 
+def _herramientas():
+    if str(RAIZ / 'herramientas') not in sys.path:
+        sys.path.insert(0, str(RAIZ / 'herramientas'))
+
+
+def _resumen_de_corrida(texto):
+    ruta = os.environ.get('GITHUB_STEP_SUMMARY')
+    if ruta:
+        with open(ruta, 'a', encoding='utf-8') as f:
+            f.write(texto + '\n')
+
+
+def metricas_cmd(args):
+    _herramientas()
+    import metricas as met
+    sub = args[0] if args else ''
+    ids_ok = set(ids())
+    try:
+        if sub == 'ver':
+            print(met.tabla(RAIZ, args[1] if len(args) > 1 and not args[1].startswith('--') else None, ids_ok))
+        elif sub == 'anotar' and len(args) >= 4:
+            f = met.anotar(RAIZ, args[1], args[2], args[3], _opcion('--semana', 'esta'), _opcion('--fuente', 'manual'), _opcion('--nota', ''), ids_ok)
+            print('Anotado: %s · %s · %s = %s (fuente %s)%s' % (f['semana'].isoformat(), f['juego'], f['metrica'], f['valor'], f['fuente'],
+                  '. Es la semana en curso: no cuenta para decidir hasta que termine.' if f['en_curso'] else ''))
+        elif sub == 'cloudflare':
+            nucleo, _ = _publicacion()
+            ent = nucleo.Entorno()
+            if not (ent.env.get(met.VARIABLE_TOKEN) and ent.env.get(met.VARIABLE_CUENTA)) and '--opcional' in args:
+                print('[metricas] sin %s y %s: no se importa nada (es opcional).' % (met.VARIABLE_TOKEN, met.VARIABLE_CUENTA))
+                return
+            try:
+                r = met.importar_cloudflare(RAIZ, ent, ids_ok, int(_opcion('--dias', 21)))
+            except met.ErrorMetricas as e:
+                _resumen_de_corrida('### Importación de Cloudflare Web Analytics\n\nFalló: %s\n' % e)
+                raise
+            linea = '%s desde %s: %d filas nuevas, %d sin cambio (%d grupos leídos).' % (r['host'], r['desde'].isoformat(), r['escritas'], r['sin_cambio'], r['grupos'])
+            print('[metricas] ' + linea)
+            if r['aviso']:
+                print('[metricas] aviso: ' + r['aviso'])
+            _resumen_de_corrida('### Importación de Cloudflare Web Analytics\n\n%s%s\n' % (linea, ('\n\nAviso: ' + r['aviso']) if r['aviso'] else ''))
+        else:
+            sys.exit('Uso: metricas ver [JUEGO] | metricas anotar JUEGO METRICA VALOR [--semana S] [--fuente F] [--nota T] | metricas cloudflare [--dias N] [--opcional]\n'
+                     'Métricas: ' + ', '.join(sorted(met.cargar_politica(RAIZ)['metricas'])))
+    except (met.ErrorMetricas, ValueError) as e:
+        if isinstance(e, ValueError) and not isinstance(e, met.ErrorMetricas):
+            sys.exit('[metricas] valor no válido: %s' % e)
+        sys.exit('[metricas] ' + str(e))
+
+
+def rumbo_cmd(args):
+    _herramientas()
+    import metricas as met
+    import rumbo
+    try:
+        print('\n'.join(rumbo.informe(rumbo.recomendar(RAIZ), detalle='--detalle' in args)))
+    except met.ErrorMetricas as e:
+        sys.exit('[rumbo] ' + str(e))
+
+
 def _captura(paso, *args):
     """Corre un paso que puede terminar con sys.exit; devuelve el mensaje de error o None si salió bien."""
     try:
@@ -476,11 +539,12 @@ def ciclo():
             L.append('  Lee el plan con `python3 fabrica.py publicar %s` y, si está bien: `python3 fabrica.py publicar %s --ejecutar --aprobar %s`' % (i, i, plan['huella'][:16]))
         L.append('')
     L += ['## Qué construir después', '']
-    peso = {'bajo': 0, 'medio': 1, 'alto': 2}
-    for idea, r in sorted(nov.evaluar_ideas(RAIZ), key=lambda x: peso.get(x[0].get('riesgo_estimado'), 3))[:3]:
-        m = idea['mecanica']
-        L.append('- `%s` · %s · %s / %s / %s · riesgo de clon %s. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero %s --verbo %s --objetivo %s`'
-                 % (idea['id'], idea.get('titulo', ''), m['genero'], m['verbo'], m['objetivo'], idea.get('riesgo_estimado', '?'), m['genero'], m['verbo'], m['objetivo']))
+    try:
+        import rumbo
+        L += rumbo.informe(rumbo.recomendar(RAIZ))
+    except Exception as e:      # un registro dañado no debe impedir el resto del estado, pero sí quedar a la vista y hacer fallar el ciclo
+        errores.append('rumbo: %s' % e)
+        L += ['No se pudo calcular el rumbo: %s' % e]
     L += ['', 'Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: %s.' % (', '.join(politica.get('canales', [])) or 'ninguno'), '']
     texto = '\n'.join(L)
     (RAIZ / 'publicacion' / 'PENDIENTE.md').write_text(texto, encoding='utf-8')
@@ -524,6 +588,10 @@ if __name__ == '__main__':
         sys.path.insert(0, str(RAIZ / 'herramientas'))
         import perfiles
         perfiles.main(sys.argv)
+    elif orden == 'metricas':
+        metricas_cmd(sys.argv[2:])
+    elif orden == 'rumbo':
+        rumbo_cmd(sys.argv[2:])
     elif orden == 'huella':
         huella(objetivo)
     elif orden == 'publicar':

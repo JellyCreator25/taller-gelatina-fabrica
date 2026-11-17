@@ -207,6 +207,8 @@ class Sitio:
         clave = self.cfg.get('indexnow_clave') or ''
         if clave and not re.fullmatch(r'[A-Za-z0-9-]{8,128}', clave):
             raise ErrorSitio('sitio.json: «indexnow_clave» debe medir de 8 a 128 y usar solo letras, números y guiones')
+        if self.cfg.get('analitica', '') not in ('', 'cloudflare'):
+            raise ErrorSitio('sitio.json: «analitica» debe ser vacío o «cloudflare» (hoy dice «%s»)' % self.cfg.get('analitica'))
         ads = self.cfg.get('adsense_publisher') or ''
         if ads and not re.fullmatch(r'pub-\d{16}', ads):
             raise ErrorSitio('sitio.json: «adsense_publisher» debe tener la forma pub-0000000000000000')
@@ -441,7 +443,12 @@ def pagina_privacidad(s, l):
     t = s.textos[l]
     rutas = {x: s.ruta_privacidad(x) for x in s.idiomas}
     base = list(t['privacidad_base'])
-    parrafos = [base[0], t['privacidad_anuncios'] if s.cfg.get('adsense_publisher') else t['privacidad_sin_anuncios']] + base[1:-1]
+    anuncios, analitica = bool(s.cfg.get('adsense_publisher')), s.cfg.get('analitica') == 'cloudflare'
+    if anuncios:
+        centro = [t['privacidad_anuncios']] + ([t['privacidad_analitica']] if analitica else [])
+    else:
+        centro = [t['privacidad_analitica'], t['privacidad_sin_propias']] if analitica else [t['privacidad_sin_anuncios']]
+    parrafos = [base[0]] + centro + base[1:-1]
     if any(j['spec'].get('apoyo_url') for j in s.juegos):
         parrafos.append(t['privacidad_apoyo'])
     parrafos.append(base[-1])

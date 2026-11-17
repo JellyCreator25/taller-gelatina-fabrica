@@ -1167,7 +1167,7 @@ Los portales (CrazyGames, Poki, Playgama) se evalúan desde el D28: cada uno se 
 
 ## Qué se mide y cómo se decide
 
-Se anota en `metricas.csv` cada 3 días durante 2 semanas y después una vez por semana: fecha, vistas, partidas o descargas, ingresos, donaciones, comentarios, de dónde llegó la gente y notas. Cómo leer los números (criterio mío, no de las plataformas):
+Se anota en el registro de la fábrica (`metricas/registro.csv`, con `python3 fabrica.py metricas anotar JUEGO METRICA VALOR`) cada 3 días durante 2 semanas y después una vez por semana: vistas del juego y de la ficha, comentarios favorables y desfavorables, donaciones e ingresos en dólares y de dónde llegó la gente (la fuente). Ese registro es lo que lee `python3 fabrica.py rumbo` para recomendar qué construir después; `metricas.csv` de esta carpeta queda como libreta para notas libres. Cómo leer los números (criterio mío, no de las plataformas):
 
 | Lo que ves | Probable causa | Qué se cambia |
 |---|---|---|

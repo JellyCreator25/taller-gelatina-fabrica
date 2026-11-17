@@ -29,7 +29,7 @@ Los canales, sus reglas, el calendario y el banco de respuestas están en `difus
 
 | Cuándo | Quién | Qué |
 |---|---|---|
-| Cada 3 días, 2 semanas | Yo | Leer métricas y comentarios; anotar en metricas.csv; proponer respuestas (tú apruebas). |
+| Cada 3 días, 2 semanas | Yo | Leer métricas y comentarios; anotarlos con `python3 fabrica.py metricas anotar` (las vistas de Cloudflare entran solas si la medición está activada); proponer respuestas (tú apruebas). |
 | Semana 2 | Yo | Parche con lo que repita la gente (error, balance, claridad). Subir la versión y volver a pasar por «publicar»: un parche actualiza el sitio sin volver a publicar en redes. |
 | Semana 3-4 | Ambos | Paquete nuevo si hay interés. |
 | Semana 4 | Tú | Decidir con datos: seguir, cambiar de enfoque o lanzar el siguiente juego. |

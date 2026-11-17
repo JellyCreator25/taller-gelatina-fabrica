@@ -6,18 +6,35 @@ Lo escribe `python3 fabrica.py ciclo`. No contiene claves ni fechas; lo que sale
 
 - Novedad: distinto
 - **Listo para aprobar** (2 acciones pendientes: indexnow, sitio-propio).
-  Lee el plan con `python3 fabrica.py publicar guerreros-gelatina` y, si está bien: `python3 fabrica.py publicar guerreros-gelatina --ejecutar --aprobar 1134151cdd93e93a`
+  Lee el plan con `python3 fabrica.py publicar guerreros-gelatina` y, si está bien: `python3 fabrica.py publicar guerreros-gelatina --ejecutar --aprobar 4fb162a472803b5c`
 
 ## torre-gelatina (v1.1.0)
 
 - Novedad: distinto — Riesgo «alto» de ser visto como clon de un juego de fuera (Stack): no se envía a portales.
 - **Listo para aprobar** (2 acciones pendientes: indexnow, sitio-propio).
-  Lee el plan con `python3 fabrica.py publicar torre-gelatina` y, si está bien: `python3 fabrica.py publicar torre-gelatina --ejecutar --aprobar 9b224091b5246ea0`
+  Lee el plan con `python3 fabrica.py publicar torre-gelatina` y, si está bien: `python3 fabrica.py publicar torre-gelatina --ejecutar --aprobar 5fe25e31ab588ea3`
 
 ## Qué construir después
 
-- `trazos` · Trazos (puzzle de palabras y caracteres en tres idiomas) · puzzle-palabras / conectar / aprender · riesgo de clon bajo. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero puzzle-palabras --verbo conectar --objetivo aprender`
-- `arena` · Arena (sandbox de materiales que caen) · sandbox-creativo / dibujar / descubrir · riesgo de clon medio. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero sandbox-creativo --verbo dibujar --objetivo descubrir`
-- `compas` · Compás (ritmo de un botón con sonido sintetizado) · ritmo / cronometrar / puntaje-maximo · riesgo de clon medio. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero ritmo --verbo cronometrar --objetivo puntaje-maximo`
+- No hay ninguna métrica registrada. La fuente automática es Cloudflare Web Analytics (ver LEEME-DUENO.md, «Medir visitas»); lo demás se anota con `python3 fabrica.py metricas anotar`.
+
+**Todavía no hay datos para decidir por métricas.** Hacen falta al menos 2 juegos con 3 semanas completas y 200 vistas del juego; mientras tanto el rumbo se elige explorando: lo que más se aleja de lo que ya hay, con menos riesgo de clon y menor costo.
+
+Evidencia por juego (semanas completas, últimas 8):
+- `guerreros-gelatina`: 0 semana(s), 0 vistas del juego, 0 de la ficha → sin datos todavía
+- `torre-gelatina`: 0 semana(s), 0 vistas del juego, 0 de la ficha → sin datos todavía
+
+Recomendación, en orden:
+1. `compas` · Compás (ritmo de un botón con sonido sintetizado) · puntaje 1.12 · riesgo de clon medio · costo bajo
+   Por qué: género «ritmo» no se ha probado; verbo «cronometrar» no se ha probado; objetivo «puntaje-maximo» no se ha probado. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero ritmo --verbo cronometrar --objetivo puntaje-maximo`
+2. `rebote` · Rebote (puzzle de física con gelatina) · puntaje 1.01 · riesgo de clon medio · costo medio
+   Por qué: género «puzzle-fisico» no se ha probado; verbo «apuntar» no se ha probado; objetivo «llegar-a-la-meta» no se ha probado. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero puzzle-fisico --verbo apuntar --objetivo llegar-a-la-meta`
+3. `arena` · Arena (sandbox de materiales que caen) · puntaje 1.01 · riesgo de clon medio · costo medio
+   Por qué: género «sandbox-creativo» no se ha probado; verbo «dibujar» no se ha probado; objetivo «descubrir» no se ha probado. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero sandbox-creativo --verbo dibujar --objetivo descubrir`
+
+En espera (algo que solo una persona puede resolver):
+- `trazos`: Revisión del contenido en chino por una persona hablante nativa: sin ella el juego no debe salir.
+
+Recomendar no es lanzar: un juego nuevo sigue sujeto a la revisión de novedad, a la pausa entre lanzamientos y a tu aprobación con la huella.
 
 Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow.

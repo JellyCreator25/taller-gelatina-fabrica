@@ -40,7 +40,7 @@ PLANTILLA_PROYECTO = None
 
 
 def _copiar_proyecto(destino):
-    for carpeta in ('juegos', 'plantillas', 'catalogo', 'ideas', 'difusion', 'herramientas', 'publicacion'):
+    for carpeta in ('juegos', 'plantillas', 'catalogo', 'ideas', 'difusion', 'herramientas', 'publicacion', 'metricas'):
         shutil.copytree(RAIZ / carpeta, destino / carpeta, ignore=shutil.ignore_patterns('__pycache__', 'libro.jsonl'))
     shutil.copy(RAIZ / 'fabrica.py', destino / 'fabrica.py')
     shutil.copytree(RAIZ / 'motor', destino / 'motor')
@@ -1201,6 +1201,511 @@ class PruebasEtiquetaBot(Base):
         (c,) = self.p.red.a('PATCH', 'https://mast.ejemplo/api/v1/accounts/update_credentials')
         self.assertEqual(c['cuerpo'], b'bot=true')
         self.assertEqual(c['cab']['Authorization'], 'Bearer ' + SECRETOS['MASTODON_TOKEN'])
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Métricas y rumbo
+# ---------------------------------------------------------------------------------------------------------------------
+
+import metricas as met      # noqa: E402
+import rumbo                # noqa: E402
+
+IDS = {'guerreros-gelatina', 'torre-gelatina'}
+TORRE = 'torre-gelatina'
+HOY = datetime.date(2026, 11, 23)          # un lunes: las semanas completas son las que terminan antes de hoy
+TOKEN_CF = 'cf-analitica-SECRETO-9'
+CUENTA_CF = 'a1b2c3d4e5f60718293a4b5c6d7e8f90'
+GRAPHQL = 'https://api.cloudflare.com/client/v4/graphql'
+
+
+def gql(grupos):
+    return resp(200, {'data': {'viewer': {'accounts': [{'rumPageloadEventsAdaptiveGroups': grupos}]}}, 'errors': None})
+
+
+def grupo(fecha, ruta, cuenta):
+    return {'count': cuenta, 'dimensions': {'date': fecha, 'requestPath': ruta}}
+
+
+def idea(iid, genero, verbo, objetivo, entrada, progresion, riesgo='medio', costo='medio', **extra):
+    d = {'id': iid, 'titulo': iid.capitalize(), 'mecanica': {'genero': genero, 'verbo': verbo, 'objetivo': objetivo, 'entrada': entrada, 'progresion': progresion},
+         'referencias': [], 'riesgo_estimado': riesgo, 'costo_estimado': costo, 'brief': 'x', 'gancho': 'x'}
+    d.update(extra)
+    return d
+
+
+# dos ideas que comparten rasgos, una con guerreros-gelatina y la otra con torre-gelatina, y por lo demás iguales
+IDEA_COMO_GUERREROS = idea('cercana-a-guerreros', 'tiro-arcade', 'colocar', 'sobrevivir', ['arrastrar'], 'niveles-con-oro')
+IDEA_COMO_TORRE = idea('cercana-a-torre', 'plataformas', 'soltar', 'llegar-a-la-meta', ['teclado'], 'puntaje-infinito')
+
+
+class BaseMetricas(Base):
+    def setUp(self):
+        super().setUp()
+        self.raiz = self.p.raiz
+
+    def ideas(self, lista):
+        (self.raiz / 'ideas' / 'ideas.json').write_text(json.dumps({'ideas': lista}, ensure_ascii=False), encoding='utf-8')
+
+    def anota(self, juego, metrica, valor, semana, fuente='cloudflare'):
+        return met.anotar(self.raiz, juego, metrica, valor, semana, fuente, '', IDS, HOY)
+
+    def vistas(self, juego, por_semana, metrica='vistas_juego'):
+        for semana, v in por_semana:
+            self.anota(juego, metrica, v, semana)
+
+    def tres_semanas(self, juego, cada_una):
+        self.vistas(juego, [('2026-11-02', cada_una), ('2026-11-09', cada_una), ('2026-11-16', cada_una)])
+
+    def recomendar(self, libro=None):
+        return rumbo.recomendar(self.raiz, HOY, libro=libro if libro is not None else [])
+
+
+class PruebasRegistroDeMetricas(BaseMetricas):
+    def test_anotar_escribe_una_fila_y_la_semana_es_siempre_un_lunes(self):
+        f = met.anotar(self.raiz, JUEGO, 'vistas_juego', '40', '2026-11-19', 'manual', 'dato de prueba', IDS, HOY)     # un jueves
+        self.assertEqual(f['semana'], datetime.date(2026, 11, 16))
+        (fila,) = met.leer(self.raiz, IDS)
+        self.assertEqual((fila['semana'], fila['juego'], fila['metrica'], fila['valor'], fila['fuente'], fila['nota']),
+                         (datetime.date(2026, 11, 16), JUEGO, 'vistas_juego', 40, 'manual', 'dato de prueba'))
+
+    def test_esta_y_pasada_se_calculan_desde_hoy_y_la_semana_en_curso_se_avisa(self):
+        self.assertEqual(met.interpretar_semana('esta', datetime.date(2026, 11, 25)), datetime.date(2026, 11, 23))
+        self.assertEqual(met.interpretar_semana('pasada', datetime.date(2026, 11, 25)), datetime.date(2026, 11, 16))
+        self.assertTrue(met.anotar(self.raiz, JUEGO, 'vistas_juego', 1, 'esta', 'manual', '', IDS, HOY)['en_curso'])
+        self.assertFalse(met.anotar(self.raiz, JUEGO, 'vistas_juego', 1, 'pasada', 'manual', '', IDS, HOY)['en_curso'])
+        with self.assertRaises(met.ErrorMetricas):
+            met.interpretar_semana('ayer', HOY)
+
+    def test_se_rechaza_lo_que_no_tiene_sentido_y_no_se_escribe_nada(self):
+        malos = [('no-existe', 'vistas_juego', '1', 'manual'), (JUEGO, 'visitas', '1', 'manual'), (JUEGO, 'vistas_juego', '-3', 'manual'),
+                 (JUEGO, 'vistas_juego', '2.5', 'manual'), (JUEGO, 'vistas_juego', 'mucho', 'manual'), (JUEGO, 'vistas_juego', 'nan', 'manual'),
+                 (JUEGO, 'donaciones_usd', '1.234', 'manual'), (JUEGO, 'vistas_juego', '1', 'Fuente Con Espacios')]
+        for juego, metrica, valor, fuente in malos:
+            with self.assertRaises(met.ErrorMetricas, msg=(juego, metrica, valor, fuente)):
+                met.anotar(self.raiz, juego, metrica, valor, 'pasada', fuente, '', IDS, HOY)
+        with self.assertRaises(met.ErrorMetricas):
+            met.anotar(self.raiz, JUEGO, 'vistas_juego', 1, 'pasada', 'manual', 'dos\nlíneas', IDS, HOY)
+        self.assertEqual(met.leer(self.raiz, IDS), [])
+
+    def test_el_dinero_acepta_centavos_y_coma_decimal(self):
+        met.anotar(self.raiz, JUEGO, 'donaciones_usd', '3,5', 'pasada', 'manual', '', IDS, HOY)
+        (fila,) = met.leer(self.raiz, IDS)
+        self.assertEqual((fila['valor'], fila['texto']), (3.5, '3.50'))
+
+    def test_una_nota_no_puede_volverse_formula_en_una_hoja_de_calculo(self):
+        met.anotar(self.raiz, JUEGO, 'vistas_juego', 1, 'pasada', 'manual', '=HYPERLINK("http://x")', IDS, HOY)
+        met.anotar(self.raiz, JUEGO, 'vistas_juego', 2, 'pasada', 'itch', '-5 % que la semana pasada', IDS, HOY)
+        for linea in (self.raiz / 'metricas' / 'registro.csv').read_text(encoding='utf-8').splitlines()[1:]:
+            self.assertNotRegex(linea.split(',', 5)[-1].strip('"'), r'^[=+\-@]')
+
+    def test_la_ultima_fila_de_cada_fuente_corrige_y_las_fuentes_se_suman(self):
+        self.anota(JUEGO, 'vistas_juego', 100, '2026-11-09', 'cloudflare')
+        self.anota(JUEGO, 'vistas_juego', 130, '2026-11-09', 'cloudflare')          # corrección
+        self.anota(JUEGO, 'vistas_juego', 25, '2026-11-09', 'itch')
+        s = met.sumas(met.leer(self.raiz, IDS))
+        self.assertEqual(s[(datetime.date(2026, 11, 9), JUEGO, 'vistas_juego')], 155)
+        self.assertEqual(len((self.raiz / 'metricas' / 'registro.csv').read_text(encoding='utf-8').splitlines()), 4)     # encabezado + las tres filas: nada se borra
+
+    def test_un_registro_dañado_dice_en_que_linea_y_no_se_lee_a_medias(self):
+        ruta = self.raiz / 'metricas' / 'registro.csv'
+        ruta.write_text(','.join(met.ENCABEZADO) + '\n2026-11-18,%s,vistas_juego,3,manual,\n2026-11-16,%s,vistas_juego,3,manual\n2026-11-16,%s,vistas_juego,3,Mala Fuente,\n' % (JUEGO, JUEGO, JUEGO),
+                        encoding='utf-8')
+        with self.assertRaises(met.ErrorMetricas) as c:
+            met.leer(self.raiz, IDS)
+        mensaje = str(c.exception)
+        for esperado in ('línea 2', 'línea 3', 'línea 4'):
+            self.assertIn(esperado, mensaje)
+        ruta.write_text('semana,otra\n', encoding='utf-8')
+        with self.assertRaises(met.ErrorMetricas):
+            met.leer(self.raiz, IDS)
+
+    def test_agregar_a_un_archivo_sin_salto_final_no_pega_dos_filas(self):
+        ruta = self.raiz / 'metricas' / 'registro.csv'
+        ruta.write_text(','.join(met.ENCABEZADO) + '\n2026-11-16,%s,vistas_juego,3,manual,' % JUEGO, encoding='utf-8')
+        self.anota(JUEGO, 'vistas_juego', 4, '2026-11-09', 'manual')
+        self.assertEqual(len(met.leer(self.raiz, IDS)), 2)
+
+    def test_la_tabla_marca_la_semana_en_curso(self):
+        self.anota(JUEGO, 'vistas_juego', 7, '2026-11-16')
+        self.anota(JUEGO, 'vistas_juego', 9, '2026-11-23', 'manual')
+        texto = met.tabla(self.raiz, None, IDS, HOY)
+        self.assertIn('2026-11-16 ', texto)
+        self.assertIn('2026-11-23*', texto)
+        self.assertEqual(met.tabla(self.raiz, TORRE, IDS, HOY), 'Todavía no hay métricas registradas de «%s».' % TORRE)
+
+    def test_la_politica_es_coherente(self):
+        pol = met.cargar_politica(self.raiz)
+        r = pol['rumbo']
+        self.assertEqual(set(r['pesos']), {'alcance', 'aceptacion', 'apoyo'})
+        self.assertEqual(set(r['fuerza_previa']), {'alcance', 'aceptacion', 'apoyo', 'rasgos'})
+        self.assertLessEqual(set(r['peso_ejes']), set(rumbo.EJES))
+        for tabla in ('factor_riesgo', 'factor_costo'):
+            self.assertEqual(set(r[tabla]), {'bajo', 'medio', 'alto'})
+            self.assertTrue(all(0 < v <= 1 for v in r[tabla].values()))
+        self.assertEqual(set(r['factor_novedad']), {'distinto', 'parecido'})        # una variante nunca entra
+        for nombre, m in pol['metricas'].items():
+            self.assertIn(m['tipo'], ('conteo', 'dinero'), nombre)
+
+
+class PruebasImportarCloudflare(BaseMetricas):
+    def setUp(self):
+        super().setUp()
+        self.p.env.update({'CLOUDFLARE_ANALITICA_TOKEN': TOKEN_CF, 'CLOUDFLARE_ACCOUNT_ID': CUENTA_CF})
+
+    def importar(self, grupos=None, dias=21, hoy=datetime.date(2026, 11, 18)):
+        self.p.red.al('POST', GRAPHQL, gql(grupos if grupos is not None else []))
+        return met.importar_cloudflare(self.raiz, self.p.ent(), IDS, dias, hoy)
+
+    def test_la_consulta_pide_las_vistas_del_dominio_desde_un_lunes_con_el_token_en_la_cabecera(self):
+        self.importar([grupo('2026-11-17', '/jugar/%s/' % JUEGO, 5)])
+        (c,) = self.p.red.a('POST', GRAPHQL)
+        self.assertEqual(c['cab']['Authorization'], 'Bearer ' + TOKEN_CF)
+        consulta = json.loads(c['cuerpo'])['query']
+        for esperado in ('rumPageloadEventsAdaptiveGroups', 'accountTag: "%s"' % CUENTA_CF, 'requestHost: "taller-gelatina.pages.dev"', 'bot: 0',
+                         'datetime_geq: "2026-10-26T00:00:00Z"', 'datetime_lt: "2026-11-19T00:00:00Z"', 'requestPath', 'date'):
+            self.assertIn(esperado, consulta)
+        self.assertNotIn(TOKEN_CF, consulta)
+
+    def test_cada_ruta_va_a_su_metrica_y_las_demas_se_ignoran(self):
+        r = self.importar([
+            grupo('2026-11-02', '/jugar/%s/' % JUEGO, 30), grupo('2026-11-04', '/jugar/%s/' % JUEGO, 12),          # misma semana: se suman
+            grupo('2026-11-03', '/es/juegos/%s/' % JUEGO, 8), grupo('2026-11-03', '/en/juegos/%s/index.html' % JUEGO, 2),
+            grupo('2026-11-10', '/jugar/%s/' % TORRE, 4),
+            grupo('2026-11-10', '/es/', 99), grupo('2026-11-10', '/jugar/no-existe/', 99), grupo('2026-11-10', '/jugar/%s/otra/cosa' % JUEGO, 99)])
+        self.assertEqual(r['aviso'], '')
+        s = met.sumas(met.leer(self.raiz, IDS))
+        L = datetime.date
+        self.assertEqual(s[(L(2026, 11, 2), JUEGO, 'vistas_juego')], 42)
+        self.assertEqual(s[(L(2026, 11, 2), JUEGO, 'vistas_ficha')], 10)
+        self.assertEqual(s[(L(2026, 11, 9), TORRE, 'vistas_juego')], 4)
+        self.assertNotIn(99, s.values())
+
+    def test_las_semanas_sin_visitas_quedan_en_cero_para_distinguirlas_de_no_medidas(self):
+        self.importar([grupo('2026-11-10', '/jugar/%s/' % JUEGO, 3)])
+        s = met.sumas(met.leer(self.raiz, IDS))
+        self.assertEqual(s[(datetime.date(2026, 10, 26), TORRE, 'vistas_juego')], 0)
+        self.assertEqual(s[(datetime.date(2026, 11, 16), JUEGO, 'vistas_ficha')], 0)
+
+    def test_volver_a_importar_lo_mismo_no_agrega_filas_y_un_cambio_agrega_una_correccion(self):
+        grupos = [grupo('2026-11-10', '/jugar/%s/' % JUEGO, 10)]
+        primero = self.importar(grupos)
+        filas = len((self.raiz / 'metricas' / 'registro.csv').read_text(encoding='utf-8').splitlines())
+        segundo = self.importar(grupos)
+        self.assertEqual((segundo['escritas'], len((self.raiz / 'metricas' / 'registro.csv').read_text(encoding='utf-8').splitlines())), (0, filas))
+        self.assertEqual(segundo['sin_cambio'], primero['escritas'])
+        tercero = self.importar([grupo('2026-11-10', '/jugar/%s/' % JUEGO, 14)])
+        self.assertEqual(tercero['escritas'], 1)
+        self.assertEqual(met.sumas(met.leer(self.raiz, IDS))[(datetime.date(2026, 11, 9), JUEGO, 'vistas_juego')], 14)
+
+    def test_sin_ninguna_vista_no_se_escribe_nada_y_se_explica(self):
+        r = self.importar([])
+        self.assertEqual(r['escritas'], 0)
+        self.assertIn('Web Analytics', r['aviso'])
+        self.assertEqual(met.leer(self.raiz, IDS), [])
+
+    def test_la_ventana_empieza_en_lunes_y_nunca_pide_mas_de_un_mes(self):
+        self.importar([grupo('2026-11-10', '/jugar/%s/' % JUEGO, 1)], dias=400)
+        consulta = json.loads(self.p.red.a('POST', GRAPHQL)[0]['cuerpo'])['query']
+        # tope de 27 días antes del miércoles 18/11 = jueves 22/10; la ventana empieza el lunes anterior (19/10): menos de 5 semanas
+        self.assertEqual(met.VENTANA_MAXIMA_DIAS, 27)
+        self.assertIn('datetime_geq: "2026-10-19T00:00:00Z"', consulta)
+        self.assertIn('datetime_lt: "2026-11-19T00:00:00Z"', consulta)
+        filas = met.leer(self.raiz, IDS)
+        self.assertEqual(min(f['semana'] for f in filas), datetime.date(2026, 10, 19))
+
+    def test_token_sin_permiso_dice_que_permiso_falta_y_no_muestra_el_token(self):
+        self.p.red.al('POST', GRAPHQL, resp(403, {'errors': [{'message': 'forbidden ' + TOKEN_CF}]}))
+        with self.assertRaises(met.ErrorMetricas) as c:
+            met.importar_cloudflare(self.raiz, self.p.ent(), IDS, 21, HOY)
+        self.assertIn('Account Analytics: Read', str(c.exception))
+        self.assertNotIn(TOKEN_CF, str(c.exception))
+        self.assertEqual(met.leer(self.raiz, IDS), [])
+
+    def test_si_el_esquema_rechaza_el_filtro_de_bots_se_reintenta_sin_el_y_queda_anotado(self):
+        respuestas = [resp(200, {'data': None, 'errors': [{'message': 'unknown field "bot"'}]}), gql([grupo('2026-11-10', '/jugar/%s/' % JUEGO, 6)])]
+        self.p.red.al('POST', GRAPHQL, lambda url, cab, cuerpo: respuestas.pop(0))
+        r = met.importar_cloudflare(self.raiz, self.p.ent(), IDS, 21, datetime.date(2026, 11, 18))
+        consultas = [json.loads(c['cuerpo'])['query'] for c in self.p.red.a('POST', GRAPHQL)]
+        self.assertIn('bot: 0', consultas[0])
+        self.assertNotIn('bot: 0', consultas[1])
+        self.assertGreater(r['escritas'], 0)
+        self.assertTrue(all(f['nota'] == 'sin filtro de bots' for f in met.leer(self.raiz, IDS)))
+
+    def test_otros_errores_de_graphql_se_informan_y_no_escriben(self):
+        self.p.red.al('POST', GRAPHQL, resp(200, {'data': None, 'errors': [{'message': 'zone not found'}]}))
+        with self.assertRaises(met.ErrorMetricas) as c:
+            met.importar_cloudflare(self.raiz, self.p.ent(), IDS, 21, HOY)
+        self.assertIn('zone not found', str(c.exception))
+        self.assertEqual(met.leer(self.raiz, IDS), [])
+
+    def test_cuenta_vacia_y_secretos_faltantes_o_mal_formados(self):
+        self.p.red.al('POST', GRAPHQL, resp(200, {'data': {'viewer': {'accounts': []}}, 'errors': None}))
+        with self.assertRaises(met.ErrorMetricas):
+            met.importar_cloudflare(self.raiz, self.p.ent(), IDS, 21, HOY)
+        for cambio in ({'CLOUDFLARE_ANALITICA_TOKEN': ''}, {'CLOUDFLARE_ACCOUNT_ID': ''}, {'CLOUDFLARE_ACCOUNT_ID': 'no-es-hexadecimal'}):
+            self.p.env.update(cambio)
+            with self.assertRaises(met.ErrorMetricas):
+                met.importar_cloudflare(self.raiz, self.p.ent(), IDS, 21, HOY)
+            self.p.env.update({'CLOUDFLARE_ANALITICA_TOKEN': TOKEN_CF, 'CLOUDFLARE_ACCOUNT_ID': CUENTA_CF})
+
+    def test_el_token_nunca_llega_al_registro(self):
+        self.importar([grupo('2026-11-10', '/jugar/%s/' % JUEGO, 6)])
+        texto = (self.raiz / 'metricas' / 'registro.csv').read_text(encoding='utf-8')
+        for secreto in (TOKEN_CF, CUENTA_CF):
+            self.assertNotIn(secreto, texto)
+
+
+class PruebasRumbo(BaseMetricas):
+    def test_sin_datos_explora_y_dice_cuanto_falta(self):
+        self.ideas([idea('nueva', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos')])
+        r = self.recomendar()
+        self.assertEqual(r['modo'], 'explorar')
+        self.assertEqual([c['id'] for c in r['ranking']], ['nueva'])
+        texto = '\n'.join(rumbo.informe(r))
+        self.assertIn('Todavía no hay datos para decidir por métricas', texto)
+        self.assertIn('No hay ninguna métrica registrada', texto)
+
+    def test_explorar_prefiere_lo_nuevo_barato_y_con_menos_riesgo_de_clon(self):
+        self.ideas([idea('cara-y-arriesgada', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos', riesgo='alto', costo='alto'),
+                    idea('barata-y-segura', 'sandbox-creativo', 'dibujar', 'descubrir', ['arrastrar'], 'desbloqueos', riesgo='bajo', costo='bajo'),
+                    idea('media', 'puzzle-fisico', 'apuntar', 'resolver-nivel', ['apuntar-y-disparar'], 'niveles-fijos')])
+        self.assertEqual([c['id'] for c in self.recomendar()['ranking']], ['barata-y-segura', 'media', 'cara-y-arriesgada'])
+
+    def test_explorar_prefiere_los_rasgos_que_la_fabrica_todavia_no_tiene(self):
+        self.ideas([idea('repite-rasgos', 'tiro-arcade', 'colocar', 'sobrevivir', ['toque'], 'niveles-con-oro'),
+                    idea('rasgos-nuevos', 'tiro-arcade', 'apuntar', 'puntaje-maximo', ['apuntar-y-disparar'], 'niveles-fijos')])
+        orden = [c['id'] for c in self.recomendar()['ranking']]
+        self.assertEqual(orden, ['rasgos-nuevos', 'repite-rasgos'])
+
+    def test_el_resultado_es_el_mismo_cada_vez(self):
+        self.ideas([IDEA_COMO_GUERREROS, IDEA_COMO_TORRE])
+        self.tres_semanas(JUEGO, 300)
+        self.tres_semanas(TORRE, 100)
+        a, b = self.recomendar(), self.recomendar()
+        self.assertEqual(rumbo.informe(a, detalle=True), rumbo.informe(b, detalle=True))
+        self.assertEqual([c['id'] for c in a['ranking']], [c['id'] for c in b['ranking']])
+
+    def test_una_variante_de_un_juego_existente_nunca_se_recomienda(self):
+        m = json.loads((self.raiz / 'juegos' / TORRE / 'juego.json').read_text(encoding='utf-8'))['mecanica']
+        self.ideas([idea('torre-otra-vez', m['genero'], m['verbo'], m['objetivo'], ['toque'], 'niveles-fijos', riesgo='bajo', costo='bajo'),
+                    idea('otra', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos', riesgo='alto', costo='alto')])
+        r = self.recomendar()
+        self.assertEqual([c['id'] for c in r['ranking']], ['otra'])
+        self.assertEqual([e['id'] for e in r['excluidas']], ['torre-otra-vez'])
+        self.assertIn('variante', r['excluidas'][0]['motivo'])
+
+    def test_una_idea_bloqueada_se_lista_aparte_y_una_ya_construida_se_omite(self):
+        (self.raiz / 'plantillas' / 'ya-hecha').mkdir()
+        self.ideas([idea('bloqueada', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos', bloqueada_por='falta una revisión humana'),
+                    idea('ya-hecha', 'sandbox-creativo', 'dibujar', 'descubrir', ['arrastrar'], 'desbloqueos'),
+                    idea('libre', 'puzzle-fisico', 'apuntar', 'resolver-nivel', ['apuntar-y-disparar'], 'niveles-fijos')])
+        r = self.recomendar()
+        self.assertEqual([c['id'] for c in r['ranking']], ['libre'])
+        self.assertEqual([(e['id'], e['motivo']) for e in r['en_espera']], [('bloqueada', 'falta una revisión humana')])
+        self.assertIn(('ya-hecha', 'ya está construida'), [(e['id'], e['motivo']) for e in r['excluidas']])
+        self.assertIn('falta una revisión humana', '\n'.join(rumbo.informe(r)))
+
+    def test_lo_parecido_se_penaliza_y_se_avisa_que_no_es_apto_para_portales(self):
+        # mismo género y verbo que Guerreros, otro objetivo: no es variante, pero tampoco es un juego distinto
+        self.ideas([idea('parecida', 'simulador-batalla', 'colocar', 'sobrevivir', ['toque'], 'niveles-con-oro'),
+                    idea('distinta', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'niveles-con-oro')])
+        r = self.recomendar()
+        por_id = {c['id']: c for c in r['ranking']}
+        self.assertEqual((por_id['parecida']['novedad'], por_id['distinta']['novedad']), ('parecido', 'distinto'))
+        self.assertEqual(por_id['parecida']['factores']['novedad'], met.cargar_politica(self.raiz)['rumbo']['factor_novedad']['parecido'])
+        self.assertLess(por_id['parecida']['puntaje'], por_id['distinta']['puntaje'])
+        self.assertIn('no apta para portales', '\n'.join(rumbo.informe(r)))
+
+    def test_poca_evidencia_no_cambia_el_modo_y_se_dice_que_falta(self):
+        self.ideas([IDEA_COMO_GUERREROS, IDEA_COMO_TORRE])
+        self.tres_semanas(JUEGO, 300)
+        self.tres_semanas(TORRE, 50)                               # 150 vistas: menos del mínimo
+        r = self.recomendar()
+        self.assertEqual(r['modo'], 'explorar')
+        self.assertTrue(r['datos'][JUEGO]['medible'])
+        self.assertFalse(r['datos'][TORRE]['medible'])
+        self.assertIn('faltan 50 vistas', ' '.join(r['datos'][TORRE]['faltan']))
+        self.assertIn('faltan 50 vistas del juego', '\n'.join(rumbo.informe(r)))
+
+    def test_pocas_semanas_tampoco_bastan_aunque_haya_muchas_vistas(self):
+        self.vistas(JUEGO, [('2026-11-09', 5000), ('2026-11-16', 5000)])
+        self.vistas(TORRE, [('2026-11-09', 5000), ('2026-11-16', 5000)])
+        r = self.recomendar()
+        self.assertEqual(r['modo'], 'explorar')
+        self.assertIn('faltan 1 semana', ' '.join(r['datos'][JUEGO]['faltan']))
+
+    def test_la_semana_en_curso_no_cuenta(self):
+        self.tres_semanas(JUEGO, 300)
+        self.anota(JUEGO, 'vistas_juego', 100000, '2026-11-23')              # la semana de HOY, sin terminar
+        d = self.recomendar()['datos'][JUEGO]
+        self.assertEqual((d['semanas'], d['vistas_juego']), (3, 900))
+
+    def test_los_ceros_antes_del_primer_dia_con_visitas_no_cuentan_como_semanas_de_exposicion(self):
+        self.vistas(JUEGO, [('2026-10-26', 0), ('2026-11-02', 0), ('2026-11-09', 300), ('2026-11-16', 300)])
+        d = self.recomendar()['datos'][JUEGO]
+        self.assertEqual((d['semanas'], d['vistas_juego']), (2, 600))
+
+    def test_con_evidencia_suficiente_aprende_y_las_ideas_cercanas_al_juego_que_funciono_suben(self):
+        self.ideas([IDEA_COMO_TORRE, IDEA_COMO_GUERREROS])
+        self.tres_semanas(JUEGO, 300)
+        self.tres_semanas(TORRE, 100)
+        r = self.recomendar()
+        self.assertEqual(r['modo'], 'aprender')
+        self.assertGreater(r['puntajes'][JUEGO]['puntaje'], 1)
+        self.assertLess(r['puntajes'][TORRE]['puntaje'], 1)
+        self.assertEqual([c['id'] for c in r['ranking']], ['cercana-a-guerreros', 'cercana-a-torre'])
+
+    def test_si_los_datos_se_invierten_se_invierte_el_orden(self):
+        self.ideas([IDEA_COMO_GUERREROS, IDEA_COMO_TORRE])
+        self.tres_semanas(JUEGO, 100)
+        self.tres_semanas(TORRE, 300)
+        self.assertEqual([c['id'] for c in self.recomendar()['ranking']], ['cercana-a-torre', 'cercana-a-guerreros'])
+
+    def test_el_puntaje_se_suaviza_hacia_el_promedio_con_poca_evidencia(self):
+        self.tres_semanas(JUEGO, 70)                               # 210 vistas
+        self.tres_semanas(TORRE, 67)                               # 201 vistas: casi iguales
+        p = self.recomendar()['puntajes']
+        self.assertAlmostEqual(p[JUEGO]['puntaje'], 1.0, delta=0.05)
+        self.assertAlmostEqual(p[TORRE]['puntaje'], 1.0, delta=0.05)
+
+    def test_la_difusion_se_descuenta_para_no_premiar_a_un_juego_solo_por_haberse_anunciado_mas(self):
+        self.tres_semanas(JUEGO, 300)
+        self.tres_semanas(TORRE, 300)
+        base = self.recomendar()['puntajes']
+        self.assertAlmostEqual(base[JUEGO]['puntaje'], base[TORRE]['puntaje'], places=9)
+        libro = [{'ts': '2026-11-03T15:00:00Z', 'resultado': 'ok', 'canal': 'bluesky', 'juego': JUEGO},
+                 {'ts': '2026-11-04T15:00:00Z', 'resultado': 'ok', 'canal': 'mastodon', 'juego': JUEGO},
+                 {'ts': '2026-11-05T15:00:00Z', 'resultado': 'ok', 'canal': 'sitio-propio', 'juego': JUEGO},       # el sitio no es empuje
+                 {'ts': '2026-11-06T15:00:00Z', 'resultado': 'fallo', 'canal': 'bluesky', 'juego': JUEGO}]          # lo que no salió tampoco
+        con = self.recomendar(libro)
+        self.assertEqual(con['datos'][JUEGO]['empuje'], 2)
+        self.assertLess(con['puntajes'][JUEGO]['puntaje'], con['puntajes'][TORRE]['puntaje'])
+
+    def test_aceptacion_y_apoyo_solo_cuentan_cuando_hay_con_que_compararlos(self):
+        pol = met.cargar_politica(self.raiz)
+
+        def d(jid, pos, neg, dinero):
+            return {'id': jid, 'medible': True, 'vistas_juego': 500, 'exposicion': 4, 'pos': pos, 'neg': neg, 'dinero': dinero}
+        solo_alcance = rumbo.puntajes({'a': d('a', 3, 1, 0), 'b': d('b', 2, 2, 0)}, pol)               # menos de 10 comentarios y nadie pagó nada
+        self.assertEqual(set(solo_alcance['a']['componentes']), {'alcance'})
+        completo = rumbo.puntajes({'a': d('a', 18, 2, 5.0), 'b': d('b', 10, 10, 0)}, pol)
+        self.assertEqual(set(completo['a']['componentes']), {'alcance', 'aceptacion', 'apoyo'})
+        self.assertGreater(completo['a']['componentes']['aceptacion'], 1)
+        self.assertLess(completo['b']['componentes']['aceptacion'], 1)
+        self.assertGreater(completo['a']['componentes']['apoyo'], completo['b']['componentes']['apoyo'])
+        uno_con_comentarios = rumbo.puntajes({'a': d('a', 18, 2, 0), 'b': d('b', 2, 2, 0)}, pol)
+        self.assertNotIn('aceptacion', uno_con_comentarios['a']['componentes'])                          # con un solo juego no hay contra qué comparar
+
+    def test_el_informe_no_lleva_fechas_ni_claves(self):
+        self.ideas([IDEA_COMO_GUERREROS])
+        self.tres_semanas(JUEGO, 300)
+        self.tres_semanas(TORRE, 100)
+        texto = '\n'.join(rumbo.informe(self.recomendar(), detalle=True))
+        self.assertNotRegex(texto, r'\d{4}-\d\d-\d\d')
+        for valor in list(SECRETOS.values()) + [TOKEN_CF, CUENTA_CF]:
+            self.assertNotIn(valor, texto)
+        self.assertIn('Recomendar no es lanzar', texto)
+
+    def test_datos_de_cloudflare_con_el_sitio_diciendo_que_no_hay_analitica_se_avisa(self):
+        self.tres_semanas(JUEGO, 300)
+        self.assertTrue(any('no declara `"analitica": "cloudflare"`' in a for a in self.recomendar()['avisos']))
+        self.p.editar('publicacion/sitio.json', lambda d: d.update(analitica='cloudflare'))
+        self.assertFalse(any('analitica' in a for a in self.recomendar()['avisos']))
+
+    def test_datos_manuales_no_disparan_el_aviso_de_analitica(self):
+        self.anota(JUEGO, 'comentarios_pos', 3, '2026-11-09', 'manual')
+        self.assertFalse(any('analitica' in a for a in self.recomendar()['avisos']))
+
+
+class PruebasMetricasEnLaFabrica(BaseMetricas):
+    def fabrica(self, *args, env=None):
+        e = {'PYTHONHASHSEED': '5', 'PATH': '/usr/bin:/bin'}
+        e.update(env or {})
+        return subprocess.run([sys.executable, '-I', str(self.raiz / 'fabrica.py'), *args], capture_output=True, text=True, env=e, cwd=str(self.raiz))
+
+    def test_anotar_ver_y_rumbo_desde_la_linea_de_comandos(self):
+        r = self.fabrica('metricas', 'anotar', JUEGO, 'vistas_juego', '123', '--semana', '2026-11-09', '--fuente', 'itch', '--nota', 'de itch')
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn('Anotado: 2026-11-09', r.stdout)
+        r = self.fabrica('metricas', 'ver')
+        self.assertIn('123', r.stdout)
+        r = self.fabrica('rumbo')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('Recomendación, en orden', r.stdout)
+
+    def test_un_dato_malo_sale_con_codigo_distinto_de_cero_y_sin_escribir(self):
+        r = self.fabrica('metricas', 'anotar', JUEGO, 'vistas_juego', 'mucho')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertEqual(met.leer(self.raiz, IDS), [])
+
+    def test_importar_de_cloudflare_es_opcional_sin_secretos_pero_manual_los_exige(self):
+        r = self.fabrica('metricas', 'cloudflare', '--opcional')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('es opcional', r.stdout)
+        r = self.fabrica('metricas', 'cloudflare')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('faltan', r.stdout + r.stderr)
+
+    def test_el_ciclo_incluye_el_rumbo_y_un_registro_roto_lo_hace_fallar_a_la_vista(self):
+        r = self.fabrica('ciclo')
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        texto = (self.raiz / 'publicacion' / 'PENDIENTE.md').read_text(encoding='utf-8')
+        self.assertIn('## Qué construir después', texto)
+        self.assertIn('Todavía no hay datos para decidir por métricas', texto)
+        (self.raiz / 'metricas' / 'registro.csv').write_text(','.join(met.ENCABEZADO) + '\nfecha-mala,%s,vistas_juego,1,manual,\n' % JUEGO, encoding='utf-8')
+        r = self.fabrica('ciclo')
+        self.assertNotEqual(r.returncode, 0)
+        texto = (self.raiz / 'publicacion' / 'PENDIENTE.md').read_text(encoding='utf-8')
+        self.assertIn('No se pudo calcular el rumbo', texto)
+        self.assertIn('línea 2', texto)
+        self.assertIn('## %s (v' % JUEGO, texto)                         # el resto del estado se escribe igual
+
+    def test_el_flujo_semanal_usa_las_claves_que_el_codigo_lee_y_guarda_el_registro(self):
+        texto = (RAIZ / '.github' / 'workflows' / 'ciclo.yml').read_text(encoding='utf-8')
+        self.assertEqual(set(re.findall(r'\$\{\{ secrets\.(\w+) \}\}', texto)), {met.VARIABLE_TOKEN, met.VARIABLE_CUENTA})
+        self.assertIn('metricas cloudflare --opcional', texto)
+        self.assertIn('git add publicacion/PENDIENTE.md metricas/registro.csv', texto)
+        self.assertIn('continue-on-error: true', texto)                       # un token vencido no debe apagar el latido semanal
+        guia = (RAIZ / 'LEEME-DUENO.md').read_text(encoding='utf-8')
+        for clave in (met.VARIABLE_TOKEN, met.VARIABLE_CUENTA, 'Account Analytics'):
+            self.assertIn(clave, guia)
+
+
+class PruebasAnaliticaEnElSitio(BaseMetricas):
+    def privacidad(self, idioma):
+        self.p.regenerar_sitio()
+        return (self.raiz / 'dist' / 'sitio' / idioma / 'privacidad' / 'index.html').read_text(encoding='utf-8')
+
+    def test_por_defecto_el_sitio_dice_que_no_usa_analitica(self):
+        self.assertNotIn('analitica', json.loads((self.raiz / 'publicacion' / 'sitio.json').read_text(encoding='utf-8')))
+        self.assertIn('herramientas de análisis', self.privacidad('es'))
+        self.assertNotIn('Cloudflare Web Analytics', self.privacidad('es'))
+
+    def test_con_cloudflare_la_privacidad_lo_dice_en_los_tres_idiomas_y_no_afirma_lo_contrario(self):
+        self.p.editar('publicacion/sitio.json', lambda d: d.update(analitica='cloudflare'))
+        for idioma, frase_que_ya_no_debe_estar in (('es', 'herramientas de análisis'), ('en', 'analytics tools'), ('zh', '不使用统计分析工具')):
+            h = self.privacidad(idioma)
+            self.assertIn('Cloudflare Web Analytics', h, idioma)
+            self.assertNotIn(frase_que_ya_no_debe_estar, h, idioma)
+
+    def test_con_anuncios_y_analitica_salen_los_dos_parrafos(self):
+        self.p.editar('publicacion/sitio.json', lambda d: d.update(analitica='cloudflare', adsense_publisher='pub-1234567890123456'))
+        h = self.privacidad('es')
+        self.assertIn('AdSense', h)
+        self.assertIn('Cloudflare Web Analytics', h)
+
+    def test_un_valor_desconocido_de_analitica_detiene_la_generacion(self):
+        self.p.editar('publicacion/sitio.json', lambda d: d.update(analitica='otra-herramienta'))
+        with self.assertRaises(gen.ErrorSitio):
+            self.p.regenerar_sitio()
+
+    def test_la_analitica_no_cambia_nada_del_resto_del_sitio(self):
+        self.p.regenerar_sitio()
+        antes = {str(r.relative_to(self.raiz / 'dist' / 'sitio')): r.read_bytes() for r in (self.raiz / 'dist' / 'sitio').rglob('*') if r.is_file()}
+        self.p.editar('publicacion/sitio.json', lambda d: d.update(analitica='cloudflare'))
+        self.p.regenerar_sitio()
+        despues = {str(r.relative_to(self.raiz / 'dist' / 'sitio')): r.read_bytes() for r in (self.raiz / 'dist' / 'sitio').rglob('*') if r.is_file()}
+        self.assertEqual(sorted(k for k in antes if antes[k] != despues.get(k)), ['en/privacidad/index.html', 'es/privacidad/index.html', 'zh/privacidad/index.html'])
 
 
 if __name__ == '__main__':

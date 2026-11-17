@@ -223,7 +223,7 @@ def plan(spec):
         '| Itch.io o portales (opcional) | Ambos | Texto y archivos listos en `ficha-itch.md` y el zip; la página se crea a mano. Con butler: `butler push salida/%s/%s-web.zip tuusuario/tujuego:html5` y marcar HTML5 en «Edit game». |' % (spec['id'], spec['id']),
         '', '## Después del lanzamiento', '',
         '| Cuándo | Quién | Qué |', '|---|---|---|',
-        '| Cada 3 días, 2 semanas | Yo | Leer métricas y comentarios; anotar en metricas.csv; proponer respuestas (tú apruebas). |',
+        '| Cada 3 días, 2 semanas | Yo | Leer métricas y comentarios; anotarlos con `python3 fabrica.py metricas anotar` (las vistas de Cloudflare entran solas si la medición está activada); proponer respuestas (tú apruebas). |',
         '| Semana 2 | Yo | Parche con lo que repita la gente (error, balance, claridad). Subir la versión y volver a pasar por «publicar»: un parche actualiza el sitio sin volver a publicar en redes. |',
         '| Semana 3-4 | Ambos | Paquete nuevo si hay interés. |',
         '| Semana 4 | Tú | Decidir con datos: seguir, cambiar de enfoque o lanzar el siguiente juego. |',
@@ -488,7 +488,7 @@ def difusion(spec, salida, datos, resp, titulo_previo, nov=None):
           'Los portales (CrazyGames, Poki, Playgama) se evalúan desde el D28: cada uno se prepara solo si el juego cumple sus requisitos y hay datos de itch.io que lo justifiquen.', '',
           '## Banco de respuestas', ''] + banco_respuestas(spec, resp) + [
           '## Qué se mide y cómo se decide', '',
-          'Se anota en `metricas.csv` cada 3 días durante 2 semanas y después una vez por semana: fecha, vistas, partidas o descargas, ingresos, donaciones, comentarios, de dónde llegó la gente y notas. '
+          'Se anota en el registro de la fábrica (`metricas/registro.csv`, con `python3 fabrica.py metricas anotar JUEGO METRICA VALOR`) cada 3 días durante 2 semanas y después una vez por semana: vistas del juego y de la ficha, comentarios favorables y desfavorables, donaciones e ingresos en dólares y de dónde llegó la gente (la fuente). Ese registro es lo que lee `python3 fabrica.py rumbo` para recomendar qué construir después; `metricas.csv` de esta carpeta queda como libreta para notas libres. '
           'Cómo leer los números (criterio mío, no de las plataformas):', '',
           '| Lo que ves | Probable causa | Qué se cambia |', '|---|---|---|',
           '| Pocas vistas | Nadie encuentra la página | La difusión (devlog, video, comunidades, inglés), no el juego |',
