@@ -29,6 +29,7 @@ Uso:
   python3 fabrica.py publicar ID [--solo canal,canal]     (muestra el plan y las compuertas; no publica nada)
   python3 fabrica.py publicar ID --ejecutar --aprobar HUELLA   (publica EXACTAMENTE lo que esa huella cubre)
   python3 fabrica.py resolver ACCION salio|no-salio       (anota qué pasó con un envío que quedó en duda)
+  python3 fabrica.py calendario [--aprobar HUELLA_DEL_LOTE | --ejecutar]   (publicaciones propias del calendario: se aprueban por lote y salen en su fecha)
   python3 fabrica.py configurar bluesky-bot|mastodon-bot [--ejecutar]   (ajuste de una sola vez en la cuenta del bot)
 """
 import base64
@@ -389,6 +390,31 @@ def publicar(juego_id):
         sys.exit('[publicar] hubo acciones sin completar (ver arriba). Lo que salió quedó anotado en publicacion/libro.jsonl')
 
 
+def calendario_cmd():
+    """calendario | calendario --aprobar HUELLA_DEL_LOTE | calendario --ejecutar"""
+    nucleo, adaptadores = _publicacion()
+    from publicacion import calendario
+    ent = nucleo.Entorno()
+    hoy = ent.ahora().date()
+    try:
+        if _opcion('--aprobar'):
+            ids = calendario.aprobar(RAIZ, hoy, _opcion('--aprobar'))
+            print('[calendario] aprobadas %d publicación(es): %s\nQueda anotado en contenido/aprobaciones.json: súbelo al repositorio para que la tarea diaria lo vea.' % (len(ids), ', '.join(ids)))
+            return
+        if '--ejecutar' in sys.argv:
+            informe, ok = calendario.ejecutar(RAIZ, hoy, ent, adaptadores)
+            publicadas = [l for l in informe if l['resultado'] == 'ok']
+            print('Calendario del %s: %s' % (hoy.isoformat(), '%d publicada(s)' % len(publicadas) if publicadas else 'nada que publicar hoy'))
+            for l in informe:
+                print('  %-9s %-9s %s — %s' % (l['resultado'], l['canal'], l['accion'], l['detalle']))
+            if not ok:
+                sys.exit('[calendario] algo quedó sin completar o en duda (ver arriba). Lo que salió quedó anotado en publicacion/libro.jsonl')
+            return
+        print(calendario.mostrar(calendario.estado(RAIZ, hoy)))
+    except calendario.ErrorCalendario as e:
+        sys.exit('[calendario] ' + str(e))
+
+
 def resolver(accion_id, resultado):
     nucleo, _ = _publicacion()
     if resultado not in ('salio', 'no-salio'):
@@ -598,6 +624,8 @@ if __name__ == '__main__':
         publicar(objetivo)
     elif orden == 'resolver' and len(sys.argv) > 3:
         resolver(sys.argv[2], sys.argv[3])
+    elif orden == 'calendario':
+        calendario_cmd()
     elif orden == 'configurar' and len(sys.argv) > 2:
         configurar(sys.argv[2])
     elif orden in ('construir', 'probar', 'kit', 'revisar', 'todo'):

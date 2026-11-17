@@ -138,6 +138,14 @@ El camino para crecer es una **plantilla nueva** (otro género), no otra ficha d
 - Un juego solo sale en el sitio cuando su id se agrega a `publicacion/sitio.json → juegos`. Esa línea es la decisión de lanzarlo.
 - Torre Gelatina tiene riesgo alto de parecerse a un juego de fuera: no va a portales, solo a tu sitio (ya está en la lista del sitio, junto a Guerreros).
 
+## Publicaciones del calendario
+
+Además de los lanzamientos, preparo publicaciones propias (hoy, una tarjeta por cada Leyenda de Guerreros Gelatina). Tú aprobaste el primer lote viendo cada texto, su imagen y su fecha. Salen solas, una por día como mucho, a las 10:00 de la Ciudad de México, y solo si siguen siendo exactamente lo que aprobaste.
+
+- **Para frenar una:** dímelo y la quito del calendario, o bórrala desde tu cuenta de Bluesky si ya salió.
+- **Para cambiar una:** cualquier cambio (texto, imagen o fecha) la deja sin aprobar y te la vuelvo a mostrar.
+- **Si algo falla:** la publicación espera al día siguiente (3 días como máximo) y no sale dos veces. Si el servicio no contesta y no se sabe si salió, se detiene y te aviso.
+
 ## Medir visitas y decidir el rumbo
 
 **Cómo decide la fábrica qué construir después.** Todo dato vive en `metricas/registro.csv` (una fila por semana, juego, métrica y fuente) y `python3 fabrica.py rumbo` lo lee junto con el cuaderno de ideas. Cada lunes, el ciclo semanal repite el cálculo y lo deja en `PENDIENTE.md`. Tiene dos modos:

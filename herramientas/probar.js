@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { dibujarUnidades, tipografias } = require('./arte.js');
 
 const RAIZ = path.resolve(__dirname, '..');
 const id = process.argv[2];
@@ -60,42 +61,9 @@ async function correr(browser, nombre, slug, opts) {
   await ctx.close();
 }
 
-// Portada «de héroes»: las Leyendas se dibujan con el propio código del juego (la plantilla expone drawJelly solo dentro de su función; aquí se
-// pone una copia temporal de index.html con una línea más que la deja a mano) y quedan sobre fondo transparente. No toca el juego publicado.
+// Portada «de héroes»: las Leyendas se dibujan con el propio código del juego (herramientas/arte.js) y quedan sobre fondo transparente.
 // juego.json → portada.reparto: [tipo, equipo (0 azul, 1 rojo), x, y, escala, dirección (1 | -1), golpe (0 a 1)] sobre un lienzo de 630×500.
-async function arteHeroes(browser, reparto) {
-  const origen = path.join(dir, 'index.html');
-  let html = fs.readFileSync(origen, 'utf8');
-  const gancho = 'else boot();\n})();';
-  if (html.split(gancho).length !== 2) throw new Error('la plantilla de «' + id + '» no permite dibujar la portada de héroes (no encuentro «else boot();» al final de su script)');
-  html = html.replace(gancho, 'else boot();\nwindow.__dibujo = { drawJelly, UNITS, teamColor };\n})();');
-  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'portada-'));
-  try {
-    const archivo = path.join(tmp, 'juego.html');
-    fs.writeFileSync(archivo, html);
-    const ctx = await browser.newContext({ viewport: { width: 1300, height: 900 } });
-    const page = await ctx.newPage();
-    await page.goto('file://' + archivo);
-    await page.waitForSelector('#cv');
-    const url = await page.evaluate((lista) => {
-      const { drawJelly, UNITS, teamColor } = window.__dibujo;
-      const c = document.createElement('canvas'); c.width = 1260; c.height = 1000;
-      const x = c.getContext('2d'); x.scale(2, 2);
-      for (const [t] of lista) if (!UNITS[t]) throw new Error('portada.reparto: la unidad «' + t + '» no existe');
-      for (const [t, eq, px, py, s, dir, golpe] of lista.slice().sort((a, b) => a[3] - b[3])) {   // de atrás hacia adelante
-        const r = UNITS[t].r * s, col = teamColor(eq);
-        x.fillStyle = 'rgba(8,16,40,.38)'; x.beginPath(); x.ellipse(px, py + r * 0.7, r * 1.15, r * 0.42, 0, 0, Math.PI * 2); x.fill();
-        x.globalAlpha = 0.9; x.strokeStyle = col; x.lineWidth = 1.3 * s; x.beginPath(); x.ellipse(px, py + r * 0.7, r * 1.17, r * 0.48, 0, 0, Math.PI * 2); x.stroke();
-        x.globalAlpha = 0.55; x.strokeStyle = '#ffd24a'; x.lineWidth = 0.8 * s; x.beginPath(); x.ellipse(px, py + r * 0.7, r * 1.34, r * 0.58, 0, 0, Math.PI * 2); x.stroke();
-        x.globalAlpha = 1;
-        drawJelly(x, t, col, px, py, { scale: s, dir, swing: golpe });
-      }
-      return c.toDataURL('image/png');
-    }, reparto);
-    await ctx.close();
-    return url;
-  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
-}
+const arteHeroes = (browser, reparto) => dibujarUnidades(browser, path.join(dir, 'index.html'), reparto, { ancho: 630, alto: 500, densidad: 2 });
 
 function lineasDeTitulo(titulo) {   // dos líneas lo más parejas posible; un título de una sola palabra queda en una línea
   const w = String(titulo).trim().split(/\s+/);
@@ -111,14 +79,7 @@ async function portada(browser) {
   const heroes = p.estilo === 'heroes';
   const fuente = path.join(medios, 'portada-fuente.png');
   if (!heroes && !fs.existsSync(fuente)) { chequear(false, 'el escenario no dejó portada-fuente.png'); return; }
-  const mapa = JSON.parse(fs.readFileSync(path.join(RAIZ, 'motor', 'fuentes', 'fuentes.json'), 'utf8'));
-  let css = '';
-  for (const fam of ['Fredoka', 'Nunito Sans']) {
-    for (const [peso, arch] of Object.entries(mapa[fam])) {
-      const b64 = fs.readFileSync(path.join(RAIZ, 'motor', 'fuentes', arch)).toString('base64');
-      css += "@font-face{font-family:'" + fam + "';font-weight:" + peso + ';src:url(data:font/woff2;base64,' + b64 + ") format('woff2')}\n";
-    }
-  }
+  const css = tipografias(RAIZ);
   const idioma = spec.idiomas[0], f = spec.ficha[idioma];
   const gratis = ['donar', 'gratis'].includes((spec.precio || {}).modo);
   const sello = idioma === 'en' ? (gratis ? 'Free in your browser' : 'Play in your browser') : (gratis ? 'Gratis en el navegador' : 'Juega en el navegador');

@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="utf-8">
+<!-- Tarjeta de «Leyenda de la semana» (herramientas/tarjetas.js). Marcas con doble arroba: tipografías incrustadas, arte (el personaje sobre fondo transparente, dibujado con el código del juego),
+     etiqueta, nombre, poder, frase, título del juego, sello y nombre del estudio. 800×450 px CSS a densidad 1.5 = 1200×675. -->
+<style>
+@@FUENTES@@
+*{box-sizing:border-box}
+html,body{margin:0;width:800px;height:450px;overflow:hidden}
+body{position:relative;font-family:'Fredoka',system-ui,sans-serif;color:#fff;background:linear-gradient(180deg,#171c5c 0%,#33288a 42%,#7a3a9e 72%,#d2507a 100%)}
+.rayos{position:absolute;left:-40%;top:-90%;width:180%;height:260%;
+  background:repeating-conic-gradient(from 0deg at 29% 66%,rgba(255,255,255,.10) 0deg 6deg,rgba(255,255,255,0) 6deg 16deg);
+  -webkit-mask-image:radial-gradient(circle at 29% 66%,#000 0%,rgba(0,0,0,.5) 14%,transparent 30%);mask-image:radial-gradient(circle at 29% 66%,#000 0%,rgba(0,0,0,.5) 14%,transparent 30%)}
+.brillo{position:absolute;left:-30px;top:170px;width:560px;height:420px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,226,140,.55),rgba(255,160,120,.18) 55%,rgba(255,160,120,0))}
+.suelo{position:absolute;left:-200px;right:-200px;top:318px;height:520px;border-radius:50%/30%;
+  background:radial-gradient(ellipse at 30% 14%,#a6dd6e 0%,#7cc455 45%,#55a243 100%);box-shadow:inset 0 7px 0 rgba(255,255,255,.28),0 -10px 40px rgba(255,220,150,.25)}
+.suelo::after{content:"";position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(90deg,rgba(255,255,255,0) 0 52px,rgba(255,255,255,.07) 52px 104px)}
+.chispa{position:absolute;width:var(--s);height:var(--s);background:var(--c,#fff);opacity:var(--o,.9);clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
+.arte{position:absolute;left:0;top:0;width:800px;height:450px}
+.col{position:absolute;left:452px;top:34px;width:324px}
+.etiqueta{display:inline-block;margin:0;font:700 13px 'Nunito Sans',system-ui,sans-serif;letter-spacing:1.6px;text-transform:uppercase;color:#2a1a5e;background:linear-gradient(180deg,#ffe27a,#ffc233);padding:6px 14px 7px;border-radius:999px;box-shadow:0 3px 0 #b9790f}
+.nombre{margin:14px 0 0;font-weight:700;font-size:64px;line-height:.95;white-space:nowrap;letter-spacing:-.4px;-webkit-text-stroke:7px #141a4a;paint-order:stroke fill;text-shadow:0 5px 0 #0b0f38,0 12px 20px rgba(0,0,0,.35)}
+.poder{margin:20px 0 0;font:700 20px/1.38 'Nunito Sans',system-ui,sans-serif;color:#fff;text-shadow:0 2px 0 rgba(10,12,50,.55);text-wrap:pretty}
+.frase{position:absolute;left:34px;top:62px;transform:rotate(-4deg);font-weight:700;font-size:30px;line-height:1;color:#1d2a55;background:#fff;padding:9px 18px 11px;border-radius:20px;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.frase::after{content:"";position:absolute;left:62px;bottom:-14px;width:22px;height:22px;background:#fff;transform:rotate(45deg) skew(8deg,8deg);border-radius:0 0 6px 0}
+.estudio{position:absolute;left:18px;bottom:15px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:16px;letter-spacing:.2px;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.estudio svg{width:32px;height:32px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
+.juego{position:absolute;right:18px;bottom:16px;display:flex;align-items:center;gap:10px}
+.juego b{font-weight:700;font-size:20px;text-shadow:0 2px 0 rgba(0,0,0,.4);-webkit-text-stroke:3px #141a4a;paint-order:stroke fill}
+.sello{font:700 13px 'Nunito Sans',system-ui,sans-serif;color:#1d2a55;background:rgba(255,255,255,.92);padding:6px 13px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+</style>
+<div class="rayos"></div>
+<div class="brillo"></div>
+<div class="suelo"></div>
+<i class="chispa" style="left:36px;top:226px;--s:16px;--c:#ffe27a"></i>
+<i class="chispa" style="left:412px;top:300px;--s:26px;--c:#fff;--o:1"></i>
+<i class="chispa" style="left:760px;top:262px;--s:14px;--c:#ffe27a"></i>
+<i class="chispa" style="left:96px;top:150px;--s:11px;--c:#fff"></i>
+<i class="chispa" style="left:772px;top:20px;--s:18px;--c:#fff"></i>
+<img class="arte" src="@@ARTE@@" alt="">
+<div class="frase">@@FRASE@@</div>
+<div class="col"><p class="etiqueta">@@ETIQUETA@@</p><h1 class="nombre" id="nombre">@@NOMBRE@@</h1><p class="poder">@@PODER@@</p></div>
+<div class="estudio"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 31c0-13 6-24 15-24s15 11 15 24c0 3-4 4-15 4S5 34 5 31z" fill="#3fb37a"/><path d="M5 29c4 3 10 4 15 4s11-1 15-4c0 4-5 6-15 6S5 33 5 29z" fill="#2b8a5c"/><ellipse cx="13" cy="14" rx="4" ry="2.5" fill="#fff" opacity=".35" transform="rotate(-30 13 14)"/><ellipse cx="14.5" cy="22" rx="3.2" ry="3.8" fill="#fff"/><ellipse cx="25.5" cy="22" rx="3.2" ry="3.8" fill="#fff"/><circle cx="15.3" cy="22.6" r="1.7" fill="#14251b"/><circle cx="26.3" cy="22.6" r="1.7" fill="#14251b"/><path d="M16 28.5q4 3 8 0" stroke="#14251b" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span>@@ESTUDIO@@</span></div>
+<div class="juego"><b>@@JUEGO@@</b><span class="sello">@@SELLO@@</span></div>
+<script>
+// nombres largos: se achica la letra hasta que quepan en la columna
+const n = document.getElementById('nombre');
+let px = 64;
+while (n.scrollWidth > 330 && px > 30) { px -= 2; n.style.fontSize = px + 'px'; }
+</script>

@@ -40,7 +40,7 @@ PLANTILLA_PROYECTO = None
 
 
 def _copiar_proyecto(destino):
-    for carpeta in ('juegos', 'plantillas', 'catalogo', 'ideas', 'difusion', 'herramientas', 'publicacion', 'metricas'):
+    for carpeta in ('juegos', 'plantillas', 'catalogo', 'ideas', 'difusion', 'herramientas', 'publicacion', 'metricas', 'contenido'):
         shutil.copytree(RAIZ / carpeta, destino / carpeta, ignore=shutil.ignore_patterns('__pycache__', 'libro.jsonl'))
     shutil.copy(RAIZ / 'fabrica.py', destino / 'fabrica.py')
     shutil.copytree(RAIZ / 'motor', destino / 'motor')
@@ -1373,6 +1373,215 @@ class BaseMetricas(Base):
 
     def recomendar(self, libro=None):
         return rumbo.recomendar(self.raiz, HOY, libro=libro if libro is not None else [])
+
+
+class PruebasCalendario(Base):
+    """Publicaciones propias del calendario: se aprueban por lote y salen solas en su fecha, sin saltarse ninguna barrera."""
+
+    def setUp(self):
+        super().setUp()
+        from publicacion import calendario
+        self.cal = calendario
+        informe, ok = self.p.ejecutar()      # el lanzamiento: el juego queda publicado el 20 de noviembre
+        self.assertTrue(ok, informe)
+        self.p.reloj.avanzar(days=1)         # hoy es 21 de noviembre
+        self.antes = len(self.p.red.a('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord'))   # la publicación del lanzamiento no cuenta
+        (self.p.raiz / 'contenido' / 'imagenes').mkdir(parents=True, exist_ok=True)
+        from PIL import Image
+        for n in ('a', 'b', 'c'):
+            Image.new('RGB', (300, 169), (40, 60, 160)).save(self.p.raiz / 'contenido' / 'imagenes' / (n + '.png'))
+
+    @property
+    def hoy(self):
+        return self.p.reloj().date()
+
+    def item(self, id, fecha='2026-11-21', **extra):
+        d = {'id': id, 'juego': JUEGO, 'canal': 'bluesky', 'idioma': 'es', 'no_antes_de': fecha, 'texto': 'Conoce a las Leyendas (' + id + '). Zeus lanza rayos.\n\nJuega gratis: {enlace}\n{ia}',
+             'imagen': 'contenido/imagenes/a.png', 'alt': 'Tarjeta con Zeus, una gelatina azul con un rayo dorado.'}
+        d.update(extra)
+        return d
+
+    def escribir(self, *items):
+        (self.p.raiz / 'contenido' / 'calendario.json').write_text(json.dumps({'publicaciones': list(items)}, ensure_ascii=False), encoding='utf-8')
+
+    def estados(self):
+        return {l['id']: l['estado'] for l in self.cal.estado(self.p.raiz, self.hoy)}
+
+    def aprobar_todo(self):
+        lineas = self.cal.estado(self.p.raiz, self.hoy)
+        return self.cal.aprobar(self.p.raiz, self.hoy, self.cal.huella_del_lote(self.cal.pendientes_de_aprobar(lineas))[:16])
+
+    def correr(self):
+        return self.cal.ejecutar(self.p.raiz, self.p.reloj().date(), self.p.ent(), ADAPTADORES)
+
+    def posts(self):
+        return self.p.red.a('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord')[self.antes:]
+
+    def test_nada_sale_sin_aprobar(self):
+        self.escribir(self.item('uno'))
+        self.assertEqual(self.estados(), {'uno': 'sin aprobar'})
+        informe, ok = self.correr()
+        self.assertTrue(ok)
+        self.assertEqual(self.posts(), [])
+        self.assertEqual(informe[0]['resultado'], 'espera')
+
+    def test_el_lote_solo_se_aprueba_con_su_huella(self):
+        self.escribir(self.item('uno'), self.item('dos'))
+        with self.assertRaises(self.cal.ErrorCalendario):
+            self.cal.aprobar(self.p.raiz, self.hoy, 'a' * 16)
+        with self.assertRaises(self.cal.ErrorCalendario):
+            self.cal.aprobar(self.p.raiz, self.hoy, '')
+        self.assertEqual(self.cal.aprobaciones(self.p.raiz), {})
+        self.assertEqual(sorted(self.aprobar_todo()), ['dos', 'uno'])
+        self.assertEqual(set(self.cal.aprobaciones(self.p.raiz)), {'uno', 'dos'})
+        self.assertEqual(self.estados(), {'uno': 'lista', 'dos': 'lista'})
+
+    def test_publica_solo_lo_aprobado_cuya_fecha_ya_llego(self):
+        self.escribir(self.item('hoy'), self.item('futura', fecha='2026-11-27'), self.item('sin-aprobar-no-existe'))
+        # se aprueban las dos primeras; la tercera se agrega después y queda sin aprobar
+        lineas = [l for l in self.cal.estado(self.p.raiz, self.hoy) if l['id'] in ('hoy', 'futura')]
+        self.cal.aprobar(self.p.raiz, self.hoy, self.cal.huella_del_lote(lineas + [l for l in self.cal.estado(self.p.raiz, self.hoy) if l['id'] == 'sin-aprobar-no-existe'])[:16])
+        self.escribir(self.item('hoy'), self.item('futura', fecha='2026-11-27'), self.item('nueva', texto='Otro texto distinto.\n{enlace}\n{ia}'))
+        self.assertEqual(self.estados(), {'hoy': 'lista', 'futura': 'aún no es su fecha', 'nueva': 'sin aprobar'})
+        informe, ok = self.correr()
+        self.assertTrue(ok)
+        self.assertEqual(len(self.posts()), 1)
+        r = json.loads(self.posts()[0]['cuerpo'])['record']
+        self.assertIn('Conoce a las Leyendas (hoy)', r['text'])
+        self.assertEqual(r['embed']['images'][0]['alt'], 'Tarjeta con Zeus, una gelatina azul con un rayo dorado.')
+        self.assertTrue(r['facets'])
+        entrada = [e for e in self.p.libro() if e['accion'] == 'calendario:hoy:bluesky'][0]
+        self.assertEqual((entrada['resultado'], entrada['lanzamiento'], entrada['tipo']), ('ok', False, 'post'))
+
+    def test_no_publica_dos_veces_lo_mismo(self):
+        self.escribir(self.item('uno'))
+        self.aprobar_todo()
+        self.correr()
+        self.p.reloj.avanzar(hours=30)
+        informe, ok = self.correr()
+        self.assertTrue(ok)
+        self.assertEqual(len(self.posts()), 1)
+        self.assertEqual(informe[0]['resultado'], 'ya hecho')
+
+    def test_cambiar_el_texto_la_imagen_o_la_fecha_despues_de_aprobar_pide_aprobar_otra_vez(self):
+        for cambio in ({'texto': 'Otro texto.\n{enlace}\n{ia}'}, {'imagen': 'contenido/imagenes/b.png'}, {'no_antes_de': '2026-11-22'}, {'alt': 'Otra descripción.'}):
+            with self.subTest(cambio=list(cambio)):
+                (self.p.raiz / 'contenido' / 'aprobaciones.json').unlink(missing_ok=True)
+                self.escribir(self.item('uno'))
+                self.aprobar_todo()
+                self.escribir(self.item('uno', **cambio))
+                self.assertEqual(self.estados(), {'uno': 'cambió tras aprobar'})
+                self.correr()
+                self.assertEqual(self.posts(), [])
+
+    def test_cambiar_los_bytes_de_la_imagen_tambien_cambia_la_huella(self):
+        from PIL import Image
+        self.escribir(self.item('uno'))
+        self.aprobar_todo()
+        Image.new('RGB', (300, 169), (200, 10, 10)).save(self.p.raiz / 'contenido' / 'imagenes' / 'a.png')
+        self.assertEqual(self.estados(), {'uno': 'cambió tras aprobar'})
+
+    def test_una_publicacion_aprobada_pero_vencida_no_sale(self):
+        self.escribir(self.item('uno', fecha='2026-11-21'))
+        self.aprobar_todo()
+        self.p.reloj.avanzar(days=self.cal.VENTANA_DIAS + 1)
+        self.assertEqual(self.estados(), {'uno': 'vencida'})
+        self.correr()
+        self.assertEqual(self.posts(), [])
+
+    def test_una_por_canal_y_corrida_y_el_ritmo_del_canal_manda(self):
+        self.escribir(self.item('uno'), self.item('dos'))
+        self.aprobar_todo()
+        informe, _ = self.correr()
+        self.assertEqual(len(self.posts()), 1)
+        self.assertIn('una publicación por canal y corrida', ' '.join(l['detalle'] for l in informe))
+        informe, ok = self.correr()          # misma hora: el ritmo (6 h entre publicaciones) la deja pasar a la siguiente corrida
+        self.assertTrue(ok)
+        self.assertEqual(len(self.posts()), 1)
+        self.assertIn('omitido', [l['resultado'] for l in informe])
+        self.p.reloj.avanzar(hours=7)
+        self.correr()
+        self.assertEqual(len(self.posts()), 2)
+
+    def test_un_juego_que_no_se_ha_lanzado_no_entra(self):
+        nuevo = self.nuevo_proyecto('sin-lanzar')
+        (nuevo.raiz / 'contenido' / 'imagenes').mkdir(parents=True, exist_ok=True)
+        from PIL import Image
+        Image.new('RGB', (300, 169)).save(nuevo.raiz / 'contenido' / 'imagenes' / 'a.png')
+        (nuevo.raiz / 'contenido' / 'calendario.json').write_text(json.dumps({'publicaciones': [self.item('uno')]}, ensure_ascii=False), encoding='utf-8')
+        l = self.cal.estado(nuevo.raiz, self.hoy)[0]
+        self.assertEqual(l['estado'], 'con problemas')
+        self.assertTrue(any('todavía no está publicado' in p for p in l['problemas']))
+
+    def test_validaciones_del_texto_la_imagen_y_la_fecha(self):
+        casos = {
+            'marcas': (self.item('uno', texto='Hola {otra}\n{enlace}\n{ia}'), 'marcas sin resolver'),
+            'sin-enlace': (self.item('uno', texto='Sin enlace.\n{ia}'), 'no lleva el enlace'),
+            'sin-ia': (self.item('uno', texto='Sin la línea.\n{enlace}'), 'línea de IA'),
+            'largo': (self.item('uno', texto='x' * 400 + '\n{enlace}\n{ia}'), 'grafemas'),
+            'sin-alt': (self.item('uno', alt=' '), 'texto alternativo'),
+            'imagen-fuera': (self.item('uno', imagen='salida/guerreros-gelatina/medios/portada.png'), 'dentro de contenido/'),
+            'imagen-falta': (self.item('uno', imagen='contenido/imagenes/no-existe.png'), 'no existe la imagen'),
+            'fecha': (self.item('uno', no_antes_de='pronto'), 'AAAA-MM-DD'),
+            'pendiente': (self.item('uno', texto='PENDIENTE\n{enlace}\n{ia}'), 'PENDIENTE'),
+        }
+        for nombre, (it, esperado) in casos.items():
+            with self.subTest(nombre):
+                self.escribir(it)
+                (l,) = self.cal.estado(self.p.raiz, self.hoy)
+                self.assertEqual(l['estado'], 'con problemas')
+                self.assertTrue(any(esperado in p for p in l['problemas']), l['problemas'])
+                with self.assertRaises(self.cal.ErrorCalendario):
+                    self.cal.aprobar(self.p.raiz, self.hoy, 'a' * 16)
+
+    def test_ids_repetidos_o_canal_desconocido_se_rechazan(self):
+        self.escribir(self.item('uno'), self.item('uno'))
+        with self.assertRaises(self.cal.ErrorCalendario):
+            self.cal.estado(self.p.raiz, self.hoy)
+        self.escribir(self.item('uno', canal='telegram-canal'))
+        with self.assertRaises(self.cal.ErrorCalendario):
+            self.cal.estado(self.p.raiz, self.hoy)
+
+    def test_un_login_fallido_no_deja_nada_a_medias(self):
+        self.escribir(self.item('uno'))
+        self.aprobar_todo()
+        self.p.red.al('POST', 'https://bsky.social/xrpc/com.atproto.server.createSession', resp(401, {'error': 'AuthenticationRequired'}))
+        informe, ok = self.correr()
+        self.assertFalse(ok)
+        self.assertEqual(self.posts(), [])
+        self.assertEqual(self.estados(), {'uno': 'lista'})    # sigue lista: mañana se reintenta, no hubo publicación dudosa
+
+
+class PruebasCalendarioReal(unittest.TestCase):
+    """El calendario que está en el repositorio."""
+
+    def setUp(self):
+        sys.path.insert(0, str(RAIZ))
+        from publicacion import calendario
+        self.cal = calendario
+
+    def test_cada_publicacion_es_valida_y_tiene_imagen_con_la_forma_de_una_tarjeta(self):
+        from PIL import Image
+        lineas = self.cal.estado(RAIZ, datetime.date(2026, 11, 17))
+        self.assertTrue(lineas)
+        for l in lineas:
+            with self.subTest(l['id']):
+                self.assertNotEqual(l['estado'], 'con problemas', l['problemas'])
+                with Image.open(RAIZ / l['accion']['datos']['imagen']['archivo']) as im:
+                    self.assertEqual(im.size, (1200, 675))
+                self.assertIn('Hecho con ayuda de IA', l['accion']['datos']['texto'])
+        fechas = [l['fecha'] for l in lineas]
+        self.assertEqual(fechas, sorted(fechas))
+
+    def test_la_tarea_diaria_existe_y_solo_publica_lo_aprobado(self):
+        yml = (RAIZ / '.github' / 'workflows' / 'calendario.yml').read_text(encoding='utf-8')
+        self.assertIn("cron: '0 16 * * *'", yml)
+        self.assertIn('group: publicar', yml)                  # comparte el candado con «Publicar»: nunca dos escrituras del libro a la vez
+        self.assertIn('fabrica.py calendario --ejecutar', yml)
+        self.assertIn('if: ${{ always() }}', yml)              # el libro se guarda aunque algo falle
+        self.assertIn('git pull --rebase', yml)                # y si el envío choca con otro cambio, se reintenta: perderlo repetiría una publicación
+        self.assertNotIn('--aprobar', yml)                     # la tarea diaria nunca aprueba nada por su cuenta
+        self.assertNotIn('MASTODON', yml)
 
 
 class PruebasPortadaDeHeroes(unittest.TestCase):

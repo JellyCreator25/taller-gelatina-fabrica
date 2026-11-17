@@ -1,0 +1,53 @@
+name: Calendario de contenido
+# Publica, una vez al día, las publicaciones del calendario (contenido/calendario.json) que cumplen las TRES condiciones:
+#   1) el dueño las aprobó con su huella (contenido/aprobaciones.json; si el texto, la imagen o la fecha cambian, vuelven a pedir aprobación),
+#   2) ya llegó su fecha (y no pasaron más de 3 días),
+#   3) caben en el ritmo del canal (política: máximo por día y horas entre publicaciones).
+# Una publicación por canal y corrida. Nada que no esté aprobado sale de aquí. Para ver el estado sin publicar: python3 fabrica.py calendario
+on:
+  schedule:
+    - cron: '0 16 * * *'   # 16:00 UTC = 10:00 en Ciudad de México
+  workflow_dispatch:
+
+# el mismo grupo que «Publicar»: dos trabajos nunca escriben el libro de registro a la vez
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  calendario:
+    runs-on: ubuntu-latest
+    environment: produccion
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Publicar lo aprobado que ya toca
+        env:
+          BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+        shell: bash   # con pipefail: si la fábrica falla, el paso falla (sin esto, «| tee» oculta el error y la corrida sale en verde)
+        run: |
+          .venv/bin/python -I fabrica.py calendario --ejecutar | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Guardar el libro de registro, también si algo falló (lo que salió debe quedar anotado, o mañana se repetiría)
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          git config user.name "fabrica-de-juegos"
+          git config user.email "fabrica-de-juegos@users.noreply.github.com"
+          git add publicacion/libro.jsonl
+          if ! git diff --cached --quiet; then
+            git commit -m "Libro de publicación: calendario"
+            for intento in 1 2 3 4 5; do
+              git pull --rebase origin main && git push && exit 0
+              sleep 6
+            done
+            echo "No se pudo guardar el libro tras 5 intentos"; exit 1
+          fi

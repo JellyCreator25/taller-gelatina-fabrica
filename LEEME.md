@@ -96,6 +96,19 @@ Cada juego declara `idiomas` (hoy es, en y zh) y trae sus textos por idioma en `
 
 También genera dos páginas por idioma para la difusión: **Novedades** (`/es/novedades/`, `/en/novedades/`, `/zh/novedades/`), con las notas de cada versión de cada juego, y **Prensa** (`/es/prensa/`…), con los datos rápidos (plataforma, precio, idiomas, versión, cómo se hizo —con la declaración de que se usó IA—), portada y capturas en grande y el contacto, para quien quiera reseñar o mostrar los juegos. Ambas salen en el pie y en la portada, con `hreflang` y en el `sitemap.xml`. Las notas de versión se escriben en `juego.json → novedades`: una lista de `{"version", "es", "en", "zh"}`; si falta un idioma o la versión, el sitio se niega a generarse. Los parches se anuncian aquí y no en redes (ver «Parches» abajo).
 
+## Calendario de contenido
+
+Publicaciones propias que no son lanzamientos (por ejemplo «Conoce a las Leyendas», una tarjeta por personaje) viven en `contenido/calendario.json`: juego, canal (hoy solo Bluesky), `no_antes_de`, `texto` con `{enlace}` y `{ia}`, `imagen` (dentro de `contenido/`) y `alt`.
+
+```
+python3 fabrica.py calendario                              # estado de cada publicación y huella del lote pendiente
+python3 fabrica.py calendario --aprobar HUELLA_DEL_LOTE    # el dueño aprueba el lote: anota la huella de cada publicación en contenido/aprobaciones.json
+python3 fabrica.py calendario --ejecutar                   # publica lo que cumple las tres condiciones (lo corre a diario .github/workflows/calendario.yml)
+node herramientas/tarjetas.js <id-del-juego> [idioma]      # regenera las tarjetas de Leyenda (contenido/imagenes/), con el código del propio juego
+```
+
+Sale solo lo que está aprobado **con su huella actual** (texto ya resuelto, imagen, texto alternativo y fecha), ya llegó su fecha y no pasaron más de 3 días. Si algo cambia después de aprobar, esa publicación vuelve a pedir aprobación. Pasa por las barreras de siempre: compuertas, ritmo del canal, libro de registro, «incierto» sin reintentos. Una publicación por canal y corrida. La tarea diaria nunca aprueba nada.
+
 ## Métricas y rumbo
 
 Dos piezas pequeñas, sin dependencias fuera de la biblioteca estándar: `herramientas/metricas.py` (el registro y el importador de Cloudflare) y `herramientas/rumbo.py` (la recomendación). Los parámetros están en `metricas/politica.json`.
