@@ -51,6 +51,13 @@ def linea_ia(spec, idioma):
     return 'Made with the help of AI (%s).' % _unir(usados, 'en')
 
 
+def linea_ia_corta(spec, idioma):
+    """La misma transparencia, en pocas palabras, para el cierre de una publicación en redes (la lista de qué hizo la IA va en el sitio, la prensa y los portales)."""
+    if not any((spec.get('ia') or {}).get(k) for k in ('codigo', 'graficos', 'texto', 'sonido')):
+        return ''
+    return {'es': 'Hecho con ayuda de IA.', 'zh': '借助 AI 制作。'}.get(idioma, 'Made with the help of AI.')
+
+
 def texto_precio(spec):
     p = spec.get('precio') or {'modo': 'gratis'}
     modo, sug = p.get('modo', 'gratis'), p.get('sugerido_usd')

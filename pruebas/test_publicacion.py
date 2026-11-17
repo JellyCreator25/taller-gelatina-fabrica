@@ -1503,6 +1503,16 @@ class PruebasCalendario(Base):
         self.correr()
         self.assertEqual(len(self.posts()), 2)
 
+    def test_la_linea_de_ia_es_corta_por_defecto_y_se_puede_omitir(self):
+        self.escribir(self.item('con-linea', texto='Hola.\n{enlace}\n{ia}'), self.item('sin-linea', texto='Hola.\n{enlace}', ia=False), self.item('olvidada', texto='Hola.\n{enlace}'))
+        e = {l['id']: l for l in self.cal.estado(self.p.raiz, self.hoy)}
+        self.assertTrue(e['con-linea']['accion']['datos']['texto'].endswith('Hecho con ayuda de IA.'))
+        self.assertNotIn('(código', e['con-linea']['accion']['datos']['texto'])
+        self.assertEqual(e['sin-linea']['estado'], 'sin aprobar')
+        self.assertNotIn('IA', e['sin-linea']['accion']['datos']['texto'])
+        self.assertEqual(e['olvidada']['estado'], 'con problemas')     # sin «ia»: false, el texto debe llevar la línea
+        self.assertTrue(any('línea de IA' in p for p in e['olvidada']['problemas']))
+
     def test_un_juego_que_no_se_ha_lanzado_no_entra(self):
         nuevo = self.nuevo_proyecto('sin-lanzar')
         (nuevo.raiz / 'contenido' / 'imagenes').mkdir(parents=True, exist_ok=True)
@@ -1569,7 +1579,7 @@ class PruebasCalendarioReal(unittest.TestCase):
                 self.assertNotEqual(l['estado'], 'con problemas', l['problemas'])
                 with Image.open(RAIZ / l['accion']['datos']['imagen']['archivo']) as im:
                     self.assertEqual(im.size, (1200, 675))
-                self.assertIn('Hecho con ayuda de IA', l['accion']['datos']['texto'])
+                self.assertNotIn('Hecho con ayuda de IA', l['accion']['datos']['texto'])   # ia: false (decisión del dueño); el perfil y el sitio lo dicen
         fechas = [l['fecha'] for l in lineas]
         self.assertEqual(fechas, sorted(fechas))
 
@@ -1582,6 +1592,29 @@ class PruebasCalendarioReal(unittest.TestCase):
         self.assertIn('git pull --rebase', yml)                # y si el envío choca con otro cambio, se reintenta: perderlo repetiría una publicación
         self.assertNotIn('--aprobar', yml)                     # la tarea diaria nunca aprueba nada por su cuenta
         self.assertNotIn('MASTODON', yml)
+
+
+class PruebasLineaDeIA(Base):
+    def test_los_posts_de_lanzamiento_cierran_con_la_linea_corta_y_el_kit_y_youtube_conservan_la_larga(self):
+        import kit_lanzamiento
+        sys.path.insert(0, str(self.p.raiz / 'herramientas'))
+        self.addCleanup(sys.path.remove, str(self.p.raiz / 'herramientas'))
+        ctx, plan, problemas = self.p.plan()
+        post = [a for a in plan['acciones'] if a['canal'] == 'bluesky'][0]['datos']['texto']
+        self.assertTrue(post.endswith(ctx.linea_ia_corta('es')))
+        self.assertNotIn('(código', post)
+        self.assertIn('código', kit_lanzamiento.linea_ia(ctx.spec, 'es'))          # la lista de qué hizo la IA sigue completa en el sitio, la prensa y los portales
+        self.assertEqual(ctx.linea_ia_corta('es'), 'Hecho con ayuda de IA.')
+        self.assertEqual(ctx.linea_ia_corta('en'), 'Made with the help of AI.')
+        self.assertTrue(ctx.linea_ia_corta('zh').startswith('借助 AI'))
+        yt = [a for a in plan['acciones'] if a['canal'] == 'youtube-api']
+        self.assertTrue(yt and 'código' in json.dumps(yt[0]['datos'], ensure_ascii=False))
+
+    def test_sin_ia_declarada_no_hay_linea(self):
+        import kit_lanzamiento
+        sys.path.insert(0, str(self.p.raiz / 'herramientas'))
+        self.addCleanup(sys.path.remove, str(self.p.raiz / 'herramientas'))
+        self.assertEqual(kit_lanzamiento.linea_ia_corta({'ia': {}}, 'es'), '')
 
 
 class PruebasPortadaDeHeroes(unittest.TestCase):

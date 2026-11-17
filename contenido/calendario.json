@@ -1,5 +1,5 @@
 {
-  "nota": "Calendario de contenido propio. Cada publicación necesita la aprobación del dueño (python3 fabrica.py calendario). {enlace} y {ia} se completan solos con el enlace del juego y su línea de IA.",
+  "nota": "Calendario de contenido propio. Cada publicación necesita la aprobación del dueño (python3 fabrica.py calendario). {enlace} se completa solo con el enlace del juego; «ia»: false omite la línea corta «Hecho con ayuda de IA.» (el perfil de la cuenta, que es un bot, y el sitio ya lo dicen).",
   "publicaciones": [
     {
       "id": "leyenda-zeus",
@@ -7,9 +7,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-20",
-      "texto": "Conoce a las Leyendas (1/8): Zeus. Cada 6.5 s invoca una tormenta y 3 rayos caen sobre los enemigos cercanos. ¿Lo pones al frente o bien guardado atrás?\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (1/8): Zeus. Cada 6.5 s invoca una tormenta y 3 rayos caen sobre los enemigos cercanos. ¿Lo pones al frente o bien guardado atrás?\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-zeus.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Zeus. Una gelatina azul con barba blanca, aureola dorada y un rayo. A la derecha, su nombre y su poder: Dios del trueno. Cada 6.5 s invoca una tormenta: 3 rayos caen sobre los enemigos cercanos."
+      "alt": "Tarjeta de Guerreros Gelatina con Zeus. Una gelatina azul con barba blanca, aureola dorada y un rayo. A la derecha, su nombre y su poder: Dios del trueno. Cada 6.5 s invoca una tormenta: 3 rayos caen sobre los enemigos cercanos.",
+      "ia": false
     },
     {
       "id": "leyenda-medusa",
@@ -17,9 +18,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-24",
-      "texto": "Conoce a las Leyendas (2/8): Medusa. Su mirada petrifica a los enemigos cercanos 3 s: no se mueven ni atacan y reciben más daño.\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (2/8): Medusa. Su mirada petrifica a los enemigos cercanos 3 s: no se mueven ni atacan y reciben más daño.\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-medusa.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Medusa. Una gelatina roja con serpientes verdes en lugar de pelo. A la derecha, su nombre y su poder: Su mirada petrifica a los enemigos cercanos 3 s: no se mueven ni atacan y reciben más daño."
+      "alt": "Tarjeta de Guerreros Gelatina con Medusa. Una gelatina roja con serpientes verdes en lugar de pelo. A la derecha, su nombre y su poder: Su mirada petrifica a los enemigos cercanos 3 s: no se mueven ni atacan y reciben más daño.",
+      "ia": false
     },
     {
       "id": "leyenda-merlin",
@@ -27,9 +29,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-27",
-      "texto": "Conoce a las Leyendas (3/8): Merlín. Mago del rey Arturo. Cada 5 s convierte en ranas a los 2 enemigos más fuertes que tenga cerca. ¡Croac!\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (3/8): Merlín. Mago del rey Arturo. Cada 5 s convierte en ranas a los 2 enemigos más fuertes que tenga cerca. ¡Croac!\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-merlin.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Merlín. Una gelatina azul con sombrero de mago, barba blanca y un bastón con una esfera celeste. A la derecha, su nombre y su poder: Mago del rey Arturo. Cada 5 s convierte en ranas a los 2 enemigos más fuertes que tenga cerca."
+      "alt": "Tarjeta de Guerreros Gelatina con Merlín. Una gelatina azul con sombrero de mago, barba blanca y un bastón con una esfera celeste. A la derecha, su nombre y su poder: Mago del rey Arturo. Cada 5 s convierte en ranas a los 2 enemigos más fuertes que tenga cerca.",
+      "ia": false
     },
     {
       "id": "leyenda-hercules",
@@ -37,9 +40,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-12-04",
-      "texto": "Conoce a las Leyendas (4/8): Hércules. Semidiós. Pisotón de área cada 7 s y, con menos de la mitad de vida, entra en furia. ¡HYAA!\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (4/8): Hércules. Semidiós. Pisotón de área cada 7 s y, con menos de la mitad de vida, entra en furia. ¡HYAA!\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-hercules.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Hércules. Una gelatina azul con rizos dorados y una gran maza de madera. A la derecha, su nombre y su poder: Semidiós. Pisotón de área cada 7 s y, con menos de la mitad de vida, entra en furia."
+      "alt": "Tarjeta de Guerreros Gelatina con Hércules. Una gelatina azul con rizos dorados y una gran maza de madera. A la derecha, su nombre y su poder: Semidiós. Pisotón de área cada 7 s y, con menos de la mitad de vida, entra en furia.",
+      "ia": false
     },
     {
       "id": "leyenda-dracula",
@@ -47,9 +51,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-12-08",
-      "texto": "Conoce a las Leyendas (5/8): Drácula. Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos.\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (5/8): Drácula. Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos.\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-dracula.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Drácula. Una gelatina roja con pelo negro de vampiro, colmillos y capa roja oscura. A la derecha, su nombre y su poder: Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos."
+      "alt": "Tarjeta de Guerreros Gelatina con Drácula. Una gelatina roja con pelo negro de vampiro, colmillos y capa roja oscura. A la derecha, su nombre y su poder: Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos.",
+      "ia": false
     },
     {
       "id": "leyenda-anubis",
@@ -57,9 +62,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-12-11",
-      "texto": "Conoce a las Leyendas (6/8): Anubis. Guardián de los muertos. Cada 7 s devuelve a la vida hasta 3 aliados recién caídos: la batalla aún puede darse vuelta.\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (6/8): Anubis. Guardián de los muertos. Cada 7 s devuelve a la vida hasta 3 aliados recién caídos: la batalla aún puede darse vuelta.\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-anubis.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Anubis. Una gelatina roja con orejas de chacal y un bastón dorado con forma de cruz con asa. A la derecha, su nombre y su poder: Guardián de los muertos. Cada 7 s devuelve a la vida hasta 3 aliados recién caídos."
+      "alt": "Tarjeta de Guerreros Gelatina con Anubis. Una gelatina roja con orejas de chacal y un bastón dorado con forma de cruz con asa. A la derecha, su nombre y su poder: Guardián de los muertos. Cada 7 s devuelve a la vida hasta 3 aliados recién caídos.",
+      "ia": false
     },
     {
       "id": "leyenda-robin",
@@ -67,9 +73,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-12-15",
-      "texto": "Conoce a las Leyendas (7/8): Robin Hood. Arquero de Sherwood. Dispara 3 flechas a la vez y cada 6 s hace un tiro certero de 45 de daño.\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (7/8): Robin Hood. Arquero de Sherwood. Dispara 3 flechas a la vez y cada 6 s hace un tiro certero de 45 de daño.\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-robin.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Robin Hood. Una gelatina azul con sombrero verde de pluma roja y un arco. A la derecha, su nombre y su poder: Arquero de Sherwood. Dispara 3 flechas a la vez y cada 6 s hace un tiro certero de 45 de daño."
+      "alt": "Tarjeta de Guerreros Gelatina con Robin Hood. Una gelatina azul con sombrero verde de pluma roja y un arco. A la derecha, su nombre y su poder: Arquero de Sherwood. Dispara 3 flechas a la vez y cada 6 s hace un tiro certero de 45 de daño.",
+      "ia": false
     },
     {
       "id": "leyenda-llorona",
@@ -77,9 +84,10 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-12-18",
-      "texto": "Conoce a las Leyendas (8/8): La Llorona. Fantasma del folclor mexicano. Su lamento aterra a los enemigos cercanos: huyen 4 s sin atacar.\n\nJuega gratis: {enlace}\n{ia}",
+      "texto": "Conoce a las Leyendas (8/8): La Llorona. Fantasma del folclor mexicano. Su lamento aterra a los enemigos cercanos: huyen 4 s sin atacar.\n\nJuega gratis: {enlace}",
       "imagen": "contenido/imagenes/leyenda-llorona.png",
-      "alt": "Tarjeta de Guerreros Gelatina con La Llorona. Una gelatina roja con vestido blanco, pelo negro largo y lágrimas. A la derecha, su nombre y su poder: Fantasma del folclor mexicano. Su lamento aterra a los enemigos cercanos: huyen 4 s sin atacar."
+      "alt": "Tarjeta de Guerreros Gelatina con La Llorona. Una gelatina roja con vestido blanco, pelo negro largo y lágrimas. A la derecha, su nombre y su poder: Fantasma del folclor mexicano. Su lamento aterra a los enemigos cercanos: huyen 4 s sin atacar.",
+      "ia": false
     }
   ]
 }

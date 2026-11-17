@@ -24,7 +24,7 @@ class Mastodon:
 
     def acciones(self, ctx):
         idioma = ctx.idioma_de('mastodon')
-        texto, problemas = tx.componer_post(ctx.spec, idioma, ctx.url_juego(idioma), ctx.linea_ia(idioma))
+        texto, problemas = tx.componer_post(ctx.spec, idioma, ctx.url_juego(idioma), ctx.linea_ia_corta(idioma))
         if problemas:
             raise ErrorPlan('; '.join(problemas))
         if len(texto) > LIMITE:

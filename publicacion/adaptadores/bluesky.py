@@ -69,7 +69,7 @@ class Bluesky:
 
     def acciones(self, ctx):
         idioma = ctx.idioma_de('bluesky')
-        texto, problemas = tx.componer_post(ctx.spec, idioma, ctx.url_juego(idioma), ctx.linea_ia(idioma))
+        texto, problemas = tx.componer_post(ctx.spec, idioma, ctx.url_juego(idioma), ctx.linea_ia_corta(idioma))
         if problemas:
             raise ErrorPlan('; '.join(problemas))
         n, tope = tx.grafemas(texto), limite_para(texto)

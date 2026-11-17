@@ -195,6 +195,10 @@ class Contexto:
         import kit_lanzamiento
         return kit_lanzamiento.linea_ia(self.spec, idioma)
 
+    def linea_ia_corta(self, idioma):
+        import kit_lanzamiento
+        return kit_lanzamiento.linea_ia_corta(self.spec, idioma)
+
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Plan y huella

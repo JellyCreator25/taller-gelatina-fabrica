@@ -75,7 +75,8 @@ def armar(raiz, item, libro=None):
     if idioma not in ctx.spec['idiomas']:
         problemas.append('el juego no tiene versión en «%s»' % idioma)
         idioma = ctx.spec['idiomas'][0]
-    texto = str(item.get('texto', '')).replace('{enlace}', ctx.url_juego(idioma)).replace('{ia}', ctx.linea_ia(idioma)).strip()
+    ia = ctx.linea_ia_corta(idioma) if item.get('ia', True) else ''   # «ia»: false = la publicación no repite la línea (el perfil de la cuenta y el sitio ya lo dicen)
+    texto = str(item.get('texto', '')).replace('{enlace}', ctx.url_juego(idioma)).replace('{ia}', ia).strip()
     if not texto:
         problemas.append('falta el texto')
     if re.search(r'\{[a-z_]+\}|\[ENLACE', texto):
@@ -84,8 +85,8 @@ def armar(raiz, item, libro=None):
         problemas.append('el texto dice PENDIENTE')
     if ctx.url_juego(idioma) not in texto:
         problemas.append('el texto no lleva el enlace del juego')
-    if ctx.linea_ia(idioma) and ctx.linea_ia(idioma) not in texto:
-        problemas.append('el texto no lleva la línea de IA')
+    if ia and ia not in texto:
+        problemas.append('el texto no lleva la línea de IA (o pon «ia»: false en la publicación)')
     from .adaptadores import bluesky
     n, tope = tx.grafemas(texto), bluesky.limite_para(texto)
     if n > tope or tx.bytes_utf8(texto) > 3000:
