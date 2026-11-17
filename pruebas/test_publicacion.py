@@ -1375,6 +1375,38 @@ class BaseMetricas(Base):
         return rumbo.recomendar(self.raiz, HOY, libro=libro if libro is not None else [])
 
 
+class PruebasPortadaDeHeroes(unittest.TestCase):
+    """La portada de Guerreros Gelatina se compone con un escenario de héroes (herramientas/portada-heroes.html + portada.reparto)."""
+
+    def test_la_plantilla_trae_todas_las_marcas_que_sustituye_probar_y_ninguna_de_mas(self):
+        js = (RAIZ / 'herramientas' / 'probar.js').read_text(encoding='utf-8')
+        bloque = js[js.index('if (heroes) {'):js.index("plantilla = 'portada-heroes.html'")]
+        usadas = set(re.findall(r"'(@@[A-Z0-9]+@@)'", bloque))
+        html = (RAIZ / 'herramientas' / 'portada-heroes.html').read_text(encoding='utf-8')
+        en_plantilla = set(re.findall(r'@@[A-Z0-9]+@@', html))
+        self.assertTrue(usadas)
+        self.assertEqual(usadas, en_plantilla, 'cada marca de la plantilla debe sustituirse (y al revés)')
+
+    def test_el_reparto_es_valido_y_usa_unidades_que_existen_en_el_juego(self):
+        spec = json.loads((RAIZ / 'juegos' / JUEGO / 'juego.json').read_text(encoding='utf-8'))
+        p = spec['portada']
+        self.assertEqual(p['estilo'], 'heroes')
+        juego = (RAIZ / 'salida' / JUEGO / 'index.html').read_text(encoding='utf-8')
+        self.assertIn('else boot();\n})();', juego, 'sin este final no se puede dibujar el arte de la portada')
+        for tipo, equipo, x, y, escala, direccion, golpe in p['reparto']:
+            with self.subTest(tipo=tipo):
+                self.assertTrue(('units.%s = ' % tipo) in juego or re.search(r'\b%s: *\{' % tipo, juego), 'la unidad %s no existe' % tipo)
+                self.assertIn(equipo, (0, 1))
+                self.assertIn(direccion, (1, -1))
+                self.assertTrue(0 <= golpe <= 1 and 0 < escala < 8)
+                self.assertTrue(0 <= x <= 630 and 0 <= y <= 500)
+
+    def test_la_portada_generada_tiene_la_proporcion_que_pide_itch(self):
+        from PIL import Image
+        with Image.open(RAIZ / 'salida' / JUEGO / 'medios' / 'portada.png') as im:
+            self.assertEqual(im.size, (1260, 1000))
+
+
 class PruebasRegistroDeMetricas(BaseMetricas):
     def test_anotar_escribe_una_fila_y_la_semana_es_siempre_un_lunes(self):
         f = met.anotar(self.raiz, JUEGO, 'vistas_juego', '40', '2026-11-19', 'manual', 'dato de prueba', IDS, HOY)     # un jueves

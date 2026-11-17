@@ -1,0 +1,47 @@
+<!doctype html>
+<meta charset="utf-8">
+<!-- Portada «de héroes» (portada.estilo = "heroes" en juego.json). herramientas/probar.js sustituye las marcas con doble arroba: las tipografías incrustadas, el arte (personajes sobre fondo transparente,
+     dibujados con el propio código del juego), el título en dos líneas, el lema, el sello y el nombre del estudio (de publicacion/sitio.json).
+     630×500 px a doble densidad = 1260×1000, la proporción 315:250 que pide itch.io. -->
+<style>
+@@FUENTES@@
+*{box-sizing:border-box}
+html,body{margin:0;width:630px;height:500px;overflow:hidden}
+body{position:relative;font-family:'Fredoka',system-ui,sans-serif;color:#fff;
+  background:linear-gradient(180deg,#171c5c 0%,#33288a 40%,#7a3a9e 70%,#d2507a 100%)}
+.rayos{position:absolute;left:-50%;top:-60%;width:200%;height:200%;
+  background:repeating-conic-gradient(from 0deg at 50% 62%,rgba(255,255,255,.10) 0deg 6deg,rgba(255,255,255,0) 6deg 16deg);
+  -webkit-mask-image:radial-gradient(circle at 50% 62%,#000 0%,rgba(0,0,0,.5) 18%,transparent 36%);mask-image:radial-gradient(circle at 50% 62%,#000 0%,rgba(0,0,0,.5) 18%,transparent 36%)}
+.brillo{position:absolute;left:50%;top:300px;width:620px;height:420px;margin-left:-310px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,226,140,.55),rgba(255,160,120,.18) 55%,rgba(255,160,120,0))}
+.suelo{position:absolute;left:-150px;right:-150px;top:250px;height:560px;border-radius:50%/34%;
+  background:radial-gradient(ellipse at 50% 18%,#a6dd6e 0%,#7cc455 45%,#55a243 100%);box-shadow:inset 0 7px 0 rgba(255,255,255,.28),0 -10px 40px rgba(255,220,150,.25)}
+.suelo::after{content:"";position:absolute;inset:0;border-radius:inherit;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,0) 0 52px,rgba(255,255,255,.07) 52px 104px)}
+.chispa{position:absolute;width:var(--s);height:var(--s);background:var(--c,#fff);opacity:var(--o,.9);
+  clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
+.arte{position:absolute;left:0;top:0;width:630px;height:500px}
+.titulo{position:absolute;left:0;right:0;top:12px;margin:0;text-align:center;font-weight:700;font-size:76px;line-height:.86;letter-spacing:-.5px}
+.titulo span{display:block;-webkit-text-stroke:8px #141a4a;paint-order:stroke fill;text-shadow:0 6px 0 #0b0f38,0 14px 22px rgba(0,0,0,.35)}
+.lema{position:absolute;left:50%;top:158px;transform:translateX(-50%) rotate(-1.5deg);white-space:nowrap;margin:0;
+  font-size:24px;font-weight:600;color:#2a1a5e;background:linear-gradient(180deg,#ffe27a,#ffc233);padding:5px 20px 7px;border-radius:999px;
+  box-shadow:0 4px 0 #b9790f,0 10px 18px rgba(0,0,0,.28)}
+.estudio{position:absolute;left:18px;bottom:16px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:17px;letter-spacing:.2px;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.estudio svg{width:34px;height:34px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
+.sello{position:absolute;right:18px;bottom:20px;font:700 14px 'Nunito Sans',system-ui,sans-serif;color:#1d2a55;background:rgba(255,255,255,.92);padding:7px 14px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+</style>
+<div class="rayos"></div>
+<div class="brillo"></div>
+<div class="suelo"></div>
+<i class="chispa" style="left:44px;top:236px;--s:18px;--c:#ffe27a"></i>
+<i class="chispa" style="left:566px;top:226px;--s:22px;--c:#fff"></i>
+<i class="chispa" style="left:298px;top:300px;--s:34px;--c:#fff;--o:1"></i>
+<i class="chispa" style="left:520px;top:262px;--s:12px;--c:#fff"></i>
+<i class="chispa" style="left:96px;top:228px;--s:10px;--c:#fff"></i>
+<i class="chispa" style="left:600px;top:120px;--s:14px;--c:#ffe27a"></i>
+<i class="chispa" style="left:22px;top:130px;--s:14px;--c:#fff"></i>
+<img class="arte" src="@@ARTE@@" alt="">
+<h1 class="titulo"><span>@@L1@@</span><span>@@L2@@</span></h1>
+<p class="lema">@@LEMA@@</p>
+<div class="estudio"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 31c0-13 6-24 15-24s15 11 15 24c0 3-4 4-15 4S5 34 5 31z" fill="#3fb37a"/><path d="M5 29c4 3 10 4 15 4s11-1 15-4c0 4-5 6-15 6S5 33 5 29z" fill="#2b8a5c"/><ellipse cx="13" cy="14" rx="4" ry="2.5" fill="#fff" opacity=".35" transform="rotate(-30 13 14)"/><ellipse cx="14.5" cy="22" rx="3.2" ry="3.8" fill="#fff"/><ellipse cx="25.5" cy="22" rx="3.2" ry="3.8" fill="#fff"/><circle cx="15.3" cy="22.6" r="1.7" fill="#14251b"/><circle cx="26.3" cy="22.6" r="1.7" fill="#14251b"/><path d="M16 28.5q4 3 8 0" stroke="#14251b" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span>@@ESTUDIO@@</span></div>
+<div class="sello">@@SELLO@@</div>

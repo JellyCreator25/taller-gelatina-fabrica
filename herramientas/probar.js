@@ -60,10 +60,57 @@ async function correr(browser, nombre, slug, opts) {
   await ctx.close();
 }
 
+// Portada «de héroes»: las Leyendas se dibujan con el propio código del juego (la plantilla expone drawJelly solo dentro de su función; aquí se
+// pone una copia temporal de index.html con una línea más que la deja a mano) y quedan sobre fondo transparente. No toca el juego publicado.
+// juego.json → portada.reparto: [tipo, equipo (0 azul, 1 rojo), x, y, escala, dirección (1 | -1), golpe (0 a 1)] sobre un lienzo de 630×500.
+async function arteHeroes(browser, reparto) {
+  const origen = path.join(dir, 'index.html');
+  let html = fs.readFileSync(origen, 'utf8');
+  const gancho = 'else boot();\n})();';
+  if (html.split(gancho).length !== 2) throw new Error('la plantilla de «' + id + '» no permite dibujar la portada de héroes (no encuentro «else boot();» al final de su script)');
+  html = html.replace(gancho, 'else boot();\nwindow.__dibujo = { drawJelly, UNITS, teamColor };\n})();');
+  const tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'portada-'));
+  try {
+    const archivo = path.join(tmp, 'juego.html');
+    fs.writeFileSync(archivo, html);
+    const ctx = await browser.newContext({ viewport: { width: 1300, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto('file://' + archivo);
+    await page.waitForSelector('#cv');
+    const url = await page.evaluate((lista) => {
+      const { drawJelly, UNITS, teamColor } = window.__dibujo;
+      const c = document.createElement('canvas'); c.width = 1260; c.height = 1000;
+      const x = c.getContext('2d'); x.scale(2, 2);
+      for (const [t] of lista) if (!UNITS[t]) throw new Error('portada.reparto: la unidad «' + t + '» no existe');
+      for (const [t, eq, px, py, s, dir, golpe] of lista.slice().sort((a, b) => a[3] - b[3])) {   // de atrás hacia adelante
+        const r = UNITS[t].r * s, col = teamColor(eq);
+        x.fillStyle = 'rgba(8,16,40,.38)'; x.beginPath(); x.ellipse(px, py + r * 0.7, r * 1.15, r * 0.42, 0, 0, Math.PI * 2); x.fill();
+        x.globalAlpha = 0.9; x.strokeStyle = col; x.lineWidth = 1.3 * s; x.beginPath(); x.ellipse(px, py + r * 0.7, r * 1.17, r * 0.48, 0, 0, Math.PI * 2); x.stroke();
+        x.globalAlpha = 0.55; x.strokeStyle = '#ffd24a'; x.lineWidth = 0.8 * s; x.beginPath(); x.ellipse(px, py + r * 0.7, r * 1.34, r * 0.58, 0, 0, Math.PI * 2); x.stroke();
+        x.globalAlpha = 1;
+        drawJelly(x, t, col, px, py, { scale: s, dir, swing: golpe });
+      }
+      return c.toDataURL('image/png');
+    }, reparto);
+    await ctx.close();
+    return url;
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+}
+
+function lineasDeTitulo(titulo) {   // dos líneas lo más parejas posible; un título de una sola palabra queda en una línea
+  const w = String(titulo).trim().split(/\s+/);
+  if (w.length < 2) return [w.join(' '), ''];
+  let mejor = 1, dif = Infinity;
+  for (let k = 1; k < w.length; k++) { const d = Math.abs(w.slice(0, k).join(' ').length - w.slice(k).join(' ').length); if (d < dif) { dif = d; mejor = k; } }
+  return [w.slice(0, mejor).join(' '), w.slice(mejor).join(' ')];
+}
+
 async function portada(browser) {
   log('— portada');
+  const p = spec.portada || {};
+  const heroes = p.estilo === 'heroes';
   const fuente = path.join(medios, 'portada-fuente.png');
-  if (!fs.existsSync(fuente)) { chequear(false, 'el escenario no dejó portada-fuente.png'); return; }
+  if (!heroes && !fs.existsSync(fuente)) { chequear(false, 'el escenario no dejó portada-fuente.png'); return; }
   const mapa = JSON.parse(fs.readFileSync(path.join(RAIZ, 'motor', 'fuentes', 'fuentes.json'), 'utf8'));
   let css = '';
   for (const fam of ['Fredoka', 'Nunito Sans']) {
@@ -72,13 +119,25 @@ async function portada(browser) {
       css += "@font-face{font-family:'" + fam + "';font-weight:" + peso + ';src:url(data:font/woff2;base64,' + b64 + ") format('woff2')}\n";
     }
   }
-  const p = spec.portada || {}, idioma = spec.idiomas[0], f = spec.ficha[idioma];
+  const idioma = spec.idiomas[0], f = spec.ficha[idioma];
   const gratis = ['donar', 'gratis'].includes((spec.precio || {}).modo);
   const sello = idioma === 'en' ? (gratis ? 'Free in your browser' : 'Play in your browser') : (gratis ? 'Gratis en el navegador' : 'Juega en el navegador');
   const lema = (p.lema || {})[idioma] || f.corta.split(/[.!?]/)[0];
-  const img = 'data:image/png;base64,' + fs.readFileSync(fuente).toString('base64');
-  const marcas = { '@@FUENTES@@': css, '@@A@@': p.color_a || '#2f6bdc', '@@B@@': p.color_b || '#e04a34', '@@TITULO@@': esc(f.titulo), '@@LEMA@@': esc(lema), '@@SELLO@@': sello, '@@CLASE@@': p.vertical ? 'vertical' : '', '@@IMG@@': img };
-  let html = fs.readFileSync(path.join(__dirname, 'portada.html'), 'utf8');
+  let marcas, plantilla;
+  if (heroes) {
+    if (!Array.isArray(p.reparto) || !p.reparto.length) { chequear(false, 'portada.estilo es «heroes» pero falta portada.reparto en juego.json'); return; }
+    let arte;
+    try { arte = await arteHeroes(browser, p.reparto); } catch (e) { chequear(false, 'arte de la portada: ' + e.message); return; }
+    const sitio = JSON.parse(fs.readFileSync(path.join(RAIZ, 'publicacion', 'sitio.json'), 'utf8'));
+    const [l1, l2] = lineasDeTitulo(f.titulo);
+    marcas = { '@@FUENTES@@': css, '@@ARTE@@': arte, '@@L1@@': esc(l1), '@@L2@@': esc(l2), '@@LEMA@@': esc(lema), '@@SELLO@@': esc(sello), '@@ESTUDIO@@': esc(sitio.nombre || '') };
+    plantilla = 'portada-heroes.html';
+  } else {
+    const img = 'data:image/png;base64,' + fs.readFileSync(fuente).toString('base64');
+    marcas = { '@@FUENTES@@': css, '@@A@@': p.color_a || '#2f6bdc', '@@B@@': p.color_b || '#e04a34', '@@TITULO@@': esc(f.titulo), '@@LEMA@@': esc(lema), '@@SELLO@@': sello, '@@CLASE@@': p.vertical ? 'vertical' : '', '@@IMG@@': img };
+    plantilla = 'portada.html';
+  }
+  let html = fs.readFileSync(path.join(__dirname, plantilla), 'utf8');
   for (const [k, v] of Object.entries(marcas)) html = html.split(k).join(v);
   const ctx = await browser.newContext({ viewport: { width: 630, height: 500 }, deviceScaleFactor: 2 });
   const page = await ctx.newPage();

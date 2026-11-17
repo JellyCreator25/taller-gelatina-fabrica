@@ -48,7 +48,7 @@ python3 fabrica.py configurar bluesky-bot|mastodon-bot [--ejecutar]   # marca la
 python3 fabrica.py ciclo [--probar]       # el latido semanal: reconstruye, revisa y escribe publicacion/PENDIENTE.md (incluye la recomendación de rumbo)
 python3 -I -m unittest discover -s pruebas   # 162 pruebas de la fábrica (texto, plan, aprobación, compuertas, ritmo, libro, sitio, páginas de difusión, métricas, importador de Cloudflare, rumbo)
 node herramientas/probar.js <id> --rapido # solo las pruebas funcionales (sin portada ni clips)
-node herramientas/probar.js <id> --portada # solo vuelve a componer la portada (útil al retocar herramientas/portada.html)
+node herramientas/probar.js <id> --portada # solo vuelve a componer la portada (útil al retocar herramientas/portada.html o portada-heroes.html)
 ```
 
 Requisitos: Python 3 (con `pillow` para la imagen de las publicaciones), Node, el paquete `playwright` de Node con su Chromium (`npm i playwright` y `npx playwright install chromium`) y `ffmpeg` para los clips. Publicar el sitio usa `npx wrangler` (Cloudflare) dentro del flujo de GitHub. Se probó con Python 3.13, Node 22 y Playwright 1.63.
@@ -59,6 +59,7 @@ Requisitos: Python 3 (con `pillow` para la imagen de las publicaciones), Node, e
 - No hay errores de consola ni de página, y no se hace ninguna conexión externa.
 - El escenario propio de cada plantilla (`plantillas/<nombre>/prueba.js`), por ejemplo en Torre: rachas de aciertos perfectos, ensanchado de la torre, cortes, caída, récord guardado, cambio de idioma que se recuerda al recargar, y entradas reales (clic, toque, barra espaciadora). En Guerreros Gelatina: colocación con el ratón o el dedo, batalla completa y sonidos.
 - Los medios se generan en la misma pasada: capturas, portada (630×500 px CSS a doble densidad, 1260×1000) y clips.
+- La portada tiene dos estilos. El de siempre (`herramientas/portada.html`) usa un recorte de la batalla. El de héroes (`"estilo": "heroes"` en `portada` de juego.json, `herramientas/portada-heroes.html`) dibuja a los personajes grandes con el propio código del juego y los reparte según `portada.reparto`: `[unidad, equipo (0 azul, 1 rojo), x, y, escala, dirección (1 o -1), golpe (0 a 1)]` sobre un lienzo de 630×500. Solo funciona con plantillas que dejen `drawJelly` a mano (la de gelatina). Cambiar la portada cambia la huella del plan de publicación.
 
 Una prueba que falla deja el comando con error y la línea `FALLA` en `informe-pruebas.txt`. Que pase todo prueba que el juego funciona, no que sea divertido: eso lo dicen los jugadores.
 

@@ -312,7 +312,12 @@
       "en": "Place. Fight. Watch the chaos.",
       "zh": "摆兵。开战。看乱斗。"
     },
-    "selector": "#cv"
+    "selector": "#cv",
+    "estilo": "heroes",
+    "reparto": [
+      ["merlin", 0, 62, 306, 3.1, 1, 0.5], ["robin", 0, 178, 298, 3.0, 1, 0.8], ["anubis", 1, 452, 302, 3.1, -1, 0.6], ["llorona", 1, 570, 308, 3.0, -1, 0.7],
+      ["zeus", 0, 112, 392, 3.9, 1, 0.9], ["hercules", 0, 240, 400, 3.7, 1, 0.8], ["dracula", 1, 392, 400, 3.7, -1, 0.8], ["medusa", 1, 518, 392, 3.8, -1, 0.7]
+    ]
   },
   "ia": {
     "codigo": true,
