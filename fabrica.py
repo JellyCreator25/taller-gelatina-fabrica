@@ -197,10 +197,12 @@ def construir(juego_id):
     destino.mkdir(parents=True, exist_ok=True)
     (destino / 'index.html').write_text(html, encoding='utf-8')
     zip_ruta = destino / ('%s-web.zip' % juego_id)
-    with zipfile.ZipFile(zip_ruta, 'w', zipfile.ZIP_DEFLATED) as z:
-        # index.html en la raíz del zip, con fecha y permisos fijos: el mismo juego da siempre el mismo zip (la huella de aprobación lo necesita)
+    with zipfile.ZipFile(zip_ruta, 'w', zipfile.ZIP_STORED) as z:
+        # index.html en la raíz del zip, con fecha y permisos fijos: el mismo juego da siempre el mismo zip (la huella de aprobación lo necesita).
+        # Sin compresión a propósito: el resultado de comprimir cambia con la versión de Python y de zlib de cada máquina (GitHub usa otra que
+        # la tuya), y entonces «lo guardado» y «lo que se reconstruye» dejarían de coincidir aunque el juego sea el mismo.
         info = zipfile.ZipInfo('index.html', date_time=(2020, 1, 1, 0, 0, 0))
-        info.compress_type = zipfile.ZIP_DEFLATED
+        info.compress_type = zipfile.ZIP_STORED
         info.external_attr = 0o644 << 16
         z.writestr(info, (destino / 'index.html').read_bytes())
     print('[construir] %s v%s → %s (%d KB) · zip %d KB%s' % (

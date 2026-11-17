@@ -1091,6 +1091,15 @@ class PruebasCiclo(Base):
         self.assertEqual(self.fabrica('construir', JUEGO).returncode, 0)
         self.assertEqual(hashlib.sha256(zip_ruta.read_bytes()).hexdigest(), primero)
 
+    def test_el_zip_del_juego_va_sin_comprimir_para_no_depender_del_zlib_de_cada_maquina(self):
+        import zipfile
+        self.assertEqual(self.fabrica('construir', JUEGO).returncode, 0)
+        with zipfile.ZipFile(self.p.raiz / 'salida' / JUEGO / ('%s-web.zip' % JUEGO)) as z:
+            (info,) = z.infolist()
+            self.assertEqual(info.filename, 'index.html')
+            self.assertEqual(info.compress_type, zipfile.ZIP_STORED)
+            self.assertEqual(z.read('index.html'), (self.p.raiz / 'salida' / JUEGO / 'index.html').read_bytes())
+
     def test_el_ciclo_deja_el_estado_y_no_cambia_la_huella(self):
         antes = self.p.plan()[1]['huella']
         r = self.fabrica('ciclo')
