@@ -487,6 +487,30 @@ class PruebasServicios(Base):
         informe, ok = self.p.ejecutar()
         self.assertTrue(ok, informe)
 
+    def test_un_account_id_mal_pegado_se_explica_sin_mostrar_el_valor_y_ni_se_llama_a_wrangler(self):
+        secreto = "94g7526cjs@privaterelay.appleid.com's Account"
+        self.p.env['CLOUDFLARE_ACCOUNT_ID'] = secreto
+        informe, ok = self.p.ejecutar()
+        self.assertFalse(ok)
+        self.assertEqual(informe[0]['resultado'], 'error')
+        detalle = informe[0]['detalle']
+        self.assertIn('CLOUDFLARE_ACCOUNT_ID no tiene la forma de un Account ID', detalle)
+        self.assertIn('tiene %d caracteres' % len(secreto), detalle)
+        for signo in ("'@'", "' '", '"\'"', "'.'"):
+            self.assertIn(signo, detalle)
+        for trozo in ('94g7526cjs', 'privaterelay', 'appleid'):
+            self.assertNotIn(trozo, detalle)
+            self.assertNotIn(trozo, self.p.texto_libro())
+        self.assertEqual(self.p.cmd.llamadas, [])
+
+    def test_un_account_id_con_espacios_o_salto_de_linea_al_final_se_limpia(self):
+        self.p.env['CLOUDFLARE_ACCOUNT_ID'] = '  ' + SECRETOS['CLOUDFLARE_ACCOUNT_ID'] + '\n'
+        self.p.env['CLOUDFLARE_API_TOKEN'] = SECRETOS['CLOUDFLARE_API_TOKEN'] + ' \n'
+        informe, ok = self.p.ejecutar()
+        self.assertTrue(ok, informe)
+        env = self.p.cmd.llamadas[0]['env']
+        self.assertEqual((env['CLOUDFLARE_ACCOUNT_ID'], env['CLOUDFLARE_API_TOKEN']), (SECRETOS['CLOUDFLARE_ACCOUNT_ID'], SECRETOS['CLOUDFLARE_API_TOKEN']))
+
     def test_si_el_sitio_no_responde_no_se_anuncia(self):
         self.p.red.al('GET', SITIO_URL + '/', resp(404))
         informe, ok = self.p.ejecutar()

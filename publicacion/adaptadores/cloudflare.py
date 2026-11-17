@@ -32,7 +32,17 @@ class CloudflarePages:
 
     def ejecutar(self, a, ent, ctx):
         d = a['datos']
-        env = dict(ent.env, WRANGLER_SEND_METRICS='false', CI='true')
+        cuenta = (ent.env.get('CLOUDFLARE_ACCOUNT_ID') or '').strip()      # un espacio o salto de línea al pegar es el error más común: se quita
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', cuenta):
+            # se dice qué tiene de mal sin mostrar el valor: solo la longitud y los signos de puntuación que sobran
+            raros = sorted({c for c in cuenta if not c.isalnum() and c not in '_-'})
+            raise ErrorPublicacion('CLOUDFLARE_ACCOUNT_ID no tiene la forma de un Account ID (una cadena de 32 letras y números): %s. Edítalo en GitHub → Settings → Environments → produccion '
+                                   'y pega solo el identificador.' % ('está vacío' if not cuenta else 'tiene %d caracteres%s' % (
+                                       len(cuenta), '; signos que no corresponden: ' + ' '.join(repr(c) for c in raros) if raros else '')))
+        token = (ent.env.get('CLOUDFLARE_API_TOKEN') or '').strip()
+        if not token:
+            raise ErrorPublicacion('CLOUDFLARE_API_TOKEN está vacío: guárdalo en GitHub → Settings → Environments → produccion')
+        env = dict(ent.env, WRANGLER_SEND_METRICS='false', CI='true', CLOUDFLARE_ACCOUNT_ID=cuenta, CLOUDFLARE_API_TOKEN=token)
         rc, salida, err = ent.cmd(['npx', '--yes', 'wrangler@4', 'pages', 'deploy', str(ctx.raiz / d['carpeta']), '--project-name=' + d['proyecto'],
                                    '--branch=' + d['rama'], '--commit-dirty=true'], cwd=str(ctx.raiz), env=env)
         if rc != 0:
