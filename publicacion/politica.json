@@ -1,6 +1,6 @@
 {
   "nota": "Política de publicación. Solo se usan los canales de «canales». Para activar uno: crea la cuenta y configura sus secretos (la lista exacta está en difusion/MAPA.md), agrégalo aquí y corre «python3 fabrica.py publicar JUEGO» para leer el plan antes de aprobar nada.",
-  "canales": ["sitio-propio", "indexnow"],
+  "canales": ["sitio-propio", "indexnow", "bluesky"],
   "idioma": {
     "bluesky": "es",
     "mastodon": "es",
