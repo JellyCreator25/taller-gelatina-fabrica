@@ -475,6 +475,18 @@ class PruebasServicios(Base):
         self.assertEqual([l['canal'] for l in informe], ['sitio-propio'])
         self.assertEqual(self.p.red.llamadas, [])
 
+    def test_el_error_de_wrangler_se_anota_sin_colores_de_terminal_y_se_puede_reintentar(self):
+        self.p.cmd = lambda argv, cwd=None, env=None, tiempo=900: (1, '', '\x1b[31m✘ \x1b[41;31m[ERROR]\x1b[0m Invalid account ID "***"')
+        informe, ok = self.p.ejecutar()
+        self.assertFalse(ok)
+        self.assertNotIn('\x1b', informe[0]['detalle'])
+        self.assertIn('Invalid account ID', informe[0]['detalle'])
+        self.assertNotIn('\x1b', self.p.texto_libro().replace('\\u001b', 'ESC'))
+        self.assertEqual(informe[0]['resultado'], 'error')          # «error», no «incierto»: con la clave corregida se reintenta el mismo plan
+        self.p.cmd = Cmd()
+        informe, ok = self.p.ejecutar()
+        self.assertTrue(ok, informe)
+
     def test_si_el_sitio_no_responde_no_se_anuncia(self):
         self.p.red.al('GET', SITIO_URL + '/', resp(404))
         informe, ok = self.p.ejecutar()
@@ -1172,6 +1184,13 @@ class PruebasCoherencia(unittest.TestCase):
         for opcion in re.findall(r'^          - ([a-z-]+-bot)$', texto, re.M):
             self.assertIn("'%s':" % opcion, fabrica, 'el flujo ofrece una cuenta que «configurar» no conoce: ' + opcion)
         self.assertEqual(sorted(re.findall(r'^          - ([a-z-]+-bot)$', texto, re.M)), ['bluesky-bot', 'mastodon-bot'])
+
+    def test_los_pasos_que_pasan_por_tee_usan_pipefail_para_no_ocultar_los_fallos(self):
+        import re
+        for f in (RAIZ / '.github' / 'workflows').glob('*.yml'):
+            for paso in re.split(r'(?m)^(?=      - )', f.read_text(encoding='utf-8')):
+                if '| tee' in paso:
+                    self.assertIn('shell: bash', paso, '%s: con «| tee» y sin pipefail, un fallo de la fábrica sale como éxito' % f.name)
 
     def test_los_flujos_no_interpolan_entradas_dentro_de_los_scripts(self):
         import re

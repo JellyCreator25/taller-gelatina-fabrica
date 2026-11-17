@@ -40,6 +40,7 @@ jobs:
           BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
           MASTODON_INSTANCE: ${{ secrets.MASTODON_INSTANCE }}
           MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+        shell: bash   # con pipefail: si la fábrica falla, el paso falla (sin esto, «| tee» oculta el error y la corrida sale en verde)
         run: |
           case "$CUENTA" in (bluesky-bot|mastodon-bot) ;; (*) echo "Cuenta no reconocida"; exit 1;; esac
           if [ "$EJECUTAR" = "true" ]; then

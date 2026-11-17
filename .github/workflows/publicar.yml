@@ -41,6 +41,7 @@ jobs:
         env:
           JUEGO: ${{ inputs.juego }}
           SOLO: ${{ inputs.solo }}
+        shell: bash   # con pipefail: si la fábrica falla, el paso falla (sin esto, «| tee» oculta el error y la corrida sale en verde)
         run: |
           case "$JUEGO" in (*[!a-z0-9-]*|'') echo "El juego debe ser un identificador como guerreros-gelatina"; exit 1;; esac
           .venv/bin/python -I fabrica.py sitio
@@ -81,6 +82,7 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        shell: bash   # con pipefail: si la fábrica falla, el paso falla (sin esto, «| tee» oculta el error y la corrida sale en verde)
         run: |
           case "$JUEGO" in (*[!a-z0-9-]*|'') echo "El juego debe ser un identificador como guerreros-gelatina"; exit 1;; esac
           .venv/bin/python -I fabrica.py sitio
