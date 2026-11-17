@@ -26,10 +26,17 @@ class Respuesta:
         return self.cuerpo.decode('utf-8', 'replace')[:n]
 
 
+AGENTE = 'ggx-fabrica/1.0 (bot declarado; no es un navegador)'
+
+
 def solicitar(metodo, url, cabeceras=None, cuerpo=None, tiempo=40, permitir_http=False):
     if not (url.startswith('https://') or (permitir_http and url.startswith('http://'))):
         raise ErrorRed('solo se admiten direcciones https')
-    req = urllib.request.Request(url, data=cuerpo, method=metodo, headers=dict(cabeceras or {}))
+    cab = dict(cabeceras or {})
+    if not any(k.lower() == 'user-agent' for k in cab):
+        # sin esto urllib se anuncia como «Python-urllib», que muchos servicios (Cloudflare incluido) rechazan; se identifica la fábrica con honestidad, sin fingir ser un navegador
+        cab['User-Agent'] = AGENTE
+    req = urllib.request.Request(url, data=cuerpo, method=metodo, headers=cab)
     try:
         with urllib.request.urlopen(req, timeout=tiempo) as r:
             return Respuesta(r.status, dict(r.headers.items()), r.read())

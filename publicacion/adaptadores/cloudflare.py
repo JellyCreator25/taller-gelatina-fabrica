@@ -54,11 +54,14 @@ class CloudflarePages:
                                    '--branch=' + d['rama'], '--commit-dirty=true'], cwd=str(ctx.raiz), env=env)
         if rc != 0:
             raise ErrorPublicacion('wrangler terminó con error (código %s): %s' % (rc, re.sub(r'\x1b\[[0-9;]*m', '', (err or salida))[-400:].strip()))   # sin los colores de la terminal
+        ultima = 'sin respuesta'
         for _ in range(12):   # el sitio tarda unos segundos en responder
             try:
-                if ent.http('GET', d['comprobar']).status == 200:
+                r = ent.http('GET', d['comprobar'])
+                if r.status == 200:
                     return {'detalle': 'desplegado y comprobado: ' + d['comprobar'], 'url': d['comprobar']}
-            except Exception:   # sin red o sin DNS todavía: se vuelve a intentar
-                pass
+                ultima = 'HTTP %s' % r.status
+            except Exception as e:   # sin red o sin DNS todavía: se vuelve a intentar
+                ultima = 'sin respuesta (%s)' % str(e)[:80]
             ent.dormir(5)
-        raise ErrorPublicacion('wrangler terminó bien, pero %s no respondió 200 en un minuto' % d['comprobar'])
+        raise ErrorPublicacion('wrangler terminó bien, pero %s no respondió 200 en un minuto (última respuesta: %s)' % (d['comprobar'], ultima))

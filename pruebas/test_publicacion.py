@@ -503,6 +503,33 @@ class PruebasServicios(Base):
             self.assertNotIn(trozo, self.p.texto_libro())
         self.assertEqual(self.p.cmd.llamadas, [])
 
+    def test_las_peticiones_se_identifican_como_bot_y_respetan_un_agente_explicito(self):
+        from unittest import mock
+
+        class Fake:
+            status = 200
+            headers = {}
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+            def read(self):
+                return b''
+        vistas = []
+
+        def falso(req, timeout=None):
+            vistas.append(req)
+            return Fake()
+        with mock.patch('urllib.request.urlopen', falso):
+            red.solicitar('GET', 'https://ejemplo.test/')
+            red.solicitar('GET', 'https://ejemplo.test/', {'User-Agent': 'otro/2'})
+        self.assertIn('bot declarado', vistas[0].get_header('User-agent'))
+        self.assertNotIn('Python-urllib', vistas[0].get_header('User-agent'))
+        self.assertEqual(vistas[1].get_header('User-agent'), 'otro/2')
+
     def test_un_token_con_varias_lineas_se_explica_con_cuentas_y_sin_mostrar_nada_del_token(self):
         secreto = 'abcDEF123-token-parte-uno\n\ncurl https://api.cloudflare.com/ -H "Authorization: Bearer xyz"'
         self.p.env['CLOUDFLARE_API_TOKEN'] = secreto
@@ -531,6 +558,7 @@ class PruebasServicios(Base):
         self.assertFalse(ok)
         self.assertEqual([l['canal'] for l in informe], ['sitio-propio'])
         self.assertIn('no respondió 200', informe[0]['detalle'])
+        self.assertIn('última respuesta: HTTP 404', informe[0]['detalle'])
         self.assertEqual(self.p.red.a('POST', 'https://bsky.social'), [])
 
     def test_indexnow(self):
