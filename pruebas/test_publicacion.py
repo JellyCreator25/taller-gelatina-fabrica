@@ -503,6 +503,20 @@ class PruebasServicios(Base):
             self.assertNotIn(trozo, self.p.texto_libro())
         self.assertEqual(self.p.cmd.llamadas, [])
 
+    def test_un_token_con_varias_lineas_se_explica_con_cuentas_y_sin_mostrar_nada_del_token(self):
+        secreto = 'abcDEF123-token-parte-uno\n\ncurl https://api.cloudflare.com/ -H "Authorization: Bearer xyz"'
+        self.p.env['CLOUDFLARE_API_TOKEN'] = secreto
+        informe, ok = self.p.ejecutar()
+        self.assertFalse(ok)
+        detalle = informe[0]['detalle']
+        self.assertIn('CLOUDFLARE_API_TOKEN no tiene la forma de un token', detalle)
+        self.assertIn('tiene %d caracteres' % len(secreto.strip()), detalle)
+        self.assertRegex(detalle, r'[1-9]\d* espacios o saltos de línea')
+        for trozo in ('abcDEF', 'token-parte', 'curl', 'Bearer'):
+            self.assertNotIn(trozo, detalle)
+            self.assertNotIn(trozo, self.p.texto_libro())
+        self.assertEqual(self.p.cmd.llamadas, [])
+
     def test_un_account_id_con_espacios_o_salto_de_linea_al_final_se_limpia(self):
         self.p.env['CLOUDFLARE_ACCOUNT_ID'] = '  ' + SECRETOS['CLOUDFLARE_ACCOUNT_ID'] + '\n'
         self.p.env['CLOUDFLARE_API_TOKEN'] = SECRETOS['CLOUDFLARE_API_TOKEN'] + ' \n'

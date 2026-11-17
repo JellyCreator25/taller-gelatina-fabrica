@@ -42,6 +42,13 @@ class CloudflarePages:
         token = (ent.env.get('CLOUDFLARE_API_TOKEN') or '').strip()
         if not token:
             raise ErrorPublicacion('CLOUDFLARE_API_TOKEN está vacío: guárdalo en GitHub → Settings → Environments → produccion')
+        if not re.fullmatch(r'[A-Za-z0-9_.~+/=-]{8,300}', token):
+            # solo cuentas, nunca el contenido: el token es un secreto
+            blancos = len(re.findall(r'\s', token))
+            otros = len(re.findall(r'[^A-Za-z0-9_.~+/=\s-]', token))
+            raise ErrorPublicacion('CLOUDFLARE_API_TOKEN no tiene la forma de un token de Cloudflare (una sola línea, sin espacios): tiene %d caracteres, %d espacios o saltos de línea en medio y %d caracteres '
+                                   'raros. Suele pasar al copiar de más (por ejemplo, el comando de ejemplo que Cloudflare muestra debajo del token). Vuelve a copiar solo el token y guárdalo en '
+                                   'GitHub → Settings → Environments → produccion.' % (len(token), blancos, otros))
         env = dict(ent.env, WRANGLER_SEND_METRICS='false', CI='true', CLOUDFLARE_ACCOUNT_ID=cuenta, CLOUDFLARE_API_TOKEN=token)
         rc, salida, err = ent.cmd(['npx', '--yes', 'wrangler@4', 'pages', 'deploy', str(ctx.raiz / d['carpeta']), '--project-name=' + d['proyecto'],
                                    '--branch=' + d['rama'], '--commit-dirty=true'], cwd=str(ctx.raiz), env=env)
