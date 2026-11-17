@@ -5,14 +5,13 @@ Lo escribe `python3 fabrica.py ciclo`. No contiene claves ni fechas; lo que sale
 ## guerreros-gelatina (v1.4.0)
 
 - Novedad: distinto
-- **Listo para aprobar** (2 acciones pendientes: indexnow, sitio-propio).
-  Lee el plan con `python3 fabrica.py publicar guerreros-gelatina` y, si está bien: `python3 fabrica.py publicar guerreros-gelatina --ejecutar --aprobar 4fb162a472803b5c`
+- Al día: todo lo del plan ya salió.
 
 ## torre-gelatina (v1.1.0)
 
 - Novedad: distinto — Riesgo «alto» de ser visto como clon de un juego de fuera (Stack): no se envía a portales.
-- **Listo para aprobar** (2 acciones pendientes: indexnow, sitio-propio).
-  Lee el plan con `python3 fabrica.py publicar torre-gelatina` y, si está bien: `python3 fabrica.py publicar torre-gelatina --ejecutar --aprobar 5fe25e31ab588ea3`
+- **Bloqueado:**
+  - ritmo: el último lanzamiento fue el 2026-11-17; la política pide al menos 14 días entre juegos nuevos
 
 ## Qué construir después
 
@@ -37,4 +36,4 @@ En espera (algo que solo una persona puede resolver):
 
 Recomendar no es lanzar: un juego nuevo sigue sujeto a la revisión de novedad, a la pausa entre lanzamientos y a tu aprobación con la huella.
 
-Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow.
+Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow, bluesky.
