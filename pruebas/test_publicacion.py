@@ -614,6 +614,36 @@ class PruebasServicios(Base):
         self.assertEqual(self.p.red.a('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord'), [])
         self.assertTrue(all(l['resultado'] == 'ok' for l in informe if l['canal'] != 'bluesky'))   # un canal caído no frena a los demás
 
+    def test_bluesky_con_claves_mal_pegadas_explica_la_forma_sin_mostrar_nada_de_las_claves(self):
+        from publicacion.adaptadores import bluesky
+        casos = [
+            ({'BSKY_IDENTIFIER': 'dueno@correo.mx', 'BSKY_APP_PASSWORD': 'abcd-efgh-ijkl-mnop'}, 'parece un correo'),
+            ({'BSKY_IDENTIFIER': 'taller', 'BSKY_APP_PASSWORD': 'abcd-efgh-ijkl-mnop'}, 'dominio completo'),
+            ({'BSKY_IDENTIFIER': 'taller.bsky.social', 'BSKY_APP_PASSWORD': 'LaContrasenaNormal9'}, 'mide 19 caracteres'),
+            ({'BSKY_IDENTIFIER': 'taller.bsky.social', 'BSKY_APP_PASSWORD': 'abcd efgh ijkl mnop'}, 'espacios o saltos de línea'),
+        ]
+        for env, esperado in casos:
+            with self.subTest(esperado=esperado):
+                ent = nucleo.Entorno(env=env, http=lambda *a, **k: resp(401, {'error': 'AuthenticationRequired', 'message': 'Invalid identifier or password'}))
+                with self.assertRaises(nucleo.ErrorPublicacion) as cm:
+                    bluesky._sesion(ent, 'https://bsky.social')
+                m = str(cm.exception)
+                self.assertIn('HTTP 401, AuthenticationRequired', m)
+                self.assertIn(esperado, m)
+                for secreto in env.values():
+                    self.assertNotIn(secreto, m)
+
+    def test_bluesky_quita_espacios_y_arroba_al_borde_antes_de_iniciar_sesion(self):
+        from publicacion.adaptadores import bluesky
+        vistos = []
+
+        def http(metodo, url, cab=None, cuerpo=None):
+            vistos.append(json.loads(cuerpo))
+            return resp(200, {'accessJwt': 'j', 'did': 'did:plc:x'})
+        ent = nucleo.Entorno(env={'BSKY_IDENTIFIER': '  @taller.bsky.social\n', 'BSKY_APP_PASSWORD': 'abcd-efgh-ijkl-mnop\n'}, http=http)
+        self.assertEqual(bluesky._sesion(ent, 'https://bsky.social'), ('j', 'did:plc:x'))
+        self.assertEqual(vistos, [{'identifier': 'taller.bsky.social', 'password': 'abcd-efgh-ijkl-mnop'}])
+
     def test_mastodon(self):
         self.p.red.al('POST', 'https://mast.ejemplo/api/v2/media', resp(202, {'id': '555'}))
         estados = iter([resp(206), resp(206), resp(200, {'id': '555'})])

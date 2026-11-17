@@ -2,6 +2,7 @@
 Fuentes: atproto.com/guides/bot-tutorial (cuenta dedicada, contraseña de aplicación, etiqueta «bot», sin interacciones automáticas), lexicons app.bsky.feed.post y com.atproto.repo.uploadBlob.
 No leí hoy el esquema de app.bsky.embed.images ni getRecord/putRecord: el primer envío real se hace supervisado."""
 import json
+import re
 import unicodedata
 
 from .imagen import preparar_imagen
@@ -17,11 +18,46 @@ def limite_para(texto):
     return LIMITE_PRUDENTE if ambiguo else LIMITE
 
 
+def _credenciales(ent):
+    """Identificador (sin espacios ni «@» al borde, que se cuelan al copiar) y contraseña de aplicación (sin espacios ni saltos de línea al borde)."""
+    ident = (ent.env.get('BSKY_IDENTIFIER') or '').strip().lstrip('@').strip()
+    clave = (ent.env.get('BSKY_APP_PASSWORD') or '').strip()
+    return ident, clave
+
+
+def _pistas(ident, clave):
+    """Qué suele fallar cuando Bluesky rechaza el inicio de sesión. Solo cuentas y formas: nunca el contenido de las claves."""
+    pistas = []
+    if not ident:
+        pistas.append('BSKY_IDENTIFIER está vacío')
+    else:
+        if '@' in ident:
+            pistas.append('BSKY_IDENTIFIER parece un correo (lleva «@»): usa el nombre de usuario, por ejemplo usuario.bsky.social')
+        if re.search(r'\s', ident):
+            pistas.append('BSKY_IDENTIFIER trae espacios o saltos de línea en medio')
+        if '.' not in ident and '@' not in ident:
+            pistas.append('BSKY_IDENTIFIER no trae el dominio completo: el nombre de usuario completo termina en «.bsky.social»')
+    if not clave:
+        pistas.append('BSKY_APP_PASSWORD está vacío')
+    else:
+        if re.search(r'\s', clave):
+            pistas.append('BSKY_APP_PASSWORD trae espacios o saltos de línea en medio')
+        if not re.fullmatch(r'[a-z0-9]{4}(-[a-z0-9]{4}){3}', clave):
+            pistas.append('BSKY_APP_PASSWORD mide %d caracteres y no tiene la forma de una contraseña de aplicación (cuatro grupos de cuatro separados por guiones, 19 caracteres): '
+                          '¿es la contraseña normal de la cuenta? Las de aplicación se crean en Configuración → Privacidad y seguridad → Contraseñas de aplicación' % len(clave))
+    return pistas
+
+
 def _sesion(ent, pds):
+    ident, clave = _credenciales(ent)
     r = ent.http('POST', pds + '/xrpc/com.atproto.server.createSession', {'Content-Type': 'application/json'},
-                 json.dumps({'identifier': ent.env['BSKY_IDENTIFIER'], 'password': ent.env['BSKY_APP_PASSWORD']}).encode('utf-8'))
+                 json.dumps({'identifier': ident, 'password': clave}).encode('utf-8'))
     if r.status != 200:
-        raise ErrorPublicacion('Bluesky no inició sesión (HTTP %d): revisa BSKY_IDENTIFIER y la contraseña de aplicación' % r.status)
+        codigo = r.json().get('error') if isinstance(r.json(), dict) else None
+        codigo = codigo if isinstance(codigo, str) and re.fullmatch(r'[A-Za-z]{1,40}', codigo) else None
+        pistas = _pistas(ident, clave)
+        raise ErrorPublicacion('Bluesky no inició sesión (HTTP %d%s): revisa BSKY_IDENTIFIER y la contraseña de aplicación%s' % (
+            r.status, ', ' + codigo if codigo else '', '. Pistas: ' + '; '.join(pistas) if pistas else ''))
     s = r.json()
     return s['accessJwt'], s['did']
 
