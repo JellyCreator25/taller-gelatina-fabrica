@@ -1,13 +1,4 @@
 {
   "nota": "Publicaciones del calendario que el dueño aprobó: id → huella. Lo escribe «python3 fabrica.py calendario --aprobar».",
-  "aprobadas": {
-    "leyenda-anubis": "ce6df89c1ef910aa8be0f22f262bd2bedd2945651eb8958266b4351afe4d5533",
-    "leyenda-dracula": "e99c5e32a1fb3440f2972295f7b06507206d610c1828a5c54839d06b21eb2624",
-    "leyenda-hercules": "c4079d09d1f45eb7de1e92bffb2a2ca41e6e8cfb165d42eb7cd8e01982e1dcbe",
-    "leyenda-llorona": "525085e1e6b8d1824e3ed2bb18a6151d684ceb648030eb8de8a1eaf3e8824ccf",
-    "leyenda-medusa": "61e2559f22102c2e667bf08aec4e51325badd4bded0698b3ad1c788de0789d86",
-    "leyenda-merlin": "b4b2fcbdcf19628b2d7484b3ad7ce52f08a516b1869fb0b9217f210422193856",
-    "leyenda-robin": "a29c97255ea346c5a3152e2f420a138b71a514512d967ef4624aea37f012ce83",
-    "leyenda-zeus": "cc19a4f3b6b0eb8a2e7a9be877db2dd2f641a4080976cfee929d5726abc045d4"
-  }
+  "aprobadas": {}
 }

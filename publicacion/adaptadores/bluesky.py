@@ -84,7 +84,7 @@ class Bluesky:
         jwt, did = _sesion(ent, pds)
         aut = {'Authorization': 'Bearer ' + jwt}
         record = {'$type': 'app.bsky.feed.post', 'text': d['texto'], 'createdAt': ent.ahora().strftime('%Y-%m-%dT%H:%M:%S.000Z'),
-                  'langs': [d['idioma']], 'facets': tx.facetas_enlaces(d['texto'])}
+                  'langs': [d['idioma']], 'facets': tx.facetas(d['texto'])}
         if d.get('imagen'):
             datos, mime = preparar_imagen(str(ctx.raiz / d['imagen']['archivo']))
             r = ent.http('POST', pds + '/xrpc/com.atproto.repo.uploadBlob', dict(aut, **{'Content-Type': mime}), datos)

@@ -4,6 +4,7 @@ import sys
 import unicodedata
 
 ENLACE = re.compile(r'https://[^\s]+')
+ETIQUETA = re.compile(r'(?<![\w#/&])#([^\W\d]\w*)')   # «#Etiqueta»: empieza con letra (no «#1»), no es el fragmento de una dirección
 
 
 def grafemas(s):
@@ -41,6 +42,24 @@ def facetas_enlaces(texto):
         caras.append({'index': {'byteStart': ini, 'byteEnd': ini + len(url.encode('utf-8'))},
                       'features': [{'$type': 'app.bsky.richtext.facet#link', 'uri': url}]})
     return caras
+
+
+def facetas_etiquetas(texto):
+    """Facetas de Bluesky para cada #etiqueta (sin la almohadilla en el valor); las que caen dentro de un enlace no cuentan."""
+    dentro = [(m.start(), m.end()) for m in ENLACE.finditer(texto)]
+    caras = []
+    for m in ETIQUETA.finditer(texto):
+        if any(a <= m.start() < b for a, b in dentro):
+            continue
+        ini = len(texto[:m.start()].encode('utf-8'))
+        caras.append({'index': {'byteStart': ini, 'byteEnd': ini + len(m.group(0).encode('utf-8'))},
+                      'features': [{'$type': 'app.bsky.richtext.facet#tag', 'tag': m.group(1)}]})
+    return caras
+
+
+def facetas(texto):
+    """Todas las facetas del texto (enlaces y etiquetas), en orden de aparición."""
+    return sorted(facetas_enlaces(texto) + facetas_etiquetas(texto), key=lambda f: f['index']['byteStart'])
 
 
 def componer_post(spec, idioma, url, linea_ia):

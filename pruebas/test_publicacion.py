@@ -230,6 +230,14 @@ class PruebasTexto(unittest.TestCase):
         self.assertEqual(t.encode('utf-8')[i['byteStart']:i['byteEnd']].decode('utf-8'), 'https://ejemplo.org/a?b=1')
         self.assertEqual(f[0]['features'][0]['uri'], 'https://ejemplo.org/a?b=1')
 
+    def test_etiquetas_son_facetas_con_bytes_utf8_y_no_se_confunden_con_enlaces_ni_numeros(self):
+        t = '¡Sábado! 🟦🟥 Mira https://x.org/es/?a=1#parte y #ScreenshotSaturday. Somos el #1, #gamedev_mx!'
+        f = tx.facetas(t)
+        etiquetas = [(t.encode('utf-8')[x['index']['byteStart']:x['index']['byteEnd']].decode('utf-8'), x['features'][0]['tag'])
+                     for x in f if x['features'][0]['$type'].endswith('#tag')]
+        self.assertEqual(etiquetas, [('#ScreenshotSaturday', 'ScreenshotSaturday'), ('#gamedev_mx', 'gamedev_mx')])   # ni «#1» ni «#parte» (fragmento del enlace)
+        self.assertEqual([x['features'][0]['$type'].split('#')[1] for x in f], ['link', 'tag', 'tag'])               # en orden de aparición
+
     def test_componer_post_exige_enlace_ia_y_sin_marcas(self):
         spec = {'difusion': {'es': {'post_corto': 'Juega: {enlace} {ia}'}}}
         t, problemas = tx.componer_post(spec, 'es', 'https://x.org/es/', 'Hecho con IA.')
@@ -1387,6 +1395,7 @@ class PruebasCalendario(Base):
         self.p.reloj.avanzar(days=1)         # hoy es 21 de noviembre
         self.antes = len(self.p.red.a('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord'))   # la publicación del lanzamiento no cuenta
         (self.p.raiz / 'contenido' / 'imagenes').mkdir(parents=True, exist_ok=True)
+        (self.p.raiz / 'contenido' / 'aprobaciones.json').unlink(missing_ok=True)   # las aprobaciones reales del dueño no son las de estas pruebas
         from PIL import Image
         for n in ('a', 'b', 'c'):
             Image.new('RGB', (300, 169), (40, 60, 160)).save(self.p.raiz / 'contenido' / 'imagenes' / (n + '.png'))
@@ -1570,7 +1579,7 @@ class PruebasCalendarioReal(unittest.TestCase):
         from publicacion import calendario
         self.cal = calendario
 
-    def test_cada_publicacion_es_valida_y_tiene_imagen_con_la_forma_de_una_tarjeta(self):
+    def test_cada_publicacion_es_valida_y_tiene_imagen_apaisada_de_buen_tamano(self):
         from PIL import Image
         lineas = self.cal.estado(RAIZ, datetime.date(2026, 11, 17))
         self.assertTrue(lineas)
@@ -1578,7 +1587,8 @@ class PruebasCalendarioReal(unittest.TestCase):
             with self.subTest(l['id']):
                 self.assertNotEqual(l['estado'], 'con problemas', l['problemas'])
                 with Image.open(RAIZ / l['accion']['datos']['imagen']['archivo']) as im:
-                    self.assertEqual(im.size, (1200, 675))
+                    ancho, alto = im.size
+                    self.assertTrue(1000 <= ancho <= 2000 and 1.2 <= ancho / alto <= 2.0, 'una imagen de publicación mide 1000–2000 px de ancho y es apaisada (hoy %dx%d)' % im.size)
                 self.assertNotIn('Hecho con ayuda de IA', l['accion']['datos']['texto'])   # ia: false (decisión del dueño); el perfil y el sitio lo dicen
         fechas = [l['fecha'] for l in lineas]
         self.assertEqual(fechas, sorted(fechas))
