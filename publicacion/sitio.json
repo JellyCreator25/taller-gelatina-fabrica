@@ -1,0 +1,20 @@
+{
+  "nota": "Datos del sitio propio. Mientras diga CAMBIA-ESTE-NOMBRE o «contacto» esté vacío, el motor se niega a publicar el sitio (compuertas). Los juegos que aparecen en el sitio son solo los de «juegos»: agregar uno ahí es la decisión de lanzarlo.",
+  "nombre": "Taller Gelatina",
+  "url_base": "https://taller-gelatina.pages.dev",
+  "proyecto": "taller-gelatina",
+  "rama_produccion": "main",
+  "contacto": "mhb250402@hotmail.com",
+  "idioma_inicial": "es",
+  "juegos": [
+    "guerreros-gelatina",
+    "torre-gelatina"
+  ],
+  "lema": {
+    "es": "Juegos para el navegador, gratis y sin descargas.",
+    "en": "Browser games, free and with no downloads.",
+    "zh": "浏览器小游戏，免费，无需下载。"
+  },
+  "adsense_publisher": "",
+  "indexnow_clave": ""
+}

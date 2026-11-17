@@ -1,0 +1,95 @@
+{
+  "nota": "Cuaderno de ideas de la fábrica. Cada idea es una plantilla (un género nuevo) por construir, no una variante: `python3 fabrica.py ideas` la compara con los juegos que ya existen. Son ideas, no promesas: ninguna está probada con jugadores, y el «gancho» es lo que tendría que ser cierto para que valga la pena. Se pueden descartar sin consecuencias.",
+  "ideas": [
+    {
+      "id": "muralla",
+      "titulo": "Muralla (defensa de torres de una pantalla)",
+      "mecanica": {
+        "genero": "defensa-torres",
+        "verbo": "colocar",
+        "objetivo": "sobrevivir",
+        "entrada": ["toque"],
+        "progresion": "niveles-fijos"
+      },
+      "referencias": ["Kingdom Rush", "Bloons TD"],
+      "riesgo_estimado": "alto",
+      "brief": "Una defensa de torres que cabe en una pantalla de celular y se juega en 3 minutos por oleada.",
+      "gancho": "Las oleadas se arman a partir de cómo defendiste la anterior (el enemigo se adapta). Si no se logra que eso se sienta distinto, es un clon de un género saturado y no debe ir a portales."
+    },
+    {
+      "id": "trazos",
+      "titulo": "Trazos (puzzle de palabras y caracteres en tres idiomas)",
+      "mecanica": {
+        "genero": "puzzle-palabras",
+        "verbo": "conectar",
+        "objetivo": "aprender",
+        "entrada": ["arrastrar", "toque"],
+        "progresion": "niveles-fijos"
+      },
+      "referencias": [],
+      "riesgo_estimado": "bajo",
+      "brief": "Se conectan caracteres chinos con su significado en español e inglés, y los niveles enseñan los componentes de cada carácter.",
+      "gancho": "Usa lo que ya tiene el motor (tres idiomas y sistema de textos) para algo que casi no existe en juegos de navegador. El contenido en chino exige revisión de una persona hablante nativa antes de publicar."
+    },
+    {
+      "id": "arena",
+      "titulo": "Arena (sandbox de materiales que caen)",
+      "mecanica": {
+        "genero": "sandbox-creativo",
+        "verbo": "dibujar",
+        "objetivo": "descubrir",
+        "entrada": ["arrastrar"],
+        "progresion": "desbloqueos"
+      },
+      "referencias": ["Powder Game", "Sandspiel"],
+      "riesgo_estimado": "medio",
+      "brief": "Se esparcen materiales (arena, agua, fuego, plantas) que reaccionan entre sí; descubrir una combinación desbloquea otro material.",
+      "gancho": "Un cuaderno de descubrimientos con pistas que guíe al jugador sin decirle la respuesta; los sandbox de materiales existentes casi no tienen meta."
+    },
+    {
+      "id": "compas",
+      "titulo": "Compás (ritmo de un botón con sonido sintetizado)",
+      "mecanica": {
+        "genero": "ritmo",
+        "verbo": "cronometrar",
+        "objetivo": "puntaje-maximo",
+        "entrada": ["toque", "teclado"],
+        "progresion": "desbloqueos"
+      },
+      "referencias": ["Rhythm Doctor"],
+      "riesgo_estimado": "medio",
+      "brief": "Una sola tecla y canciones cortas que el motor de audio genera por reglas, con un patrón distinto en cada partida.",
+      "gancho": "La música se genera con el motor de audio de la fábrica (sin archivos externos); que suene bien es el riesgo real y se prueba con oídos humanos, no con pruebas automáticas."
+    },
+    {
+      "id": "colonia",
+      "titulo": "Colonia (incremental con decisiones)",
+      "mecanica": {
+        "genero": "idle-incremental",
+        "verbo": "elegir",
+        "objetivo": "construir-algo",
+        "entrada": ["toque"],
+        "progresion": "mejoras-permanentes"
+      },
+      "referencias": ["Cookie Clicker", "A Dark Room"],
+      "riesgo_estimado": "medio",
+      "brief": "Una colonia que crece sola mientras el jugador toma decisiones que cambian qué recursos importan.",
+      "gancho": "Que las decisiones sean de verdad excluyentes (no solo «comprar lo más barato»); sin eso es un incremental más."
+    },
+    {
+      "id": "rebote",
+      "titulo": "Rebote (puzzle de física con gelatina)",
+      "mecanica": {
+        "genero": "puzzle-fisico",
+        "verbo": "apuntar",
+        "objetivo": "llegar-a-la-meta",
+        "entrada": ["apuntar-y-disparar"],
+        "progresion": "niveles-fijos"
+      },
+      "referencias": [],
+      "riesgo_estimado": "medio",
+      "brief": "Se lanza una gelatina que se aplasta y rebota para llegar a la meta; cada material del nivel la trata distinto.",
+      "gancho": "Aprovecha la física blanda que ya tiene el motor, que es lo más propio de la fábrica; el riesgo es parecerse a juegos de lanzamiento conocidos."
+    }
+  ]
+}

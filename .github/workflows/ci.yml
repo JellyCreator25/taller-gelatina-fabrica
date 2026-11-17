@@ -1,0 +1,31 @@
+name: Pruebas
+# Corre en cada cambio. No usa claves ni publica nada.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow (la imagen que se sube a las redes)
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Pruebas unitarias
+        run: .venv/bin/python -I -m unittest discover -s pruebas
+      - name: Reconstruir, revisar el kit y comprobar novedad
+        run: |
+          .venv/bin/python -I fabrica.py construir todos
+          .venv/bin/python -I fabrica.py kit todos
+          .venv/bin/python -I fabrica.py revisar todos
+          .venv/bin/python -I fabrica.py novedad todos
+          .venv/bin/python -I fabrica.py sitio
+      - name: Lo guardado en salida/ coincide con lo que se reconstruye
+        # Si falla: corre «python3 fabrica.py todo todos» en tu computadora y guarda los cambios.
+        run: git diff --exit-code -- salida

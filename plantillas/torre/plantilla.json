@@ -1,0 +1,9 @@
+{
+  "nombre": "torre",
+  "genero": "apilador",
+  "verbo": "soltar",
+  "objetivo": "altura-maxima",
+  "entrada": ["toque", "teclado"],
+  "progresion": "puntaje-infinito",
+  "descripcion": "Apilador con timing: se suelta un bloque que se mueve y lo que sobresale se corta."
+}

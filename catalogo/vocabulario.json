@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "reglas": [
+    "Cada juego declara su mecánica con valores de esta lista; así dos juegos no pueden parecer distintos solo por llamar de otro modo a lo mismo.",
+    "Tres ejes definen el núcleo de un juego: género, verbo (lo que hace el jugador una y otra vez) y objetivo. Con los tres iguales, el juego es una variante de otro y no se publica como juego aparte.",
+    "Cambiar el tema, los colores, los personajes o los textos no cambia el núcleo.",
+    "Añadir un valor nuevo es una decisión de diseño: se anota en «ampliaciones» con fecha y motivo."
+  ],
+  "ejes": {
+    "genero": {
+      "simulador-batalla": "Se colocan unidades y la batalla se resuelve sola",
+      "apilador": "Se apilan piezas con precisión de tiempo",
+      "defensa-torres": "Se defiende un punto de oleadas con unidades fijas",
+      "plataformas": "Se recorre un nivel saltando",
+      "puzzle-fisico": "Se resuelven niveles con física",
+      "puzzle-logico": "Se resuelven niveles con reglas lógicas",
+      "puzzle-palabras": "Se resuelven niveles con palabras o caracteres",
+      "carrera-infinita": "Se avanza sin fin esquivando",
+      "tiro-arcade": "Se dispara a objetivos",
+      "ritmo": "Se actúa al compás de la música",
+      "idle-incremental": "Los números crecen solos y se invierte en mejoras",
+      "gestion": "Se administran recursos",
+      "sandbox-creativo": "Se juega con materiales o reglas sin un final fijo",
+      "cartas": "Se juega con mazos",
+      "roguelike": "Partidas cortas con mapas y mejoras al azar",
+      "aventura-narrativa": "Se avanza una historia con decisiones",
+      "trivia": "Preguntas y respuestas"
+    },
+    "verbo": {
+      "colocar": "Poner piezas o unidades en un sitio",
+      "soltar": "Dejar caer una pieza",
+      "saltar": "Saltar",
+      "apuntar": "Apuntar y lanzar o disparar",
+      "arrastrar": "Arrastrar elementos",
+      "conectar": "Unir elementos entre sí",
+      "esquivar": "Evitar obstáculos",
+      "elegir": "Escoger entre opciones",
+      "construir": "Construir estructuras",
+      "cronometrar": "Actuar en el momento justo",
+      "combinar": "Mezclar elementos para obtener otros",
+      "escribir": "Escribir texto",
+      "cortar": "Cortar cuerdas, bloques o formas",
+      "dibujar": "Dibujar o esparcir materiales",
+      "recolectar": "Recoger objetos",
+      "controlar-personaje": "Mover directamente a un personaje"
+    },
+    "objetivo": {
+      "eliminar-rival": "Vencer al otro bando",
+      "altura-maxima": "Llegar lo más alto posible",
+      "puntaje-maximo": "Hacer el mejor puntaje",
+      "sobrevivir": "Aguantar lo más posible",
+      "resolver-nivel": "Resolver cada nivel",
+      "llegar-a-la-meta": "Llegar a un punto",
+      "construir-algo": "Levantar algo propio",
+      "completar-coleccion": "Reunir todos los elementos",
+      "descubrir": "Descubrir combinaciones o secretos",
+      "aprender": "Aprender algo con el juego"
+    },
+    "entrada": {
+      "toque": "Clic o toque",
+      "arrastrar": "Arrastrar con el dedo o el ratón",
+      "teclado": "Teclas",
+      "apuntar-y-disparar": "Apuntar y soltar",
+      "mantener-presionado": "Mantener presionado",
+      "texto": "Escribir"
+    },
+    "progresion": {
+      "niveles-con-oro": "Niveles con una economía que crece",
+      "niveles-fijos": "Niveles ordenados",
+      "puntaje-infinito": "Una partida sin fin que se mide en puntos",
+      "mejoras-permanentes": "Mejoras que se conservan entre partidas",
+      "desbloqueos": "Contenido que se desbloquea al jugar",
+      "historia": "Una historia que avanza",
+      "sin-progresion": "Sin progresión"
+    }
+  },
+  "libres": ["ambientacion", "arte", "sistemas"],
+  "ampliaciones": []
+}

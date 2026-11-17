@@ -1,0 +1,46 @@
+Informe de pruebas · guerreros-gelatina v1.4.0
+
+— escritorio 1280×800
+ok     · el motor común (GGX) está cargado
+ok     · tipografías incrustadas: 4 en uso, 0 con error
+ok     · sin desplazamiento horizontal al abrir (0 px de más)
+  batalla terminada en 11.4 s reales · ¡Ganó el Rojo!
+  sonidos disparados: {"click":22,"pop":16,"error":1,"horn":1,"hit":97,"whoosh":4,"zap":15,"land":5,"hurt":31,"boom":8,"heal":4,"merge":5,"win":1}
+  oro del jugador en Reto: nivel 1 → 1000, nivel 2 → 1150 (oro libre 1000)
+  idiomas ofrecidos: Español · English · 中文
+  aviso de victoria revisado en es, en, zh: «还剩 2 名战士。最高关卡：2。第 3 关你会多得 150 金币，共 1,300。»
+  modo Reto revisado en es, en, zh
+  modo Libre revisado en es, en, zh
+  frases de las 8 Leyendas revisadas en es, en, zh
+  tras recargar el idioma se mantiene (zh) y ?lang=en lo cambia
+ok     · escenario completo {"colocados":16,"reto":{"nivel1":1000,"nivel2":1150,"libre_nivel2":1000},"idiomas":["es","en","zh"]}
+ok     · sin desplazamiento horizontal al terminar (0 px de más)
+ok     · sin errores de consola ni de página
+ok     · sin conexiones externas
+— celular 390×844
+ok     · el motor común (GGX) está cargado
+ok     · tipografías incrustadas: 4 en uso, 0 con error
+ok     · sin desplazamiento horizontal al abrir (0 px de más)
+  batalla terminada en 8.0 s reales · ¡Ganó el Azul!
+  sonidos disparados: {"click":19,"pop":13,"error":1,"horn":1,"hit":69,"zap":8,"land":2,"merge":3,"hurt":27,"boom":10,"win":1}
+  oro del jugador en Reto: nivel 1 → 1000, nivel 2 → 1150 (oro libre 1000)
+  idiomas ofrecidos: Español · English · 中文
+  aviso de victoria revisado en es, en, zh: «还剩 2 名战士。最高关卡：2。第 3 关你会多得 150 金币，共 1,300。»
+  modo Reto revisado en es, en, zh
+  modo Libre revisado en es, en, zh
+  frases de las 8 Leyendas revisadas en es, en, zh
+  tras recargar el idioma se mantiene (zh) y ?lang=en lo cambia
+ok     · escenario completo {"colocados":13,"reto":{"nivel1":1000,"nivel2":1150,"libre_nivel2":1000},"idiomas":["es","en","zh"]}
+ok     · sin desplazamiento horizontal al terminar (0 px de más)
+ok     · sin errores de consola ni de página
+ok     · sin conexiones externas
+— portada
+ok     · portada.png generada (1260×1000)
+— clip principal 960×600
+  sonidos disparados: {"click":20,"pop":16,"horn":1,"hit":87,"land":3,"boom":9,"zap":9,"hurt":24,"merge":4,"heal":2,"whoosh":1}
+ok     · clip.mp4 generado (24.2 s, 1484 KB) y clip.gif (2033 KB)
+— clip vertical (Shorts, Reels, TikTok)
+  sonidos disparados: {"click":17,"pop":13,"error":1,"horn":1,"hit":40,"boom":9,"land":2,"zap":8,"hurt":14,"merge":4,"whoosh":1,"win":1}
+ok     · clip-vertical.mp4 generado (23.0 s, 1031 KB)
+
+Todo en orden

@@ -1,0 +1,100 @@
+name: Publicar
+# La publicación se aprueba con la HUELLA del plan:
+#   1) Corre este flujo con el juego y SIN huella: solo muestra el plan (textos, enlaces, archivos) y la huella.
+#   2) Lee el plan. Si está bien, vuelve a correrlo con la misma huella: el trabajo recalcula el plan y se detiene si algo cambió.
+# Las claves viven en el Environment «produccion» (Settings → Environments). Si le pones «Required reviewers», habrá además una segunda confirmación.
+on:
+  workflow_dispatch:
+    inputs:
+      juego:
+        description: 'Identificador del juego (por ejemplo guerreros-gelatina)'
+        required: true
+        type: string
+      huella:
+        description: 'Huella aprobada (vacía = solo ver el plan)'
+        required: false
+        default: ''
+        type: string
+      solo:
+        description: 'Limitar a estos canales, separados por coma (opcional)'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Generar el sitio y mostrar el plan (sin claves, sin publicar)
+        env:
+          JUEGO: ${{ inputs.juego }}
+          SOLO: ${{ inputs.solo }}
+        run: |
+          case "$JUEGO" in (*[!a-z0-9-]*|'') echo "El juego debe ser un identificador como guerreros-gelatina"; exit 1;; esac
+          .venv/bin/python -I fabrica.py sitio
+          if [ -n "$SOLO" ]; then
+            .venv/bin/python -I fabrica.py publicar "$JUEGO" --solo "$SOLO" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            .venv/bin/python -I fabrica.py publicar "$JUEGO" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+  publicar:
+    needs: plan
+    if: ${{ inputs.huella != '' }}
+    runs-on: ubuntu-latest
+    environment: produccion
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Publicar exactamente lo que cubre la huella
+        env:
+          JUEGO: ${{ inputs.juego }}
+          HUELLA: ${{ inputs.huella }}
+          SOLO: ${{ inputs.solo }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          MASTODON_INSTANCE: ${{ secrets.MASTODON_INSTANCE }}
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          case "$JUEGO" in (*[!a-z0-9-]*|'') echo "El juego debe ser un identificador como guerreros-gelatina"; exit 1;; esac
+          .venv/bin/python -I fabrica.py sitio
+          if [ -n "$SOLO" ]; then
+            .venv/bin/python -I fabrica.py publicar "$JUEGO" --solo "$SOLO" --ejecutar --aprobar "$HUELLA" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            .venv/bin/python -I fabrica.py publicar "$JUEGO" --ejecutar --aprobar "$HUELLA" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Guardar el libro de registro, también si algo falló (lo que salió debe quedar anotado)
+        if: ${{ always() }}
+        env:
+          JUEGO: ${{ inputs.juego }}
+        run: |
+          git config user.name "fabrica-de-juegos"
+          git config user.email "fabrica-de-juegos@users.noreply.github.com"
+          git add publicacion/libro.jsonl
+          git diff --cached --quiet || { git commit -m "Libro de publicación: $JUEGO" && git push; }

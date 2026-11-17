@@ -1,0 +1,29 @@
+name: Ciclo semanal
+# El latido de la fábrica: reconstruye, revisa, genera el sitio y deja publicacion/PENDIENTE.md con lo que está listo para aprobar.
+# No usa claves ni publica nada. Si GitHub llega a desactivarlo por falta de actividad, se reactiva desde la pestaña Actions.
+on:
+  schedule:
+    - cron: '17 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ciclo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Correr el ciclo
+        run: .venv/bin/python -I fabrica.py ciclo
+      - name: Guardar el estado si cambió
+        if: ${{ always() }}
+        run: |
+          git config user.name "fabrica-de-juegos"
+          git config user.email "fabrica-de-juegos@users.noreply.github.com"
+          git add publicacion/PENDIENTE.md
+          git diff --cached --quiet || { git commit -m "Estado del ciclo" && git push; }

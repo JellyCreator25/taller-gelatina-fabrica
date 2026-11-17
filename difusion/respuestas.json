@@ -1,0 +1,109 @@
+{
+  "reglas": [
+    "Se responde con calma, en el idioma del comentario, y siempre se agradece.",
+    "No se discute: una respuesta, y si el tema sigue, se deja ahí.",
+    "No se inventan funciones, fechas ni promesas: solo lo que el juego hace hoy.",
+    "No se piden votos, «me gusta» ni que lo compartan.",
+    "Cada respuesta pública pasa por tu «sí»: yo las propongo y tú las ajustas con tu voz.",
+    "Si un comentario es acoso o spam, no se contesta: se usa la herramienta de reportar de la plataforma."
+  ],
+  "es": [
+    {
+      "pregunta": "«¿Esto está hecho con IA?» o «¿Quién lo hizo?»",
+      "respuesta": "Sí. {ia_frase} Lo declaro abiertamente (en la página del juego y en cada publicación) para que cada quien decida si quiere jugarlo. Los cambios se hacen a partir de lo que ustedes cuentan en los comentarios."
+    },
+    { "pregunta": "«¿Es gratis?» o «¿Cómo puedo apoyar?»", "respuesta": "{precio}" },
+    {
+      "pregunta": "«¿Tiene anuncios?», «¿Pide cuenta?» o «¿Recoge datos?»",
+      "respuesta": "{sin_anuncios}"
+    },
+    {
+      "pregunta": "«Encontré un error»",
+      "respuesta": "Gracias por avisar. ¿Me cuentas en qué dispositivo y navegador te pasó y qué estabas haciendo justo antes? Con eso lo reviso para el próximo parche."
+    },
+    {
+      "pregunta": "«¿Funciona en celular?»",
+      "respuesta": "Sí, está pensado para celular y computadora. Está probado con pantallas de celular simuladas, no con todos los modelos reales: si algo falla en el tuyo, dime el modelo y el navegador y lo reviso."
+    },
+    {
+      "pregunta": "«Se parece a otro juego»",
+      "requiere": "originalidad",
+      "respuesta": "Es cierto, comparte género con {referencias}. Lo que intenta hacer distinto: {diferenciador}"
+    },
+    {
+      "pregunta": "«¿Van a agregar más cosas?»",
+      "respuesta": "Depende de lo que pida la gente. Cuéntame qué te gustaría ver y lo anoto para el siguiente parche."
+    },
+    {
+      "pregunta": "«Está muy fácil» o «Está muy difícil»",
+      "respuesta": "Gracias, es justo lo que quiero saber. ¿En qué momento lo sentiste así: al empezar o más adelante? Lo anoto para ajustar el balance."
+    },
+    {
+      "pregunta": "Rechazo por el uso de IA",
+      "respuesta": "Lo entiendo, y por eso lo declaro abiertamente: cada quien decide si quiere jugarlo. Si luego lo pruebas y tienes críticas del juego en sí, las leo con gusto."
+    }
+  ],
+  "en": [
+    {
+      "pregunta": "\"Is this made with AI?\" or \"Who made it?\"",
+      "respuesta": "Yes. {ia_frase} It's declared openly (on the game's page and in every post) so everyone can decide whether they want to play it. Changes are made based on what you tell me in the comments."
+    },
+    { "pregunta": "\"Is it free?\" or \"How can I support it?\"", "respuesta": "{precio}" },
+    {
+      "pregunta": "\"Does it have ads?\", \"Does it need an account?\" or \"Does it collect data?\"",
+      "respuesta": "{sin_anuncios}"
+    },
+    {
+      "pregunta": "\"I found a bug\"",
+      "respuesta": "Thanks for letting me know! Which device and browser were you on, and what were you doing right before it happened? I'll look into it for the next patch."
+    },
+    {
+      "pregunta": "\"Does it work on phones?\"",
+      "respuesta": "Yes, it's designed for phones and computers. It has been tested with simulated phone screens, not every real model: if something breaks on yours, tell me the model and browser and I'll look into it."
+    },
+    {
+      "pregunta": "\"It looks like another game\"",
+      "requiere": "originalidad",
+      "respuesta": "Fair point, it shares a genre with {referencias}. What it tries to do differently: {diferenciador}"
+    },
+    {
+      "pregunta": "\"Will you add more?\"",
+      "respuesta": "That depends on what people ask for. Tell me what you'd like to see and I'll note it for the next patch."
+    },
+    {
+      "pregunta": "\"It's too easy\" or \"It's too hard\"",
+      "respuesta": "Thanks, that's exactly what I want to know. At what point did it feel that way: at the start or later on? I'll note it to tune the balance."
+    },
+    {
+      "pregunta": "Pushback on the use of AI",
+      "respuesta": "I understand, and that's why I'm upfront about it: everyone can decide whether they want to play it. If you try it and have feedback on the game itself, I'm happy to read it."
+    }
+  ],
+  "zh": [
+    {
+      "pregunta": "「这是用 AI 做的吗？」或「谁做的？」",
+      "respuesta": "是的。{ia_frase} 我会公开说明（在游戏页面和每一条发布内容里），让每个人自己决定要不要玩。我会根据你们在评论里的反馈来修改游戏。"
+    },
+    { "pregunta": "「免费吗？」或「怎么支持你？」", "respuesta": "{precio}" },
+    { "pregunta": "「有广告吗？」「要账号吗？」或「会收集数据吗？」", "respuesta": "{sin_anuncios}" },
+    {
+      "pregunta": "「我发现了一个错误」",
+      "respuesta": "谢谢告诉我。能说说你用的是什么设备和浏览器，以及出问题之前你在做什么吗？有了这些，我就能在下一个补丁里修复。"
+    },
+    {
+      "pregunta": "「手机能玩吗？」",
+      "respuesta": "能，游戏是为手机和电脑设计的。我用模拟的手机屏幕测试过，但没有在所有真实机型上测试：如果你的手机有问题，请告诉我机型和浏览器，我会去检查。"
+    },
+    {
+      "pregunta": "「和别的游戏很像」",
+      "requiere": "originalidad",
+      "respuesta": "确实，它和 {referencias} 属于同一类型。我想做得不一样的地方是：{diferenciador}"
+    },
+    { "pregunta": "「会加更多内容吗？」", "respuesta": "要看大家的需求。告诉我你想看到什么，我会记下来放到下一个补丁里。" },
+    { "pregunta": "「太简单了」或「太难了」", "respuesta": "谢谢，这正是我想知道的。你是在什么时候有这种感觉的：刚开始，还是后面？我会记下来调整平衡。" },
+    {
+      "pregunta": "因为使用了 AI 而反感",
+      "respuesta": "我理解，所以我才公开说明：每个人都可以自己决定要不要玩。如果你之后试了，对游戏本身有意见，我很乐意看。"
+    }
+  ]
+}

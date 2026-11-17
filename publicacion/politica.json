@@ -1,0 +1,30 @@
+{
+  "nota": "Política de publicación. Solo se usan los canales de «canales». Para activar uno: crea la cuenta y configura sus secretos (la lista exacta está en difusion/MAPA.md), agrégalo aquí y corre «python3 fabrica.py publicar JUEGO» para leer el plan antes de aprobar nada.",
+  "canales": ["sitio-propio", "indexnow"],
+  "idioma": {
+    "bluesky": "es",
+    "mastodon": "es",
+    "telegram-canal": "es",
+    "discord-webhook": "es",
+    "youtube-api": "es"
+  },
+  "avisar_parches": false,
+  "ritmo": {
+    "min_dias_entre_lanzamientos": 14,
+    "canales": {
+      "bluesky": {"max_por_dia": 2, "min_horas_entre": 6},
+      "mastodon": {"max_por_dia": 2, "min_horas_entre": 6},
+      "telegram-canal": {"max_por_dia": 2, "min_horas_entre": 6},
+      "discord-webhook": {"max_por_dia": 2, "min_horas_entre": 6},
+      "youtube-api": {"max_por_dia": 1, "min_horas_entre": 24}
+    }
+  },
+  "bluesky": {"pds": "https://bsky.social"},
+  "youtube": {
+    "privacidad": "public",
+    "hecho_para_ninos": false,
+    "contenido_sintetico": false,
+    "categoria": "20",
+    "etiquetas": ["indie game", "browser game", "juegos web"]
+  }
+}

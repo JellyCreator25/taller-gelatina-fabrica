@@ -1,0 +1,9 @@
+{
+  "nombre": "gelatina",
+  "genero": "simulador-batalla",
+  "verbo": "colocar",
+  "objetivo": "eliminar-rival",
+  "entrada": ["toque", "arrastrar"],
+  "progresion": "niveles-con-oro",
+  "descripcion": "Simulador de batallas: se colocan unidades sobre el campo, empieza la pelea y se mira el caos. Con paquetes de unidades y de audio."
+}

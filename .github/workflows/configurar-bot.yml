@@ -1,0 +1,49 @@
+name: Configurar cuenta de bot
+# Ajuste de una sola vez, DESPUÉS de crear la cuenta y guardar sus claves en el Environment «produccion»:
+# pone la etiqueta «bot» en el perfil (Bluesky) o marca la cuenta como bot (Mastodon). No publica nada.
+#   1) Córrelo sin marcar «ejecutar»: solo dice qué haría y qué claves faltan.
+#   2) Córrelo marcando «ejecutar»: hace el ajuste.
+on:
+  workflow_dispatch:
+    inputs:
+      cuenta:
+        description: 'Cuenta que se declarará como bot'
+        required: true
+        type: choice
+        options:
+          - bluesky-bot
+          - mastodon-bot
+      ejecutar:
+        description: 'Hacer el ajuste de verdad (sin marcar: solo muestra qué haría)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  configurar:
+    runs-on: ubuntu-latest
+    environment: produccion
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Declarar la cuenta como bot
+        env:
+          CUENTA: ${{ inputs.cuenta }}
+          EJECUTAR: ${{ inputs.ejecutar }}
+          BSKY_IDENTIFIER: ${{ secrets.BSKY_IDENTIFIER }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          MASTODON_INSTANCE: ${{ secrets.MASTODON_INSTANCE }}
+          MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
+        run: |
+          case "$CUENTA" in (bluesky-bot|mastodon-bot) ;; (*) echo "Cuenta no reconocida"; exit 1;; esac
+          if [ "$EJECUTAR" = "true" ]; then
+            .venv/bin/python -I fabrica.py configurar "$CUENTA" --ejecutar | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            .venv/bin/python -I fabrica.py configurar "$CUENTA" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi

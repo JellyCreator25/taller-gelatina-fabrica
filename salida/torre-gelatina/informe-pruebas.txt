@@ -1,0 +1,48 @@
+Informe de pruebas · torre-gelatina v1.1.0
+
+— escritorio 1280×800
+ok     · el motor común (GGX) está cargado
+ok     · tipografías incrustadas: 4 en uso, 0 con error
+ok     · sin desplazamiento horizontal al abrir (0 px de más)
+  idioma al abrir: es
+  6 perfectos seguidos con el ancho intacto (160 px)
+  dos cortes: 160 → 87 → 48 px
+  racha de 4: 48 → 60 px (+6 desde el tercero)
+  entradas reales: clic y barra espaciadora sueltan el bloque
+  torre de 26 pisos · racha 2 · velocidad 218 px/s
+  final: «¡Nuevo récord!» · 27 pisos · 23 perfectos · mejor: 27
+  sonidos disparados: {"click":1,"coin":23,"pop":4,"hurt":1,"win":1}
+  idiomas ofrecidos: Español · English · 中文
+  medida de «果冻塔» a 32 px: 96 px con la pila china
+  tras recargar: «最高: 27», el idioma se mantiene (zh) y ?lang=en lo cambia
+ok     · escenario completo {"pisos":27}
+ok     · sin desplazamiento horizontal al terminar (0 px de más)
+ok     · sin errores de consola ni de página
+ok     · sin conexiones externas
+— celular 390×844
+ok     · el motor común (GGX) está cargado
+ok     · tipografías incrustadas: 4 en uso, 0 con error
+ok     · sin desplazamiento horizontal al abrir (0 px de más)
+  idioma al abrir: es
+  6 perfectos seguidos con el ancho intacto (160 px)
+  dos cortes: 160 → 87 → 48 px
+  racha de 4: 48 → 60 px (+6 desde el tercero)
+  entradas reales: toque y barra espaciadora sueltan el bloque
+  torre de 26 pisos · racha 1 · velocidad 218 px/s
+  final: «¡Nuevo récord!» · 27 pisos · 23 perfectos · mejor: 27
+  sonidos disparados: {"click":1,"coin":23,"pop":4,"hurt":1,"win":1}
+  idiomas ofrecidos: Español · English · 中文
+  medida de «果冻塔» a 32 px: 96 px con la pila china
+  tras recargar: «最高: 27», el idioma se mantiene (zh) y ?lang=en lo cambia
+ok     · escenario completo {"pisos":27}
+ok     · sin desplazamiento horizontal al terminar (0 px de más)
+ok     · sin errores de consola ni de página
+ok     · sin conexiones externas
+— portada
+ok     · portada.png generada (1260×1000)
+— clip principal 600×720
+ok     · clip.mp4 generado (34.7 s, 613 KB) y clip.gif (1205 KB)
+— clip vertical (Shorts, Reels, TikTok)
+ok     · clip-vertical.mp4 generado (34.7 s, 864 KB)
+
+Todo en orden
