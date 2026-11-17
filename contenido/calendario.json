@@ -1,25 +1,36 @@
 {
   "publicaciones": [
     {
-      "id": "gta-semana",
+      "id": "gta-vispera",
+      "juego": "guerreros-gelatina",
+      "canal": "bluesky",
+      "idioma": "es",
+      "no_antes_de": "2026-11-18",
+      "texto": "Mañana sale GTA VI y pide hasta 212 GB de espacio.\n\nGuerreros Gelatina pesa 232 KB: caben casi 900 mil en lo que ocupa uno solo. No tiene mapa gigante, pero Zeus lanza rayos y Merlín te vuelve rana. Gratis, en tu navegador.\n\n{enlace}",
+      "imagen": "contenido/imagenes/batalla-caos.png",
+      "alt": "Captura de Guerreros Gelatina: una batalla caótica en un prado entre gelatinas azules y rojas. Se ven a Zeus con un rayo, Merlín con sombrero de mago y gigantes rojos con garrote; los globos de texto dicen «¡Croac!» y «¡Mírame!».",
+      "ia": false
+    },
+    {
+      "id": "gta-dia",
       "juego": "guerreros-gelatina",
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-19",
-      "texto": "Esta semana medio internet juega GTA VI. Nosotros hicimos un juego donde Zeus, Medusa y Drácula (de gelatina) se agarran a golpes en tu navegador.\n\nSin descargas, sin cuenta, gratis. Pesa menos que una foto de tu celular.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "texto": "Hoy sale GTA VI, después de 13 años de espera.\n\nAquí no hay que esperar nada: abres el enlace, colocas tus gelatinas y a pelear. Zeus ya está calentando los rayos. ⚡\n\n{enlace}",
+      "imagen": "contenido/imagenes/batalla-tormenta.png",
+      "alt": "Captura de Guerreros Gelatina: un rayo amarillo en zigzag cae sobre un grupo de gelatinas rojas que pelean con gelatinas azules. Atrás, Zeus (azul, con barba blanca y un rayo) grita «¡Rayos!».",
       "ia": false
     },
     {
-      "id": "zeus",
+      "id": "antes-despues",
       "juego": "guerreros-gelatina",
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-20",
-      "texto": "Zeus no sabe pelear sin drama: cada 6.5 segundos invoca una tormenta y tres rayos caen sobre quien tenga cerca ⚡\n\n¿Lo pones al frente de tu ejército o lo escondes atrás para que no se despeine?\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-tormenta.png",
-      "alt": "Captura de Guerreros Gelatina: un rayo amarillo en zigzag cae sobre un grupo de gelatinas rojas que pelean con gelatinas azules. Atrás, Zeus (azul, con barba blanca y un rayo) grita «¡Rayos!».",
+      "texto": "Tú, colocando a todos con mucho cuidado.\nTú, unos segundos después de pulsar ¡Pelear!\n\nGuerreros Gelatina, gratis en el navegador.\n{enlace}",
+      "imagen": "contenido/imagenes/batalla-antesdespues.png",
+      "alt": "Dos capturas de Guerreros Gelatina, una sobre otra. Arriba, «Antes»: gelatinas azules y rojas en formación ordenada en el campo. Abajo, «Después»: las mismas gelatinas mezcladas en plena batalla, con globos de texto que dicen «¡Croac!»",
       "ia": false
     },
     {
@@ -28,7 +39,7 @@
       "canal": "bluesky",
       "idioma": "en",
       "no_antes_de": "2026-11-21",
-      "texto": "Screenshot Saturday: dozens of jelly warriors, giants with clubs and a wizard turning people into frogs. 🐸\n\nGuerreros Gelatina is a free browser game: place your army, hit Fight, watch the chaos.\n\n{enlace}\n#ScreenshotSaturday",
+      "texto": "Screenshot Saturday: pick your main.\n\nZeus ⚡ Medusa 🐍 Anubis 🐺 Dracula 🧛 Merlin 🐸 Hercules 💪 Robin Hood 🏹 La Llorona 👻\n\nAll jelly, all free in your browser.\n{enlace}\n#ScreenshotSaturday",
       "imagen": "contenido/imagenes/batalla-caos-en.png",
       "alt": "Screenshot of Guerreros Gelatina: a chaotic battle on a green meadow between blue and red jelly warriors. Zeus with a lightning bolt, a wizard, and two big red giants with clubs are visible; speech bubbles say \"Lightning!\" and \"HYAA!\".",
       "ia": false
@@ -39,18 +50,18 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-22",
-      "texto": "Merlín no prepara pociones: cada 5 segundos convierte en ranas a los 2 enemigos más fuertes que tenga cerca. 🐸\n\nSí, nuestro mago es básicamente un meme con barba. ¡Croac!\n\n{enlace}",
+      "texto": "Merlín dice que fue un accidente.\nLo ha hecho 12 veces por minuto.\n\nCada 5 segundos convierte en ranas a los 2 enemigos más fuertes que tiene cerca. 🐸\n\n{enlace}",
       "imagen": "contenido/imagenes/leyenda-merlin.png",
       "alt": "Tarjeta de Guerreros Gelatina con Merlín. Una gelatina azul con sombrero de mago, barba blanca y un bastón con una esfera celeste. A la derecha, su nombre y su poder: Mago del rey Arturo. Cada 5 s convierte en ranas a los 2 enemigos más fuertes que tenga cerca.",
       "ia": false
     },
     {
-      "id": "duelo",
+      "id": "premios",
       "juego": "guerreros-gelatina",
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-23",
-      "texto": "Duelo imposible: Hércules (pisotón de área y furia cuando le queda menos de la mitad de vida) contra Medusa (su mirada te deja de piedra 3 segundos).\n\n¿Quién gana? Dinos tu apuesta y compruébalo tú mismo 👇\n{enlace}",
+      "texto": "Salieron los nominados de The Game Awards. Nosotros no estamos, pero hicimos los nuestros:\n\nMejor Rayo: Zeus\nMejor Ranita: Merlín\nMejor Mirada: Medusa\n\nVota respondiendo con tu favorito. Compruébalo en la batalla: {enlace}",
       "imagen": "contenido/imagenes/batalla-duelo.png",
       "alt": "Captura de Guerreros Gelatina: varias gelatinas azules aparecen grises, petrificadas, en medio de un grupo de gelatinas rojas; a la derecha se ve a Anubis (rojo, con orejas de chacal) y un globo dice «¡Mírame!».",
       "ia": false
@@ -61,7 +72,7 @@
       "canal": "bluesky",
       "idioma": "en",
       "no_antes_de": "2026-11-24",
-      "texto": "Medusa's entire strategy: look at you. 🐍\n\nNearby enemies turn to stone for 3 seconds: they can't move, can't attack, and they take extra damage. One of eight jelly Legends you can drop into battle.\n\nFree in your browser: {enlace}",
+      "texto": "Medusa looked at me funny.\nI was stone for 3 seconds.\nI'm taking it personally.\n\n(Nearby enemies can't move or attack, and take extra damage. Free in your browser.)\n{enlace}",
       "imagen": "contenido/imagenes/batalla-duelo-en.png",
       "alt": "Screenshot of Guerreros Gelatina: several blue jelly warriors are gray, turned to stone, in the middle of a group of red jellies; Anubis (red, with jackal ears) stands on the right and a speech bubble says \"Look at me!\".",
       "ia": false
@@ -72,20 +83,20 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-25",
-      "texto": "Anubis es el guardián de los muertos y también el que te devuelve a la pelea: cada 7 segundos revive hasta 3 aliados recién caídos.\n\nUna batalla perdida, de pronto, deja de estarlo.\n\n{enlace}",
+      "texto": "Tu equipo ideal de 3 en Guerreros Gelatina. Contesta con tus tres.\n\nYo empiezo: Anubis, Anubis y Anubis.\n\n(Cada 7 s revive hasta 3 aliados recién caídos. Spoiler: es una locura.)\n{enlace}",
       "imagen": "contenido/imagenes/leyenda-anubis.png",
       "alt": "Tarjeta de Guerreros Gelatina con Anubis. Una gelatina roja con orejas de chacal y un bastón dorado con forma de cruz con asa. A la derecha, su nombre y su poder: Guardián de los muertos. Cada 7 s devuelve a la vida hasta 3 aliados recién caídos.",
       "ia": false
     },
     {
-      "id": "dracula",
+      "id": "equipo",
       "juego": "guerreros-gelatina",
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-26",
-      "texto": "Drácula no necesita botiquín: se cura con el 60% del daño que hace y, cada 6 segundos, drena sangre de los enemigos cercanos. 🧛\n\nTener un vampiro en tu bando es como un seguro de vida, pero con colmillos.\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-dracula.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Drácula. Una gelatina roja con pelo negro de vampiro, colmillos y capa roja oscura. A la derecha, su nombre y su poder: Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos.",
+      "texto": "Nuestro equipo de marketing es un bot con forma de gelatina y su plan es que se lo cuentes a un amigo.\n\nSomos un taller chiquito: hacemos juegos gratis que abren en el navegador y pesan menos que una foto.\n\n{enlace}",
+      "imagen": "contenido/imagenes/portada-heroes.png",
+      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
       "ia": false
     },
     {
@@ -94,9 +105,9 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-27",
-      "texto": "Black Friday en Taller Gelatina: Guerreros Gelatina con 100% de descuento. Siempre. 🛒\n\nSin carrito, sin registro, sin descargas. Lo único que vas a gastar es tu tarde.\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-caos.png",
-      "alt": "Captura de Guerreros Gelatina: una batalla caótica en un prado entre gelatinas azules y rojas. Se ven a Zeus con un rayo, Merlín con sombrero de mago y gigantes rojos con garrote; los globos de texto dicen «¡Croac!» y «¡Mírame!».",
+      "texto": "Black Friday en Taller Gelatina: 100% de descuento en Guerreros Gelatina.\n\nOferta válida hasta que se acabe internet. Sin carrito, sin registro, sin descargas. 🛒\n\n{enlace}",
+      "imagen": "contenido/imagenes/batalla-tormenta.png",
+      "alt": "Captura de Guerreros Gelatina: un rayo amarillo en zigzag cae sobre un grupo de gelatinas rojas que pelean con gelatinas azules. Atrás, Zeus (azul, con barba blanca y un rayo) grita «¡Rayos!».",
       "ia": false
     },
     {
@@ -105,20 +116,20 @@
       "canal": "bluesky",
       "idioma": "en",
       "no_antes_de": "2026-11-28",
-      "texto": "Screenshot Saturday, Black Friday weekend edition: Zeus calls down lightning on a crowd of very surprised red jellies. ⚡\n\nPrice: 100% off. Forever. Free in your browser.\n\n{enlace}\n#ScreenshotSaturday",
+      "texto": "Screenshot Saturday, Black Friday weekend: Zeus calls down lightning on some very surprised red jellies. ⚡\n\nPrice: 100% off. Valid until the internet runs out.\n\n{enlace}\n#ScreenshotSaturday",
       "imagen": "contenido/imagenes/batalla-tormenta-en.png",
       "alt": "Screenshot of Guerreros Gelatina: a zigzag yellow lightning bolt strikes a group of red jelly warriors fighting blue ones, while Zeus (blue, with a white beard and a bolt) shouts \"Lightning!\" from behind.",
       "ia": false
     },
     {
-      "id": "robin",
+      "id": "dracula",
       "juego": "guerreros-gelatina",
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-29",
-      "texto": "Robin Hood dispara 3 flechas a la vez y, cada 6 segundos, hace un tiro certero de 45 de daño. 🏹\n\nPulso de gelatina, puntería de leyenda.\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-robin.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Robin Hood. Una gelatina azul con sombrero verde de pluma roja y un arco. A la derecha, su nombre y su poder: Arquero de Sherwood. Dispara 3 flechas a la vez y cada 6 s hace un tiro certero de 45 de daño.",
+      "texto": "Drácula se cura con el 60% del daño que hace.\n\nO sea: cada mordida es un botiquín gratis. Tener un vampiro en tu bando es como un seguro de vida, pero con colmillos. 🧛\n\n{enlace}",
+      "imagen": "contenido/imagenes/leyenda-dracula.png",
+      "alt": "Tarjeta de Guerreros Gelatina con Drácula. Una gelatina roja con pelo negro de vampiro, colmillos y capa roja oscura. A la derecha, su nombre y su poder: Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos.",
       "ia": false
     },
     {
@@ -127,7 +138,7 @@
       "canal": "bluesky",
       "idioma": "es",
       "no_antes_de": "2026-11-30",
-      "texto": "La Llorona suelta su lamento y los enemigos cercanos huyen 4 segundos sin atacar. 😱\n\nFolclor mexicano, versión gelatina: da miedo, pero con ternura.\n\n{enlace}",
+      "texto": "Cuando La Llorona llora, los enemigos cercanos huyen 4 segundos sin atacar. 😱\n\nFolclor mexicano, versión gelatina. Da miedo, pero con ternura.\n\n{enlace}",
       "imagen": "contenido/imagenes/leyenda-llorona.png",
       "alt": "Tarjeta de Guerreros Gelatina con La Llorona. Una gelatina roja con vestido blanco, pelo negro largo y lágrimas. A la derecha, su nombre y su poder: Fantasma del folclor mexicano. Su lamento aterra a los enemigos cercanos: huyen 4 s sin atacar.",
       "ia": false

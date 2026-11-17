@@ -28,6 +28,14 @@ const ESCENAS = {
     rojo: [['medusa', 560, 270], ...fila('campesino', 630, 190, 4, 52), ['anubis', 660, 270]],
     cuando: (s) => s.units.filter((u) => u.stone > 0).length >= 2,
   },
+  antesdespues: {   // dos fotos del mismo campo apiladas: antes de pulsar «¡Pelear!» y cuando ya es un caos (formato «antes y después»)
+    compuesta: true,
+    azul: [['zeus', 250, 190], ['merlin', 225, 255], ['robin', 200, 320], ['hercules', 320, 225], ['medusa', 310, 300], ['dracula', 350, 360],
+      ...fila('campesino', 410, 160, 6, 40)],
+    rojo: [['gigante', 700, 270], ['gigante', 770, 200], ['gigante', 770, 345], ...fila('campesino', 620, 160, 6, 40), ['caballero', 690, 185], ['caballero', 690, 235], ['caballero', 690, 305], ['caballero', 690, 355],
+      ['bruja', 840, 220], ['bruja', 840, 280], ['bruja', 840, 340]],
+    cuando: (s) => s.units.filter((u) => u.dead).length >= 8 && s.fx.length >= 6,
+  },
   tormenta: {
     azul: [['zeus', 330, 270], ['robin', 250, 200], ['llorona', 250, 340], ...fila('campesino', 400, 160, 5, 55)],
     rojo: [...fila('campesino', 600, 110, 8, 46), ...fila('caballero', 690, 130, 5, 70), ...fila('bruja', 770, 170, 4, 65)],
@@ -58,6 +66,7 @@ const ESCENAS = {
       for (const [t, x, y] of e.rojo) api.spawn(t, 1, x, y);
     }, { azul: esc.azul, rojo: esc.rojo });
     await sleep(200);
+    const antes = esc.compuesta ? await page.locator('#cv').screenshot() : null;
     await page.click('#btnFight');
     const t0 = Date.now();
     let hecho = false;
@@ -67,12 +76,26 @@ const ESCENAS = {
         await sleep(90);
         const archivo = path.join(destino, 'batalla-' + nombre + (idioma === 'es' ? '' : '-' + idioma) + '.png');
         const png = await page.locator('#cv').screenshot();
-        const b64 = await page.evaluate(async (data) => {   // se normaliza a 1200×675, la forma de tarjeta de las publicaciones
-          const img = new Image(); img.src = 'data:image/png;base64,' + data; await img.decode();
+        const ETIQ = { es: ['ANTES', 'DESPUÉS'], en: ['BEFORE', 'AFTER'], zh: ['之前', '之后'] }[idioma];
+        const b64 = await page.evaluate(async ({ data, previa, etiquetas }) => {   // se normaliza a 1200×675, la forma de tarjeta de las publicaciones
+          const cargar = async (d) => { const img = new Image(); img.src = 'data:image/png;base64,' + d; await img.decode(); return img; };
+          const img = await cargar(data);
           const c = document.createElement('canvas'); c.width = 1200; c.height = 675;
-          const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, 1200, 675);
+          const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+          if (!previa) { g.drawImage(img, 0, 0, 1200, 675); return c.toDataURL('image/png').split(',')[1]; }
+          await document.fonts.load('700 30px Fredoka');
+          const otra = await cargar(previa);
+          [[otra, 0, etiquetas[0]], [img, 338, etiquetas[1]]].forEach(([im, y, texto]) => {
+            const alto = 337, sh = im.width * alto / 1200;
+            g.drawImage(im, 0, (im.height - sh) / 2, im.width, sh, 0, y, 1200, alto);   // franja central del campo: ahí está la acción
+            g.font = '700 30px Fredoka, sans-serif'; g.textBaseline = 'middle';
+            const w = g.measureText(texto).width + 36;
+            g.fillStyle = 'rgba(21,32,59,.86)'; g.beginPath(); g.roundRect(18, y + 16, w, 46, 23); g.fill();
+            g.fillStyle = '#fff'; g.fillText(texto, 36, y + 40);
+          });
+          g.fillStyle = '#fff'; g.fillRect(0, 336, 1200, 3);
           return c.toDataURL('image/png').split(',')[1];
-        }, png.toString('base64'));
+        }, { data: png.toString('base64'), previa: antes ? antes.toString('base64') : null, etiquetas: ETIQ });
         fs.writeFileSync(archivo, Buffer.from(b64, 'base64'));
         console.log('ok     · ' + path.relative(RAIZ, archivo));
         hecho = true;
