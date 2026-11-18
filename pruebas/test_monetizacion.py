@@ -184,5 +184,45 @@ class VersionesParaPortales(unittest.TestCase):
         self.assertIn('falta el SDK', ' | '.join(monetizar.revisar_variante('<head></head>', 'crazygames')))
 
 
+class FichaDeEnvio(unittest.TestCase):
+    """El paquete de envío a CrazyGames: la ficha sale del juego, no dice «sin anuncios» y las portadas tienen las medidas que pide el portal."""
+
+    def _ficha(self):
+        spec = fabrica.cargar('compas-gelatina')
+        import kit_lanzamiento
+        return monetizar.ficha_crazygames(RAIZ, spec, kit_lanzamiento.linea_ia(spec, 'en'))
+
+    def test_trae_lo_que_se_sube_los_textos_en_ingles_y_lo_no_verificado(self):
+        texto = self._ficha()
+        for esperado in ('## Qué se sube', 'Jelly Tempo', '**Controles:**', '## Requisitos de CrazyGames contra este juego', '## Lo que no está verificado', '## Fuentes',
+                         'https://docs.crazygames.com/requirements/ads/', 'Made with the help of AI'):
+            self.assertIn(esperado, texto)
+
+    def test_la_descripcion_larga_no_promete_que_no_hay_anuncios(self):
+        texto = self._ficha()
+        bloque = texto.split('```')[1]
+        self.assertFalse(monetizar.SIN_ANUNCIOS.search(bloque), 'la descripción para el portal no debe decir que no hay anuncios')
+        self.assertIn('no downloads or sign-up', bloque)      # el resto del texto sigue ahí
+
+    def test_es_la_misma_cada_vez(self):
+        self.assertEqual(self._ficha(), self._ficha())
+
+    def test_solo_los_juegos_con_ganchos_traen_ficha_en_su_kit(self):
+        self.assertTrue((RAIZ / 'salida' / 'compas-gelatina' / 'kit' / 'ficha-crazygames.md').exists())
+        for juego in ('guerreros-gelatina', 'torre-gelatina'):
+            if 'anuncios' not in fabrica.cargar(juego).get('motor', []):
+                self.assertFalse((RAIZ / 'salida' / juego / 'kit' / 'ficha-crazygames.md').exists(), juego)
+
+    def test_las_portadas_tienen_las_medidas_del_portal_y_los_videos_caben(self):
+        import struct
+        medios = RAIZ / 'salida' / 'compas-gelatina' / 'medios' / 'crazygames'
+        for nombre, medida in (('portada-16x9-1920x1080.png', (1920, 1080)), ('portada-2x3-800x1200.png', (800, 1200)), ('portada-1x1-800x800.png', (800, 800))):
+            cab = (medios / nombre).read_bytes()[:24]
+            self.assertEqual(cab[:8], b'\x89PNG\r\n\x1a\n', nombre)
+            self.assertEqual(struct.unpack('>II', cab[16:24]), medida, nombre)
+        for nombre in ('vista-previa-16x9-1920x1080.mp4', 'vista-previa-2x3-1080x1620.mp4'):
+            self.assertLess((medios / nombre).stat().st_size, 50 * 1024 * 1024, nombre)
+
+
 if __name__ == '__main__':
     unittest.main()

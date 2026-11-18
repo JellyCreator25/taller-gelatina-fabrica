@@ -45,7 +45,26 @@ const pifia = () => {
   return Object.assign({}, C.estado(), { lane: libre });
 };
 
+// Para el paquete de envío a portales (herramientas/envio_portal.js): inicia la partida y toca las gotas con precisión variada durante `segundos`.
+// `ctx.marcar('juego')` avisa cuándo empezó de verdad la partida (para recortar la tarjeta de inicio y el sello); `ctx.capturar()` se llama al llegar a 10 aciertos seguidos.
+async function envio(page, ctx) {
+  await page.locator('#btnJugar').click();
+  await page.waitForFunction(() => window.__compas.estado().fase === 'juego', null, { timeout: 8000 });
+  ctx.marcar('juego');
+  const desfases = [0, 0, 25, 0, -30, 0, 0, 60, 0, 0, -20, 0];
+  const t0 = Date.now();
+  let i = 0, foto = false;
+  while ((Date.now() - t0) / 1000 < ctx.segundos) {
+    let e;
+    try { e = await page.evaluate(golpe, { desfase: desfases[i % desfases.length], soltar: true }); } catch (err) { break; }   // se acabó la canción
+    i++;
+    if (!foto && e.combo >= 10) { foto = true; await sleep(180); if (ctx.capturar) await ctx.capturar(); if (ctx.parar_tras_captura) break; }
+  }
+  return { toques: i };
+}
+
 module.exports = {
+  envio,
   listo: '#cv',
   clip: { ancho: 600, alto: 720 },   // el juego es vertical: el clip principal también
   gif: { ultimos: 13, duracion: 12 },   // termina con la tarjeta de récord

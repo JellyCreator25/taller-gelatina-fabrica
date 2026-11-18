@@ -943,10 +943,20 @@ canvas { display: block; width: 100%; height: 100%; }
   const P = () => PROVEEDORES[S.proveedor] || PROVEEDORES.ninguno;
   const reglasPropias = () => S.proveedor === 'adsense' || S.proveedor === 'ninguno';
 
+  // CrazyGames pide usar el idioma del jugador que informa su SDK (con respaldo en inglés); un idioma elegido antes, o forzado en la dirección, manda sobre él
+  function idiomaDelPortal() {
+    try {
+      const loc = String(window.CrazyGames.SDK.user.systemInfo.locale || '').slice(0, 2).toLowerCase();
+      let forzado = null;
+      try { forzado = new URLSearchParams(location.search).get('lang'); } catch (e) { /* sin dirección */ }
+      if (loc && !forzado && G.store.get('lang', null) == null) G.setLang(loc);
+    } catch (e) { /* sin ese dato queda el idioma del navegador y, si no hay, el inglés */ }
+  }
+
   function inicializar() {
     S.listo = false;
     if (S.proveedor === 'crazygames' && window.CrazyGames && window.CrazyGames.SDK) {
-      Promise.resolve(window.CrazyGames.SDK.init()).then(() => { S.listo = true; }, () => { S.listo = false; });
+      Promise.resolve(window.CrazyGames.SDK.init()).then(() => { S.listo = true; idiomaDelPortal(); }, () => { S.listo = false; });
     } else if (S.proveedor === 'adsense') {
       if (S.sdk && S.publicador && S.sdkUrl) {
         window.adsbygoogle = window.adsbygoogle || [];

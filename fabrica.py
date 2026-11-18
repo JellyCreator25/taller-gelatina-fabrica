@@ -33,7 +33,7 @@ Uso:
   python3 fabrica.py configurar bluesky-bot|bluesky-perfil|mastodon-bot [--ejecutar]   (ajustes en la cuenta del bot; bluesky-perfil pone bio, nombre, avatar y banner)
   python3 fabrica.py motor [probar]           (el motor que crece solo: techo, juegos por nivel y cola de mejoras; «probar» corre las pruebas del motor y guarda motor/informe.json)
   python3 fabrica.py calidad [id|todos]       (en qué nivel de la escalera de calidad está cada juego, qué le falta y qué nivel se le exige para lanzarse)
-  python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]]   (qué falta para cobrar por ruta, cuentas con supuestos y versiones para portales; el estado también entra a publicacion/PENDIENTE.md)
+  python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]|envio ID]   (qué falta para cobrar por ruta, cuentas con supuestos, versiones para portales y paquete de envío a CrazyGames; el estado también entra a publicacion/PENDIENTE.md)
 """
 import base64
 import json
@@ -678,7 +678,7 @@ def motor_cmd(args):
 
 
 def monetizar_cmd(args):
-    """monetizar [estado] | escenarios [SESIONES…] | variantes ID [portal]"""
+    """monetizar [estado] | escenarios [SESIONES…] | variantes ID [portal] | envio ID (portadas, videos y ficha para CrazyGames)"""
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import monetizar as monet_mod
     accion = args[0] if args else 'estado'
@@ -705,7 +705,17 @@ def monetizar_cmd(args):
         if malo:
             sys.exit(1)
         return
-    sys.exit('Uso: python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]]')
+    if accion == 'envio' and len(args) > 1:
+        try:
+            monet_mod.variantes(RAIZ, sys.modules[__name__], args[1], ['crazygames'])
+        except monet_mod.ErrorMonetizacion as e:
+            sys.exit('[monetizar] ' + str(e))
+        r = subprocess.run(['node', str(RAIZ / 'herramientas' / 'envio_portal.js'), args[1], 'crazygames'], cwd=str(RAIZ))
+        if r.returncode:
+            sys.exit('[monetizar] el paquete de portadas y videos falló (necesita playwright y ffmpeg)')
+        kit(args[1])
+        return
+    sys.exit('Uso: python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]|envio ID]')
 
 
 def calidad_cmd(objetivo):

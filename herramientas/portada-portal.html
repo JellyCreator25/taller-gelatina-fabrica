@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+@@FUENTES@@
+*{box-sizing:border-box}
+html,body{margin:0;width:@@W@@px;height:@@H@@px;overflow:hidden}
+body{font-family:'Fredoka',system-ui,sans-serif;color:#fff;background:linear-gradient(135deg,@@A@@ 0%,@@B@@ 100%);position:relative}
+.glow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.30),rgba(255,255,255,0) 65%)}
+h1{position:absolute;margin:0;font-weight:700;letter-spacing:-.01em;line-height:.92;text-shadow:0 .035em 0 rgba(0,0,0,.22),0 .09em .22em rgba(0,0,0,.25)}
+.shot{position:absolute;border-radius:5%/2.8%;overflow:hidden;box-shadow:0 .5em 1.6em rgba(0,0,0,.4);background:#2a1850}
+.shot img{display:block;width:100%}
+/* 16:9 — título a la izquierda, el escenario grande a la derecha */
+.horizontal .glow{right:-200px;top:-260px;width:1100px;height:1100px}
+.horizontal h1{left:130px;top:50%;transform:translateY(-52%);font-size:300px}
+.horizontal .shot{right:170px;top:40px;width:540px;font-size:44px;transform:rotate(4deg);transform-origin:center}
+/* 2:3 — título arriba, el escenario asomando por abajo */
+.vertical .glow{left:50%;margin-left:-450px;top:-200px;width:900px;height:900px}
+.vertical h1{left:0;right:0;top:56px;text-align:center;font-size:178px}
+.vertical .shot{left:50%;margin-left:-250px;top:430px;width:500px;font-size:30px;transform:rotate(-3deg)}
+/* 1:1 — título arriba a la izquierda, el escenario abajo a la derecha */
+.cuadrada .glow{right:-160px;top:-180px;width:760px;height:760px}
+.cuadrada h1{left:56px;top:40px;font-size:136px}
+.cuadrada .shot{right:56px;top:372px;width:310px;font-size:22px;transform:rotate(4deg)}
+</style>
+<div class="@@FORMA@@">
+<div class="glow"></div>
+<h1>@@L1@@<br>@@L2@@</h1>
+<div class="shot"><img src="@@IMG@@" alt=""></div>
+</div>

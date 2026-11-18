@@ -51,7 +51,7 @@ async function accesible(browser) {
   chequear(M, ini.mov === false && ini.con === false && ini.attr === false, 'sin pedir nada, no se reduce el movimiento ni cambia el contraste');
   await page.evaluate(() => GGX.a11y.set('reducirMovimiento', true));
   chequear(M, await page.evaluate(() => GGX.a11y.reducedMotion() && document.documentElement.hasAttribute('data-reducir-movimiento')), 'pedir menos movimiento lo activa y marca la página');
-  await page.reload(); await page.waitForFunction(() => !!window.GGX);
+  await page.reload(); await page.waitForFunction(() => !!window.GGX && !!GGX.a11y && document.readyState === 'complete');   // sin esperar a la carga completa, a veces se lee antes de que el módulo aplique lo guardado
   chequear(M, await page.evaluate(() => GGX.a11y.reducedMotion()), 'la elección sobrevive a recargar la página');
   await page.evaluate(() => GGX.a11y.set('reducirMovimiento', null));
   chequear(M, !(await page.evaluate(() => GGX.a11y.reducedMotion())), 'null vuelve a seguir al sistema');
@@ -305,6 +305,8 @@ async function anuncios(browser) {
     let cb = 0; out.pidio = GGX.ads.intermedio('fin_de_partida', () => cb++); await espera(90);
     out.pidio2 = GGX.ads.intermedio('fin_de_partida', () => cb++); await espera(90);          // sin espera ni separación propias: manda el SDK
     window.__fallar = true; let r = null; GGX.ads.recompensa('vida', { ok: () => { r = 'ok'; }, no: (m) => { r = m; } }); await espera(90);
+    let cbError = 0; GGX.ads.intermedio('fin_de_partida', () => cbError++); await espera(90);   // anuncio intermedio con error (Basic Launch, sin relleno): el juego sigue y no queda nada pendiente
+    out.cbError = cbError; out.enAnuncio = document.documentElement.hasAttribute('data-anuncio'); out.mudoTrasError = GGX.muted();
     GGX.ads.jugando(true); GGX.ads.jugando(true); GGX.ads.jugando(false); GGX.ads.jugando(false);
     out.cb = cb; out.r = r; out.reg = reg; out.mudo = GGX.muted(); out.e = GGX.ads.estado();
     return out;
@@ -312,9 +314,29 @@ async function anuncios(browser) {
   chequear(M, cg.reg[0] === 'init' && cg.pidio === true && cg.pidio2 === true && cg.cb === 2, 'CrazyGames: se inicializa el SDK y se piden anuncios sin temporizadores propios');
   chequear(M, cg.reg.indexOf('midgame') >= 0 && cg.reg.indexOf('mudo:true') >= 0 && cg.mudo === false, 'CrazyGames: «midgame», sonido silenciado mientras suena y restituido al terminar');
   chequear(M, cg.r === 'error' && cg.e.recompensas === 0, 'CrazyGames: si el anuncio con recompensa falla, no se premia');
+  chequear(M, cg.cbError === 1 && cg.enAnuncio === false && cg.mudoTrasError === false, 'CrazyGames: si un anuncio intermedio falla (adError), el juego sigue, no queda en pausa ni mudo');
   chequear(M, cg.reg.filter((x) => x === 'start').length === 1 && cg.reg.filter((x) => x === 'stop').length === 1, 'CrazyGames: gameplayStart/Stop no se repiten dos veces seguidas');
   chequear(M, errores.length === 0, 'CrazyGames simulado: sin errores de consola ni de página' + (errores.length ? ': ' + errores.join(' || ') : ''));
   await ctx.close();
+
+  // CrazyGames pide el idioma del jugador según su SDK; el que el jugador ya eligió o la dirección tienen prioridad
+  ({ ctx, page, errores } = await abrir(browser, { locale: 'es-MX' }));
+  const sdkLoc = (l) => `window.CrazyGames = { SDK: { init: async () => {}, user: { systemInfo: { locale: '${l}' } }, ad: { requestAd: (t, c) => c.adError('x') }, game: { gameplayStart() {}, gameplayStop() {} } } };`;
+  const idi = {};
+  await page.evaluate(`${sdkLoc('en-US')} GGX.ads.configurar({ proveedor: 'crazygames' });`);
+  await page.waitForTimeout(80);
+  idi.sin_eleccion = await page.evaluate(() => GGX.lang);
+  await page.evaluate(`GGX.setLang('es'); ${sdkLoc('en-GB')} GGX.ads.configurar({ proveedor: 'crazygames' });`);
+  await page.waitForTimeout(80);
+  idi.con_eleccion = await page.evaluate(() => GGX.lang);
+  await ctx.close();
+  ({ ctx, page, errores } = await abrir(browser, { locale: 'es-MX' }, '?lang=es'));
+  await page.evaluate(`${sdkLoc('en-US')} GGX.ads.configurar({ proveedor: 'crazygames' });`);
+  await page.waitForTimeout(80);
+  idi.forzado = await page.evaluate(() => GGX.lang);
+  await ctx.close();
+  chequear(M, idi.sin_eleccion === 'en', 'CrazyGames: sin idioma elegido se usa el que informa su SDK (hoy ' + idi.sin_eleccion + ')');
+  chequear(M, idi.con_eleccion === 'es' && idi.forzado === 'es', 'CrazyGames: un idioma ya elegido o forzado en la dirección manda sobre el del SDK');
 
   // Poki simulado (borrador, se confirma al aceptar el juego)
   ({ ctx, page, errores } = await abrir(browser));

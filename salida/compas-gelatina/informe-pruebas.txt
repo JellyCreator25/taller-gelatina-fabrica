@@ -6,11 +6,11 @@ ok     · tipografías incrustadas: 4 en uso, 0 con error
 ok     · sin desplazamiento horizontal al abrir (0 px de más)
   idioma al abrir: es · canción «alegre» a 112 bpm con 43 gotas
   12 perfectos seguidos: 1400 puntos, multiplicador ×2 (aviso: «Multiplicador ×2»)
-  «bien» (109 ms): +120 puntos con ×2
+  «bien» (110 ms): +120 puntos con ×2
   «casi» (175 ms): +50 puntos y la racha se mantiene (13)
-  clic real → carril 2: «perfecto» (-21 ms)
-  flechas → carril 1: «perfecto» (-19 ms)
-  letras A S D → carril 0: «perfecto» (-19 ms)
+  clic real → carril 2: «perfecto» (-19 ms)
+  flechas → carril 1: «perfecto» (-16 ms)
+  letras A S D → carril 0: «perfecto» (-21 ms)
   barra espaciadora (carril central) → carril 1: «perfecto» (-9 ms)
   toque sin gota: racha 18 → 0, puntos intactos (2570)
   gota que se pasa: fallo 1, racha 0
@@ -32,12 +32,12 @@ ok     · tipografías incrustadas: 4 en uso, 0 con error
 ok     · sin desplazamiento horizontal al abrir (0 px de más)
   idioma al abrir: es · canción «alegre» a 112 bpm con 43 gotas
   12 perfectos seguidos: 1400 puntos, multiplicador ×2 (aviso: «Multiplicador ×2»)
-  «bien» (110 ms): +120 puntos con ×2
+  «bien» (112 ms): +120 puntos con ×2
   «casi» (175 ms): +50 puntos y la racha se mantiene (13)
-  toque real → carril 2: «perfecto» (11 ms)
+  toque real → carril 2: «perfecto» (14 ms)
   flechas → carril 1: «perfecto» (-20 ms)
-  letras A S D → carril 0: «perfecto» (-22 ms)
-  barra espaciadora (carril central) → carril 1: «perfecto» (-8 ms)
+  letras A S D → carril 0: «perfecto» (-20 ms)
+  barra espaciadora (carril central) → carril 1: «perfecto» (-6 ms)
   toque sin gota: racha 18 → 0, puntos intactos (2570)
   gota que se pasa: fallo 1, racha 0
   final: «¡Nuevo récord!» · 2670 puntos · 44 % de precisión · mejor racha: 18 · 18 perfectos · 1 bien · 1 casi · 23 fallos
@@ -55,8 +55,8 @@ ok     · sin conexiones externas
 — portada
 ok     · portada.png generada (1260×1000)
 — clip principal 600×720
-ok     · clip.mp4 generado (27.5 s, 1146 KB) y clip.gif (2512 KB)
+ok     · clip.mp4 generado (27.5 s, 1160 KB) y clip.gif (2530 KB)
 — clip vertical (Shorts, Reels, TikTok)
-ok     · clip-vertical.mp4 generado (27.5 s, 1686 KB)
+ok     · clip-vertical.mp4 generado (27.6 s, 1737 KB)
 
 Todo en orden

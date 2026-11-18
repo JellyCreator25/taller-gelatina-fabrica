@@ -61,6 +61,7 @@
         "anuncios con recompensa",
         "pausa y silencio solo mientras suena",
         "proveedores AdSense, CrazyGames y Poki",
+        "idioma del jugador según el SDK del portal",
         "apagado por defecto"
       ],
       "desde": "2026-11-18"

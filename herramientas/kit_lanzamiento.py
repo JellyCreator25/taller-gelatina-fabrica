@@ -566,6 +566,12 @@ def generar(raiz, spec):
     texto_difusion = difusion(spec, salida, datos, resp, titulo_previo, nov)
     (kit / 'difusion.md').write_text(texto_difusion, encoding='utf-8')
     (kit / 'registro-creacion.md').write_text(registro_creacion(spec), encoding='utf-8')
+    ficha_cg = kit / 'ficha-crazygames.md'
+    if 'anuncios' in (spec.get('motor') or []) and (spec.get('originalidad') or {}).get('riesgo_portales') != 'alto':   # solo los juegos que ya traen ganchos de anuncios y no chocan con la regla de originalidad
+        import monetizar
+        ficha_cg.write_text(monetizar.ficha_crazygames(raiz, spec, linea_ia(spec, 'en')), encoding='utf-8')
+    elif ficha_cg.exists():
+        ficha_cg.unlink()
     (kit / 'metricas.csv').write_text('fecha,juego,vistas,partidas_o_descargas,ingresos_usd,donaciones_usd,comentarios,fuente_de_trafico,notas\n', encoding='utf-8')
     for nombre in ('difusion.md', 'registro-creacion.md', 'publicaciones.md'):
         sobras = sorted(set(re.findall(r'\{[a-z_]+\}', (kit / nombre).read_text(encoding='utf-8'))))
