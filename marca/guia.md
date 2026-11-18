@@ -42,7 +42,7 @@ Un juego de ritmo, un puzzle o un juego de cartas pueden no tener ninguna gelati
 **Falta (en la cola del motor, `python3 fabrica.py motor`):**
 
 - **Compás** (el tercer juego) será el primero en abrir con el sello y llevar distintivo: lo exige la escalera, que pide a cada juego nuevo un nivel más que el mejor ya publicado.
-- **Guerreros** (decidido el 18 de noviembre): la versión 1.5.0 con sello, efectos, música y accesibilidad ya está preparada y probada (nivel 5) en la rama `guerreros-1.5.0`, aparte de lo publicado; se une y se publica después de Compás, con plan nuevo y tu aprobación de su huella. **Torre** sigue sin cambios; una actualización suya sería otra decisión tuya.
+- **Guerreros** (decidido el 18 de noviembre): la versión 1.5.0 con sello, efectos, música y accesibilidad ya está preparada y probada (nivel 5) en la rama `guerreros-1.5.0-anuncios`, aparte de lo publicado; se une y se publica después de Compás, con plan nuevo y tu aprobación de su huella. **Torre** sigue sin cambios; una actualización suya sería otra decisión tuya.
 - **Portadas y tarjetas** con el distintivo: cambian piezas que ya están aprobadas o publicadas, así que esperan tu visto bueno.
 
 ## Decisiones

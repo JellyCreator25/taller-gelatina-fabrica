@@ -56,8 +56,8 @@ Con 100 sesiones por día, llegar a un mínimo de pago de 50 tarda de 2 a 6 mese
 
 ## Orden de trabajo
 
-1. **Ya hecho**: módulo, política, estado, versión para CrazyGames, ganchos en Compás (aún no publicado: sale con anuncios apagados en el sitio propio, y la versión de portal los usa).
-2. **Compás primero** como ejemplo de portal; después los ganchos de **Guerreros** (evento de fin de batalla) en su actualización de calidad, que ya espera detrás del lanzamiento de Compás. Torre, solo si se decide mandarlo a portales distinto de Stack.
+1. **Ya hecho**: módulo, política, estado, versión para CrazyGames, ganchos en Compás (aún no publicado: sale con anuncios apagados en el sitio propio, y la versión de portal los usa) y su **paquete de envío a CrazyGames** (`python3 fabrica.py monetizar envio compas-gelatina`: tres portadas, dos videos de vista previa y la ficha `kit/ficha-crazygames.md`, con cada requisito del portal contra el estado real del juego). Con CrazyGames, el módulo toma el idioma del jugador de su SDK, como exige el portal.
+2. **Compás primero** como ejemplo de portal. Los ganchos de **Guerreros** (anuncio al pasar a otra batalla desde el cartel de resultado) ya están en la rama `guerreros-1.5.0-anuncios`, junto a su actualización de calidad: apagados por defecto y sin publicar; el paquete de envío de Guerreros se hace después, si se decide mandarlo a un portal. Torre, solo si se decide mandarlo a portales distinto de Stack.
 3. **Medición**: decidir la analítica (Cloudflare Web Analytics) para saber cuántas sesiones hay. Sin eso, no hay cuentas reales.
 4. **AdSense** solo cuando haya dominio y tráfico que justifique la espera de aprobación.
 5. **Datos de ingresos**: hoy no se leen solos (los reportes de cada portal y de AdSense necesitan una clave tuya); se anotan con `python3 fabrica.py metricas anotar`. Leerlos solos sería la siguiente mejora del motor y requiere esas claves.

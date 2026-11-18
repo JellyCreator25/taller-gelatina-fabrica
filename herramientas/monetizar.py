@@ -136,8 +136,12 @@ def estado(raiz, fabrica):
     falta_d = []
     if SDK_PORTAL:
         listo.append('SDK confirmado en la documentación del portal: ' + ', '.join(sorted(SDK_PORTAL)))
-    falta_d += ['crear la cuenta de desarrollador del portal (primero CrazyGames) y fijar cómo cobrar; el portal pide los datos de pago antes de recibir un juego',
-                'subir el archivo del juego (lo armo yo con `python3 fabrica.py monetizar variantes`) y llenar su ficha (la preparo yo)']
+    paquetes = [j for j in ganchos if (raiz / 'salida' / j / 'kit' / 'ficha-crazygames.md').exists() and (raiz / 'salida' / j / 'medios' / 'crazygames').is_dir()]
+    if paquetes:
+        listo.append('paquete de envío a CrazyGames (ficha, tres portadas y dos videos de vista previa): ' + ', '.join('%s (salida/%s/kit/ficha-crazygames.md)' % (j, j) for j in paquetes))
+    falta_d += ['crear la cuenta de desarrollador del portal (primero CrazyGames) y fijar cómo cobrar; el portal pide los datos de pago antes de recibir un juego']
+    falta_d.append('subir el zip de la versión para portal, las portadas y los videos ya preparados y pegar los textos de la ficha (el zip lo mando por el chat; se rearma con `python3 fabrica.py monetizar variantes ID crazygames`)' if paquetes
+                   else 'subir el archivo del juego (lo armo yo con `python3 fabrica.py monetizar variantes`) y llenar su ficha (la preparo yo con `python3 fabrica.py monetizar envio ID`)')
     salida['portales'] = {'activa': bool((rutas.get('portales') or {}).get('activa')), 'listo': listo, 'falta_fabrica': falta_f, 'falta_dueno': falta_d}
     # AdSense en el sitio propio
     listo, falta_f = base()

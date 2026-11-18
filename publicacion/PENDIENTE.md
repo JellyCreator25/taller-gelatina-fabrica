@@ -63,14 +63,15 @@ Lo que sigue para el motor:
 Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apagadas.
 
 ### Portales con revenue share (apagada)
-- Listo: módulo «anuncios» v1.0.0 con 22 pruebas del motor vigentes
+- Listo: módulo «anuncios» v1.0.0 con 25 pruebas del motor vigentes
 - Listo: juegos con anuncios en cortes naturales: compas-gelatina
 - Listo: SDK confirmado en la documentación del portal: crazygames
+- Listo: paquete de envío a CrazyGames (ficha, tres portadas y dos videos de vista previa): compas-gelatina (salida/compas-gelatina/kit/ficha-crazygames.md)
 - Falta (dueño): crear la cuenta de desarrollador del portal (primero CrazyGames) y fijar cómo cobrar; el portal pide los datos de pago antes de recibir un juego
-- Falta (dueño): subir el archivo del juego (lo armo yo con `python3 fabrica.py monetizar variantes`) y llenar su ficha (la preparo yo)
+- Falta (dueño): subir el zip de la versión para portal, las portadas y los videos ya preparados y pegar los textos de la ficha (el zip lo mando por el chat; se rearma con `python3 fabrica.py monetizar variantes ID crazygames`)
 
 ### AdSense en el sitio propio (apagada)
-- Listo: módulo «anuncios» v1.0.0 con 22 pruebas del motor vigentes
+- Listo: módulo «anuncios» v1.0.0 con 25 pruebas del motor vigentes
 - Listo: juegos con anuncios en cortes naturales: compas-gelatina
 - Falta (fábrica): el sitio muestra 2 juego(s); con pocos juegos AdSense puede rechazarlo por contenido escaso
 - Falta (dueño): un dominio propio: hoy el sitio vive en taller-gelatina.pages.dev, y los reportes de editores indican que AdSense no aprueba subdominios gratuitos
@@ -96,6 +97,10 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 
 ## Bluesky: qué ha funcionado
 
-Todavía no hay publicaciones medidas: se miden a las 24 horas y a los 3 días de salir.
+1 publicación(es) medida(s). Puntaje = likes + 3 × reposts + 2 × respuestas + 2 × citas.
+
+- Más movida: «guerreros-gelatina:1.4.0:bluesky:post» (sin formato, ?) → 3 (3 likes, 0 reposts, 0 respuestas, 0 citas, a 24 h)
+
+Todavía son pocas (1 de 8): no saco conclusiones sobre formatos, solo las anoto.
 
 Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow, bluesky.
