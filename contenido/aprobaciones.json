@@ -1,4 +1,18 @@
 {
   "nota": "Publicaciones del calendario que el dueño aprobó: id → huella. Lo escribe «python3 fabrica.py calendario --aprobar».",
-  "aprobadas": {}
+  "aprobadas": {
+    "antes-despues": "dbc1dc5eabc3a5191e22d89971c26aad483f65b2820b4c3e70f0a14bc0c10f21",
+    "anubis": "9579e9621dc9413667608aac1e162e703ab31e13da59b848aff51f25204b23c4",
+    "black-friday": "3d6b9874883d5406eb65f4d6b432fc82cb519cb441b60e72366525b1919bd6c5",
+    "dracula": "ce5c7f24cd2377467208b309ba6a4f098cb5c05a6aa86263c0d2e692bb63ecaa",
+    "equipo": "0301b4ba36a266c00d29edc03fc8a683564a030670c84a08ff2f104a8541ab9a",
+    "gta-dia": "92156d210373fab97b10eb70ca23ac08a26c23674cb24ed261dbbc2d414ca75b",
+    "gta-vispera": "e34c93842164878c4d9a9a0c88d98d9f8748d6a02726226638e4fb43bff6ffbc",
+    "llorona": "f8c7d8a92aff231390372178bdf7310cc116e7dfaed8f7ecdba132142bef420f",
+    "medusa-en": "a6785e3e027928898ebb245455ba66a0ba3dd7f022c5640eab015479e85b9e7e",
+    "merlin": "a513c76265c935fd1f30ebfcec7444400e42ad5f5967b52e31e3a4ea20bc24a4",
+    "premios": "2bcbe0cb80d785148645e1eedb32c6b82279eedbe82551ecda43ecaade72e6af",
+    "sabado-1": "a70ac159ccb2e5a70d0f490cadd997eced9e2906bf376377f2acabd831bb8222",
+    "sabado-2": "467b02da7ef2ac24574da69f4b6772a9efad6f9a296021f9836b3bc41c7a7fd9"
+  }
 }
