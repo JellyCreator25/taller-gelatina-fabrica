@@ -41,7 +41,18 @@ module.exports = {
     await sleep(120);
     assert(Number(await page.textContent('#n0')) === azul, 'se colocó un guerrero fuera de la zona');
 
+    // Acabado con el motor: el botón de accesibilidad y el distintivo ya están, el sello abre la primera batalla de la visita
+    // y la pelea arranca sola cuando termina; la música arranca con el primer gesto.
+    const antes = await page.evaluate(() => ({ boton: !!document.querySelector('.head-r .ggx-a11y-btn'), firma: !!document.querySelector('#firma *'), sellos: window.GGX.marca.estado().sellos }));
+    assert(antes.boton, 'falta el botón de accesibilidad en el encabezado');
+    assert(antes.firma, 'falta el distintivo de la marca en el pie');
+    assert(antes.sellos === 0, 'el sello ya había salido antes de pulsar ¡Pelear!');
     await page.click('#btnFight');
+    await page.waitForFunction(() => window.GuerrerosGelatina.api.state.phase === 'fight', null, { timeout: 6000 });
+    const abierta = await page.evaluate(() => ({ sellos: window.GGX.marca.estado().sellos, musica: window.GGX.music.estado() }));
+    assert(abierta.sellos === 1, 'la primera batalla debía abrir con el sello (salió ' + abierta.sellos + ' veces)');
+    assert(abierta.musica.sonando && abierta.musica.animo === 'aventura', 'la música no arrancó con la primera batalla: ' + JSON.stringify(abierta.musica));
+    log('  sello al primer ¡Pelear! y música «' + abierta.musica.animo + '» a ' + abierta.musica.bpm + ' bpm');
     if (!video) { await page.click('#btnSpeed'); }               // ×2
     await sleep(video ? 5500 : 4500);
     await cv.scrollIntoViewIfNeeded();
@@ -95,6 +106,12 @@ module.exports = {
       await page.click('#btnFight');
       await page.evaluate(() => { window.GuerrerosGelatina.api.state.units.forEach((u) => { if (u.team === 1) u.dead = true; }); });
       await page.waitForSelector('#bBtns [data-act="next"]', { timeout: 20000 });
+      const festejo = await page.evaluate(() => ({ fx: window.GGX.fx.count(), titulo: document.getElementById('bTitle').textContent }));
+      assert(festejo.fx > 0, 'ganar un nivel no lanzó confeti ni efectos');
+      await sleep(250);
+      const anuncio = await page.evaluate(() => (document.getElementById('ggx-live') || {}).textContent || '');
+      assert(anuncio.includes(festejo.titulo), 'el lector de pantalla no anunció el resultado: «' + anuncio + '» no incluye «' + festejo.titulo + '»');
+      log('  al ganar: ' + festejo.fx + ' efectos vivos y anuncio «' + anuncio + '»');
       await page.click('#bBtns [data-act="next"]');
       assert((await nivel()) === 2, 'tras ganar no se pasó al nivel 2');
       const oro2 = await oro(0);
@@ -106,6 +123,26 @@ module.exports = {
       assert(Number(await page.textContent('#n0')) === 2, 'con el oro extra del nivel 2 no se pudo añadir un guerrero');
       reto = { nivel1: oro1, nivel2: oro2, libre_nivel2: libre };
       log('  oro del jugador en Reto: nivel 1 → ' + oro1 + ', nivel 2 → ' + oro2 + ' (oro libre ' + libre + ')');
+    }
+
+    // Accesibilidad: con «alto contraste» cada guerrero lleva marca de bando por forma (pixel blanco al pie); con «menos movimiento» no hay
+    // sacudida ni partículas, y al quitarlo vuelven.
+    let accesibilidad = null;
+    if (!video) {
+      const pixel = () => page.evaluate(() => { const S = window.GuerrerosGelatina.api.state; const u = S.units.find((v) => !v.dead && v.team === 0); const d = document.getElementById('cv').getContext('2d').getImageData(Math.round(u.x * S.scale), Math.round((u.y + u.r * 0.6) * S.scale), 1, 1).data; return [d[0], d[1], d[2]]; });
+      await page.evaluate(() => window.GGX.a11y.set('altoContraste', true)); await sleep(250);
+      const conMarca = await pixel();
+      await page.evaluate(() => window.GGX.a11y.set('altoContraste', false)); await sleep(250);
+      const sinMarca = await pixel();
+      await page.evaluate(() => window.GGX.a11y.set('altoContraste', null));
+      assert(conMarca.every((v) => v >= 250), 'con alto contraste no se dibujó la marca de bando (pixel ' + conMarca + ')');
+      assert(!sinMarca.every((v) => v >= 250), 'sin alto contraste aparece la marca de bando (pixel ' + sinMarca + ')');
+      const mover = (quieto) => page.evaluate((q) => { const g = window.GuerrerosGelatina, S = g.api.state, A = window.GGX.a11y; A.set('reducirMovimiento', q); S.shake = 0; g.api.shake(12); const sac = S.shake; const creadas = window.GGX.fx.burst(100, 100, { n: 10 }); S.shake = 0; A.set('reducirMovimiento', null); return { sac, creadas }; }, quieto);
+      const quieto = await mover(true), normal = await mover(null);
+      assert(quieto.sac === 0 && quieto.creadas === 0, 'con menos movimiento hubo sacudida (' + quieto.sac + ') o partículas (' + quieto.creadas + ')');
+      assert(normal.sac > 0 && normal.creadas > 0, 'sin pedir menos movimiento no hay sacudida (' + normal.sac + ') ni partículas (' + normal.creadas + ')');
+      accesibilidad = { marca_alto_contraste: true, quieto, normal };
+      log('  accesibilidad: marca de bando en alto contraste; con menos movimiento sacudida ' + quieto.sac + ' y partículas ' + quieto.creadas + ' (normal: ' + normal.sac + ' y ' + normal.creadas + ')');
     }
 
     // Idiomas: el selector cambia todo el juego al instante (también con el aviso de fin de batalla abierto), cada texto sale del
@@ -227,6 +264,6 @@ module.exports = {
       log('  tras recargar el idioma se mantiene (' + ultimo + ') y ?lang=en lo cambia');
       idiomas = langs;
     }
-    return { colocados: azul, reto, idiomas };
+    return { colocados: azul, reto, accesibilidad, idiomas };
   },
 };

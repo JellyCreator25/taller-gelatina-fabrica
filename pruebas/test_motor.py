@@ -18,8 +18,21 @@ import motor  # noqa: E402
 LANZADO = [{'juego': 'guerreros-gelatina', 'lanzamiento': True, 'resultado': 'ok', 'tipo': 'desplegar'}]
 
 
-def ficha(juego='guerreros-gelatina'):
+def real(juego):
     return json.loads((RAIZ / 'juegos' / juego / 'juego.json').read_text(encoding='utf-8'))
+
+
+def como_la_1_4_0(spec):
+    """Guerreros Gelatina tal como salió el 20 de noviembre (1.4.0): sin motor y solo con el paquete de audio. La 1.5.0, preparada, lo declara entero;
+    estas pruebas hablan de un juego publicado que está en el nivel 2, así que parten de esa forma."""
+    if spec.get('id') == 'guerreros-gelatina':
+        spec = dict(spec, version='1.4.0', paquetes=['audio'])
+        spec.pop('motor', None)
+    return spec
+
+
+def ficha(juego='guerreros-gelatina'):
+    return como_la_1_4_0(real(juego))
 
 
 class Proyecto(unittest.TestCase):
@@ -31,6 +44,8 @@ class Proyecto(unittest.TestCase):
         for carpeta in ('motor', 'juegos', 'plantillas', 'herramientas', 'catalogo'):
             shutil.copytree(RAIZ / carpeta, self.tmp / carpeta, ignore=shutil.ignore_patterns('__pycache__'))
         shutil.copy(RAIZ / 'fabrica.py', self.tmp / 'fabrica.py')
+        ruta = self.tmp / 'juegos' / 'guerreros-gelatina' / 'juego.json'
+        ruta.write_text(json.dumps(como_la_1_4_0(json.loads(ruta.read_text(encoding='utf-8'))), ensure_ascii=False, indent=1), encoding='utf-8')
 
     def usar(self, *modulos):
         """El código de la plantilla (en la copia) llama a los módulos: la escalera solo cuenta lo que se usa, no lo que se declara."""
@@ -77,9 +92,14 @@ class PruebasDelMotorReal(unittest.TestCase):
     def test_los_juegos_publicados_no_cambian_con_el_motor_nuevo(self):
         for i in ('guerreros-gelatina', 'torre-gelatina'):   # los ya publicados; un juego en construcción sí declara su motor
             with self.subTest(i):
-                self.assertFalse(ficha(i).get('motor'), 'un juego ya publicado no cambia por que el motor crezca')
                 html = (RAIZ / 'salida' / i / 'index.html').read_text(encoding='utf-8')
-                self.assertNotIn('id="mod-', html)
+                if i == 'guerreros-gelatina' and real(i)['version'] != '1.4.0':
+                    # Guerreros 1.5.0: actualización aprobada por Max, se publica después de Compás con su propio plan
+                    self.assertEqual(sorted(real(i)['motor']), ['accesible', 'efectos', 'marca', 'musica'])
+                    self.assertIn('id="mod-marca"', html)
+                else:
+                    self.assertFalse(real(i).get('motor'), 'un juego ya publicado no cambia por que el motor crezca')
+                    self.assertNotIn('id="mod-', html)
 
     def test_el_tercer_juego_nace_en_lo_alto_de_la_escalera(self):
         n = motor.nivel_de(RAIZ, ficha('compas-gelatina'))
@@ -102,6 +122,12 @@ class PruebasDelMotorReal(unittest.TestCase):
         for i in ('guerreros-gelatina', 'torre-gelatina'):
             self.assertEqual(motor.nivel_de(RAIZ, ficha(i))['nivel'], 2, i)
             self.assertEqual(motor.exigido(RAIZ, ficha(i), LANZADO), 0, i)
+
+    def test_guerreros_1_5_0_llega_al_nivel_5_y_sigue_siendo_heredado(self):
+        spec = real('guerreros-gelatina')
+        self.assertEqual(spec['version'], '1.5.0')
+        self.assertEqual(motor.nivel_de(RAIZ, spec)['nivel'], 5, 'la actualización de calidad debía llegar al techo de la escalera')
+        self.assertEqual(motor.exigido(RAIZ, spec, LANZADO), 0, 'es un juego heredado: no tiene mínimo, pero tampoco puede bajar')
 
     def test_la_corrida_semanal_guarda_el_piso(self):
         yml = (RAIZ / '.github' / 'workflows' / 'ciclo.yml').read_text(encoding='utf-8')
@@ -228,22 +254,34 @@ class PruebasDeNivel(Proyecto):
 
 
 class PruebasDeConstruccion(Proyecto):
-    def construir(self, motores):
+    def construir(self, motores, juego='guerreros-gelatina'):
         import fabrica
-        spec = ficha()
+        spec = ficha(juego)
         if motores is not None:
             spec['motor'] = motores
+        self.escribir('juegos/%s/juego.json' % juego, spec)
+        anterior = (fabrica.RAIZ, fabrica.SALIDA)
+        fabrica.RAIZ, fabrica.SALIDA = self.tmp, self.tmp / 'salida'
+        self.addCleanup(lambda: setattr(fabrica, 'RAIZ', anterior[0]) or setattr(fabrica, 'SALIDA', anterior[1]))
+        fabrica.construir(juego)
+        return (self.tmp / 'salida' / juego / 'index.html').read_text(encoding='utf-8')
+
+    def test_sin_motor_el_resultado_es_exactamente_el_publicado(self):
+        # Torre Gelatina: publicada, sin motor y con una plantilla que no cambia. (La plantilla de Guerreros sí cambió en la 1.5.0, a propósito.)
+        html = self.construir(None, 'torre-gelatina')
+        publicado = (RAIZ / 'salida' / 'torre-gelatina' / 'index.html').read_text(encoding='utf-8')
+        self.assertEqual(html, publicado)
+
+    def test_guerreros_publicado_en_salida_es_lo_que_se_reconstruye(self):
+        import fabrica
+        spec = real('guerreros-gelatina')
         self.escribir('juegos/guerreros-gelatina/juego.json', spec)
         anterior = (fabrica.RAIZ, fabrica.SALIDA)
         fabrica.RAIZ, fabrica.SALIDA = self.tmp, self.tmp / 'salida'
         self.addCleanup(lambda: setattr(fabrica, 'RAIZ', anterior[0]) or setattr(fabrica, 'SALIDA', anterior[1]))
         fabrica.construir('guerreros-gelatina')
-        return (self.tmp / 'salida' / 'guerreros-gelatina' / 'index.html').read_text(encoding='utf-8')
-
-    def test_sin_motor_el_resultado_es_exactamente_el_publicado(self):
-        html = self.construir(None)
-        publicado = (RAIZ / 'salida' / 'guerreros-gelatina' / 'index.html').read_text(encoding='utf-8')
-        self.assertEqual(html, publicado)
+        self.assertEqual((self.tmp / 'salida' / 'guerreros-gelatina' / 'index.html').read_text(encoding='utf-8'),
+                         (RAIZ / 'salida' / 'guerreros-gelatina' / 'index.html').read_text(encoding='utf-8'))
 
     def test_con_motor_los_modulos_van_despues_del_nucleo_y_antes_del_juego_y_es_reproducible(self):
         html = self.construir(['musica', 'efectos', 'accesible'])
