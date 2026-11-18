@@ -1652,6 +1652,7 @@ class PruebasCalendario(Base):
         formatos = ['comparacion', 'comparacion', 'personaje', 'personaje', 'dato', 'dato', 'parodia', 'parodia']
         self.escribir(*[self.item('p%d' % i, formato=f) for i, f in enumerate(formatos)])
         ruta = self.p.raiz / 'contenido' / 'resultados.jsonl'
+        ruta.unlink(missing_ok=True)       # la prueba parte de cero: el proyecto copiado puede traer las mediciones reales del calendario
 
         def anotar(n):
             with open(ruta, 'w', encoding='utf-8') as f:
