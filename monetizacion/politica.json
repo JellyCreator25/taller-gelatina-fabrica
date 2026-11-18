@@ -1,0 +1,38 @@
+{
+  "nota": "Política de monetización. Todo empieza apagado: mientras una ruta diga activa:false, ningún juego se construye con anuncios y el sitio no cambia. Encender una ruta es decisión del dueño (cambia lo que el sitio le promete al jugador y obliga a republicar los juegos afectados con su aprobación). Qué falta para cada ruta lo dice `python3 fabrica.py monetizar`; la estrategia completa y sus fuentes están en monetizacion/ESTRATEGIA.md.",
+  "rutas": {
+    "portales": {
+      "activa": false,
+      "nota": "Portales con revenue share (CrazyGames primero). No cambian el sitio propio: son versiones aparte del juego, armadas con `python3 fabrica.py monetizar variantes`. El dueño crea la cuenta de desarrollador y sube el archivo; nada se envía solo.",
+      "orden": ["crazygames", "poki", "gamedistribution"]
+    },
+    "adsense-sitio": {
+      "activa": false,
+      "proveedor": "adsense",
+      "modo_prueba": true,
+      "consentimiento_listo": false,
+      "nota": "Anuncios de AdSense (H5 Games Ads) en el sitio propio. Requiere dominio propio, cuenta de AdSense aprobada, la solicitud aparte de H5 Games Ads y el mensaje de consentimiento para el EEE, el Reino Unido y Suiza. modo_prueba:true marca los anuncios como de prueba: se apaga solo cuando el dueño lo decide, con la cuenta ya aprobada."
+    },
+    "donaciones": {
+      "activa": false,
+      "nota": "Pago libre o propina con el enlace `apoyo_url` de cada juego (el botón de apoyo ya existe en el motor). Solo falta el enlace."
+    }
+  },
+  "reglas_de_anuncios": {
+    "nota": "Las aplica el módulo «anuncios» con AdSense. Con un portal mandan su SDK y sus reglas (prohíben temporizadores propios).",
+    "momentos_permitidos": ["fin_de_partida", "fin_de_nivel", "pausa_larga"],
+    "momentos_prohibidos": ["partida", "menu", "ajustes", "tienda"],
+    "espera_inicial_s": 90,
+    "min_entre_s": 180,
+    "max_por_sesion": 4,
+    "recompensa_min_entre_s": 120
+  },
+  "supuestos_de_ingresos": {
+    "nota": "Solo para hacer cuentas antes de tener datos propios. Fórmula: sesiones × anuncios por sesión × relleno × eCPM / 1000. El eCPM de abajo es un supuesto prudente nuestro, no una cifra publicada; con datos reales se reemplaza por el de los reportes.",
+    "anuncios_por_sesion": 2,
+    "relleno": 0.7,
+    "ecpm_usd": [2, 5],
+    "sesiones_por_dia": [100, 1000, 10000],
+    "pago_minimo": {"crazygames": {"moneda": "EUR", "monto": 100}, "gamedistribution": {"moneda": "EUR", "monto": 50}}
+  }
+}

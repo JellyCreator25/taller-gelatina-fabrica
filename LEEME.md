@@ -107,6 +107,16 @@ Un juego nuevo (`nuevo ID PLANTILLA`) parte con todos los módulos declarados; d
 
 La gelatina es la insignia del Taller, no solo el tema de un juego: `marca/guia.md` explica la idea, los elementos (emblema en cuatro versiones, sello, «blup», distintivo, firma y voz) y las reglas de uso. El emblema se dibuja una sola vez en `herramientas/marca.py` (`python3 herramientas/marca.py` regenera `marca/*.svg`); el módulo `marca` del motor y el ícono del sitio llevan el mismo dibujo, y una prueba lo verifica.
 
+## Monetización
+
+Todo empieza apagado. `monetizacion/politica.json` tiene tres rutas (`portales`, `adsense-sitio`, `donaciones`) en `activa: false`, las reglas de anuncios y los supuestos para hacer cuentas; `monetizacion/ESTRATEGIA.md` explica la estrategia con sus fuentes y lo que no está verificado.
+
+- **Módulo `anuncios`** (`motor/modulos/anuncios.js`, se declara en `motor` como cualquier otro): completa el `GGX.ads` del núcleo (que no se toca) con `intermedio(momento, al_terminar)`, `recompensa(motivo, {ok, no})`, `recompensaDisponible()`, `jugando(bool)`, `alPausar/alReanudar` y `estado()`. Sin proveedor no carga nada y `al_terminar` corre siempre; los anuncios solo van en cortes naturales y después de una interacción; el juego se pausa y se silencia solo mientras suena el anuncio; con un portal no hay temporizadores propios (los prohíben). Proveedores: `adsense`, `crazygames`, `poki` (borrador). Sus 22 pruebas con navegador y simulaciones corren con `python3 fabrica.py motor probar`.
+- **Qué se le inyecta a un juego**: nada mientras ninguna ruta esté encendida (el juego sale byte por byte como antes); con `adsense-sitio` encendida y `adsense_publisher` puesto, AdSense en modo de prueba; para un portal, una versión aparte.
+- **Ganchos**: el juego llama al módulo en sus cortes naturales (hoy solo Compás, en `otra()`); los juegos ya publicados no se tocan sin versión nueva y aprobación.
+- `python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]]`: qué falta por ruta (y de quién), cuentas con la fórmula sesiones × anuncios por sesión × relleno × eCPM / 1000, y la versión de un juego para un portal en `dist/portales/` (hoy solo CrazyGames, cuyo SDK está confirmado; revisa que no traiga anuncios ajenos ni llamadas de salida).
+- El estado entra a `publicacion/PENDIENTE.md` cada semana.
+
 ## Idiomas
 
 Cada juego declara `idiomas` (hoy es, en y zh) y trae sus textos por idioma en `juego.json → textos`. El motor común ofrece el selector, recuerda la elección y respeta `?lang=xx`; el sitio genera una página por idioma (`/es/`, `/en/`, `/zh/`, con `hreflang`, el chino como `zh-Hans`). La prueba de cada plantilla revisa los tres idiomas en pantalla. El chino lo escribió Claude: necesita revisión de una persona nativa antes de promocionar en ese idioma.
@@ -211,7 +221,7 @@ El paso a paso por juego está en `salida/<id>/kit/plan-lanzamiento.md`; los com
 - Las reglas de Reddit y de cada comunidad (Reddit no se pudo leer), las reglas de etiquetado de IA y de enlaces de YouTube, TikTok e Instagram, y las reglas del portal de juegos de Newgrounds (solo se leyó la de su portal de arte).
 - De los portales: la postura de CrazyGames sobre juegos hechos con IA, el plazo de su revisión y su porcentaje de ingresos; el porcentaje, los plazos y los límites de tamaño y de carga de Poki; el porcentaje, los pagos y la moderación de Playgama. Está todo en «Sin verificar» de cada canal en `difusion.md`.
 - Los adaptadores de publicación (Cloudflare Pages, Bluesky, Mastodon, Telegram, Discord, YouTube, itch.io) se probaron solo contra simulaciones y programas falsos, no contra los servicios reales: la primera ejecución real de cada canal debe ser supervisada. Detalles puntuales sin confirmar: si `wrangler` puede crear el proyecto de Pages por sí solo, el formato de la subida reanudable de YouTube, los parámetros de envío de Telegram y la última versión de las acciones de GitHub.
-- Los SDK de los portales (PokiSDK, Bridge SDK de Playgama, SDK de CrazyGames): `GGX.ads.use(...)` está preparado para enchufar uno, pero no se ha integrado ninguno. Poki además pide cubrir un lienzo 16:9 en escritorio, algo que Torre (vertical) todavía no hace.
+- Los SDK de los portales: el módulo `anuncios` trae adaptadores para AdSense, CrazyGames y Poki, escritos según la documentación disponible y probados **solo con simulaciones**; la prueba real es la herramienta de vista previa de cada portal, con la cuenta del dueño. El de Poki es un borrador hasta que Poki entregue su documentación (lo hace después de aceptar el juego); el Bridge SDK de Playgama no está integrado. Poki además pide cubrir un lienzo 16:9 en escritorio, algo que Torre (vertical) todavía no hace. Detalle en `monetizacion/ESTRATEGIA.md`.
 - Cómo pondera itch.io la visibilidad en explorar y búsqueda, y cuánto pesa en ella la declaración de IA.
 - Que el nombre de cada juego esté libre en itch.io y en las tiendas: búscalo antes de publicar.
 - Los datos de itch.io, butler y la declaración de IA salen de su documentación al momento de escribir el kit; si su panel cambió, manda el panel.

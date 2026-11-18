@@ -151,7 +151,7 @@ function reiniciar() {
 }
 function comenzar() {
   reiniciar();
-  S.fase = 'juego';
+  S.fase = 'juego'; GGX.ads.jugando(true);
   S.t0 = performance.now() + cfg.caida_ms + cfg.previo_ms;   // T negativo: las gotas todavía están cayendo hacia el primer golpe
 }
 function empezar() {
@@ -202,7 +202,7 @@ function precision() {
   return total ? Math.round(100 * (S.n.perfecto + 0.6 * S.n.bien + 0.25 * S.n.casi) / total) : 0;
 }
 function fin() {
-  S.fase = 'fin'; S.tFin = performance.now(); GGX.music.stop();
+  S.fase = 'fin'; S.tFin = performance.now(); GGX.music.stop(); GGX.ads.jugando(false);
   const previo = Number(S.mejor[S.animo]) || 0;
   S.record = S.puntos > previo;
   if (S.record) { S.mejor[S.animo] = S.puntos; X.store.set('mejor', S.mejor); }
@@ -211,7 +211,11 @@ function fin() {
   GGX.a11y.announce(X.t(S.record ? 'record' : 'fin') + '. ' + $('fP').textContent);
   try { $('btnOtra').focus({ preventScroll: true }); } catch (e) { /* opcional */ }
 }
-function otra() { X.sfx('click', 0); $('ovFin').hidden = true; S.fase = 'sello'; GGX.marca.sello({ al_terminar: () => { if (S.fase === 'sello') comenzar(); } }); }
+function otra() {
+  X.sfx('click', 0); $('ovFin').hidden = true; S.fase = 'sello';
+  // Corte natural: el jugador acaba de ver su resultado y pidió otra partida. El módulo decide si hay anuncio (solo con una ruta de monetización encendida); sin él, sigue enseguida.
+  GGX.ads.intermedio('fin_de_partida', () => GGX.marca.sello({ al_terminar: () => { if (S.fase === 'sello') comenzar(); } }));
+}
 function volverAlInicio() { X.sfx('click', 0); $('ovFin').hidden = true; $('ovInicio').hidden = false; S.fase = 'inicio'; reiniciar(); try { $('btnJugar').focus({ preventScroll: true }); } catch (e) { /* opcional */ } }
 
 /* ---------- Textos ---------- */

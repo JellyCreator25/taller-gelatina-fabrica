@@ -58,6 +58,42 @@ Niveles: 1 Base · 2 Con sonido · 3 Con jugo y accesible · 4 Con música · 5 
 Lo que sigue para el motor:
 1. Actualizar «guerreros-gelatina» del nivel 2 al 5 — Una versión nueva con lo que le falta (accesible, efectos, musica, marca) mejora el juego y da una novedad que anunciar.
 
+## Monetización: qué falta para cobrar
+
+Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apagadas.
+
+### Portales con revenue share (apagada)
+- Listo: módulo «anuncios» v1.0.0 con 22 pruebas del motor vigentes
+- Listo: juegos con anuncios en cortes naturales: compas-gelatina
+- Listo: SDK confirmado en la documentación del portal: crazygames
+- Falta (dueño): crear la cuenta de desarrollador del portal (primero CrazyGames) y fijar cómo cobrar; el portal pide los datos de pago antes de recibir un juego
+- Falta (dueño): subir el archivo del juego (lo armo yo con `python3 fabrica.py monetizar variantes`) y llenar su ficha (la preparo yo)
+
+### AdSense en el sitio propio (apagada)
+- Listo: módulo «anuncios» v1.0.0 con 22 pruebas del motor vigentes
+- Listo: juegos con anuncios en cortes naturales: compas-gelatina
+- Falta (fábrica): el sitio muestra 2 juego(s); con pocos juegos AdSense puede rechazarlo por contenido escaso
+- Falta (dueño): un dominio propio: hoy el sitio vive en taller-gelatina.pages.dev, y los reportes de editores indican que AdSense no aprueba subdominios gratuitos
+- Falta (dueño): cuenta de AdSense aprobada para ese dominio, la solicitud aparte de «H5 Games Ads» y el identificador pub-… en publicacion/sitio.json
+- Falta (dueño): configurar en la cuenta de AdSense el mensaje de consentimiento (obligatorio para tráfico del EEE, el Reino Unido y Suiza) y marcar consentimiento_listo en la política
+- Falta (dueño): decidir la analítica de visitas (Cloudflare Web Analytics): sin ella no hay forma de saber cuántas sesiones hay ni de medir ingresos por visita
+
+### Donaciones y pago libre (apagada)
+- Listo: el botón de apoyo ya existe en el motor y se muestra solo cuando hay enlace
+- Falta (dueño): crear la cuenta en un servicio de propinas o pago libre y darme el enlace (lo pongo en `apoyo_url` de cada juego y se publica cada juego con tu aprobación)
+
+### Cuentas con la fórmula (supuestos en monetizacion/politica.json)
+
+| Sesiones por día | eCPM supuesto | Por mes (US$) | Días para juntar 50 (el pago mínimo más bajo de los portales) |
+|---|---|---|---|
+| 100 | US$2 | 8.40 | 179 |
+| 100 | US$5 | 21.00 | 71 |
+| 1,000 | US$2 | 84.00 | 18 |
+| 1,000 | US$5 | 210.00 | 7 |
+| 10,000 | US$2 | 840.00 | 2 |
+| 10,000 | US$5 | 2,100.00 | 1 |
+
+
 ## Bluesky: qué ha funcionado
 
 Todavía no hay publicaciones medidas: se miden a las 24 horas y a los 3 días de salir.

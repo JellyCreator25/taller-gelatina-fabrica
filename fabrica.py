@@ -33,6 +33,7 @@ Uso:
   python3 fabrica.py configurar bluesky-bot|bluesky-perfil|mastodon-bot [--ejecutar]   (ajustes en la cuenta del bot; bluesky-perfil pone bio, nombre, avatar y banner)
   python3 fabrica.py motor [probar]           (el motor que crece solo: techo, juegos por nivel y cola de mejoras; «probar» corre las pruebas del motor y guarda motor/informe.json)
   python3 fabrica.py calidad [id|todos]       (en qué nivel de la escalera de calidad está cada juego, qué le falta y qué nivel se le exige para lanzarse)
+  python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]]   (qué falta para cobrar por ruta, cuentas con supuestos y versiones para portales; el estado también entra a publicacion/PENDIENTE.md)
 """
 import base64
 import json
@@ -157,8 +158,9 @@ def attr(texto):
     return texto.replace('&', '&amp;').replace('"', '&quot;').replace('<', '&lt;')
 
 
-def construir(juego_id):
-    spec = cargar(juego_id)
+def construir(juego_id, spec=None, destino=None, cabeza_extra=''):
+    """Sin argumentos extra construye el juego a salida/<id>/. Una versión para un portal (monetizar variantes) pasa su propia ficha, su carpeta y lo que va en la cabecera."""
+    spec = spec if spec is not None else cargar(juego_id)
     base = RAIZ / 'plantillas' / spec['plantilla']
     fuente = (base / 'plantilla.html').read_text(encoding='utf-8')
     if not fuente.startswith('<style>\n'):
@@ -172,6 +174,11 @@ def construir(juego_id):
     # Configuración y motor común, antes del primer <script> de la plantilla
     cfg = {'id': spec['id'], 'version': spec['version'], 'idiomas': spec['idiomas'],
            'titulo': spec['ficha'][spec['idiomas'][0]]['titulo'], 'apoyo_url': spec.get('apoyo_url', '')}
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import monetizar as monet_mod
+    anuncios = monet_mod.configuracion_de(RAIZ, spec)      # None mientras ninguna ruta de anuncios esté encendida: el juego sale idéntico
+    if anuncios:
+        cfg['anuncios'] = anuncios
     ggx = (RAIZ / 'motor' / 'ggx.js').read_text(encoding='utf-8')
     fuera = chinos_fuera_de_gb2312(fuente)
     if fuera:
@@ -202,6 +209,8 @@ def construir(juego_id):
 
     primero = spec['idiomas'][0]
     html = (RAIZ / 'motor' / 'envoltura.html').read_text(encoding='utf-8')
+    if cabeza_extra:
+        html = html.replace('<head>', '<head>\n' + cabeza_extra.rstrip('\n'), 1)
     for marca, valor in (('@@LANG@@', primero), ('@@TITULO@@', attr(spec['ficha'][primero]['titulo'])),
                          ('@@DESCRIPCION@@', attr(spec['ficha'][primero]['corta'])), ('@@ICONO@@', icono(spec)),
                          ('@@FUENTES@@', fuentes_css(spec.get('fuentes', ['Fredoka', 'Nunito Sans']))),
@@ -212,7 +221,7 @@ def construir(juego_id):
         sys.exit('El resultado todavía depende de Google Fonts o de metadatos del Artifact')
     externos = sorted(set(u for u in re.findall(r'https?://[^\s"\'<>)\\]+', html) if not u.startswith('http://www.w3.org/')))
 
-    destino = SALIDA / juego_id
+    destino = pathlib.Path(destino) if destino else SALIDA / juego_id
     destino.mkdir(parents=True, exist_ok=True)
     (destino / 'index.html').write_text(html, encoding='utf-8')
     zip_ruta = destino / ('%s-web.zip' % juego_id)
@@ -608,6 +617,13 @@ def ciclo():
     except Exception as e:
         errores.append('motor: %s' % e)
         L += ['No se pudo calcular el estado del motor: %s' % e]
+    L += ['', '## Monetización: qué falta para cobrar', '']
+    try:
+        import monetizar as monet_mod
+        L += monet_mod.informe(RAIZ, sys.modules[__name__])
+    except Exception as e:
+        errores.append('monetizacion: %s' % e)
+        L += ['No se pudo calcular el estado de la monetización: %s' % e]
     L += ['', '## Bluesky: qué ha funcionado', '']
     try:
         from publicacion import resultados
@@ -661,6 +677,37 @@ def motor_cmd(args):
     print('\n'.join(motor_mod.informe_de_estado(RAIZ, entradas, juegos)))
 
 
+def monetizar_cmd(args):
+    """monetizar [estado] | escenarios [SESIONES…] | variantes ID [portal]"""
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import monetizar as monet_mod
+    accion = args[0] if args else 'estado'
+    if accion == 'estado':
+        print('\n'.join(['# Monetización: qué falta y qué sigue', ''] + monet_mod.informe(RAIZ, sys.modules[__name__])))
+        return
+    if accion == 'escenarios':
+        try:
+            sesiones = [int(x) for x in args[1:]] or None
+        except ValueError:
+            sys.exit('Uso: python3 fabrica.py monetizar escenarios [SESIONES_POR_DIA …]')
+        for f in monet_mod.escenarios(RAIZ, sesiones):
+            print('%7s sesiones/día · eCPM supuesto US$%s → US$%s por mes · días para llegar al pago mínimo: %s' % (format(f['sesiones_dia'], ','), f['ecpm'], format(f['mes_usd'], ',.2f'), f['dias_a_pago_minimo']))
+        return
+    if accion == 'variantes' and len(args) > 1:
+        try:
+            hechos = monet_mod.variantes(RAIZ, sys.modules[__name__], args[1], args[2:] or None)
+        except monet_mod.ErrorMonetizacion as e:
+            sys.exit('[monetizar] ' + str(e))
+        malo = False
+        for prov, carpeta, problemas in hechos:
+            print('[monetizar] %s → %s%s' % (prov, carpeta, '' if not problemas else ' · PROBLEMAS: ' + '; '.join(problemas)))
+            malo = malo or bool(problemas)
+        if malo:
+            sys.exit(1)
+        return
+    sys.exit('Uso: python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]]')
+
+
 def calidad_cmd(objetivo):
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import motor as motor_mod
@@ -711,6 +758,8 @@ if __name__ == '__main__':
         rumbo_cmd(sys.argv[2:])
     elif orden == 'motor':
         motor_cmd(sys.argv[2:])
+    elif orden == 'monetizar':
+        monetizar_cmd(sys.argv[2:])
     elif orden == 'calidad':
         calidad_cmd(objetivo)
     elif orden == 'huella':

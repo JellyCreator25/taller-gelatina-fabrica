@@ -51,6 +51,19 @@
         "emblema en tres colores"
       ],
       "desde": "2026-11-17"
+    },
+    "anuncios": {
+      "version": "1.0.0",
+      "archivo": "anuncios.js",
+      "pide": [],
+      "aporta": [
+        "anuncios en cortes naturales",
+        "anuncios con recompensa",
+        "pausa y silencio solo mientras suena",
+        "proveedores AdSense, CrazyGames y Poki",
+        "apagado por defecto"
+      ],
+      "desde": "2026-11-18"
     }
   }
 }

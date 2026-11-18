@@ -1,10 +1,16 @@
 {
- "fuente": "4b047d161eb1f816",
+ "fuente": "4fb7a0129b0c6e81",
  "modulos": {
   "accesible": {
    "fallas": 0,
    "fallos": [],
    "pruebas": 16,
+   "version": "1.0.0"
+  },
+  "anuncios": {
+   "fallas": 0,
+   "fallos": [],
+   "pruebas": 22,
    "version": "1.0.0"
   },
   "efectos": {

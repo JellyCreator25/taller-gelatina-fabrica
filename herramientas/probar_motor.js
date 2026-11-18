@@ -239,16 +239,111 @@ async function marca(browser) {
   await ctx.close();
 }
 
+async function anuncios(browser) {
+  const M = 'anuncios';
+  let { ctx, page, errores } = await abrir(browser);
+  // por defecto está apagado: sin proveedor no hay anuncio, el juego sigue y no se carga nada de afuera
+  const base = await page.evaluate(() => {
+    let n = 0; const r = GGX.ads.intermedio('fin_de_partida', () => { n++; });
+    let rec = null; GGX.ads.recompensa('vida', { ok: () => { rec = 'ok'; }, no: (m) => { rec = m; } });
+    return { r, n, rec, disp: GGX.ads.recompensaDisponible(), e: GGX.ads.estado(), externos: [...document.scripts].filter((s) => /googlesyndication|crazygames|poki/.test(s.src)).length };
+  });
+  chequear(M, base.r === false && base.n === 1 && base.e.proveedor === 'ninguno' && base.e.mostrados === 0, 'sin proveedor no hay anuncio y el juego sigue enseguida (al_terminar corre una vez)');
+  chequear(M, base.rec === 'sin_proveedor' && base.disp === false, 'sin proveedor la recompensa no se concede y el botón de recompensa no debe mostrarse');
+  chequear(M, base.externos === 0, 'sin proveedor no se carga ningún script de afuera');
+  await ctx.close();
+
+  // AdSense simulado: reglas propias, silencio y pausa solo mientras suena
+  ({ ctx, page, errores } = await abrir(browser));
+  const ad = await page.evaluate(async () => {
+    const espera = (ms) => new Promise((r) => setTimeout(r, ms)), reg = [], out = {};
+    window.adConfig = () => {};
+    window.adBreak = (o) => {
+      reg.push(o.type);
+      const mostrar = () => { o.beforeAd(); reg.push('mudo:' + GGX.muted() + ',pausa:' + document.documentElement.hasAttribute('data-anuncio')); setTimeout(() => { if (o.type === 'reward' && window.__ver) o.adViewed(); o.afterAd(); o.adBreakDone({ breakStatus: 'viewed' }); }, 30); };
+      if (o.type === 'reward') o.beforeReward(mostrar); else mostrar();
+    };
+    GGX.ads.configurar({ proveedor: 'adsense', sdk: false, reglas: { espera_inicial_s: 0, min_entre_s: 1000, max_por_sesion: 2, recompensa_min_entre_s: 0 } });
+    let pausas = 0, reanudas = 0; GGX.ads.alPausar(() => pausas++); GGX.ads.alReanudar(() => reanudas++);
+    let cb = 0; const cuenta = () => cb++;
+    GGX.ads.intermedio('fin_de_partida', cuenta); out.antes = { cb, motivo: GGX.ads.estado().ultimoRechazo };           // aún sin tocar nada
+    window.dispatchEvent(new Event('keydown'));
+    GGX.ads.intermedio('menu', cuenta); out.menu = { cb, motivo: GGX.ads.estado().ultimoRechazo };
+    out.pidio = GGX.ads.intermedio('fin_de_partida', cuenta); out.durante = { cb };
+    await espera(90); out.despues = { cb, mudo: GGX.muted(), pausa: document.documentElement.hasAttribute('data-anuncio'), pausas, reanudas, mostrados: GGX.ads.estado().mostrados };
+    GGX.ads.intermedio('fin_de_nivel', cuenta); out.seguido = { cb, motivo: GGX.ads.estado().ultimoRechazo };
+    GGX.ads.configurar({ reglas: { min_entre_s: 0 } }); GGX.setMuted(true);
+    GGX.ads.intermedio('fin_de_nivel', cuenta); await espera(90); out.mudoPrevio = GGX.muted(); GGX.setMuted(false);
+    GGX.ads.intermedio('fin_de_nivel', cuenta); out.tope = { cb, motivo: GGX.ads.estado().ultimoRechazo };
+    window.__ver = true; let r1 = null; GGX.ads.recompensa('vida', { ok: () => { r1 = 'ok'; }, no: (m) => { r1 = m; } }); await espera(90);
+    window.__ver = false; let r2 = null; GGX.ads.recompensa('vida', { ok: () => { r2 = 'ok'; }, no: (m) => { r2 = m; } }); await espera(90);
+    out.r1 = r1; out.r2 = r2; out.disp = GGX.ads.recompensaDisponible(); out.reg = reg; out.e = GGX.ads.estado();
+    return out;
+  });
+  chequear(M, ad.antes.cb === 1 && ad.antes.motivo === 'sin_entrada', 'antes de que el jugador toque algo no se pide anuncio (y el juego sigue)');
+  chequear(M, ad.menu.cb === 2 && ad.menu.motivo === 'momento', 'en un menú no se pide anuncio (solo en cortes naturales)');
+  chequear(M, ad.pidio === true && ad.durante.cb === 2, 'en un corte natural se pide el anuncio y el juego espera a que termine');
+  chequear(M, ad.reg.indexOf('mudo:true,pausa:true') >= 0 && ad.despues.cb === 3 && ad.despues.mudo === false && ad.despues.pausa === false, 'mientras suena: silencio y pausa; al terminar, todo vuelve y el juego sigue');
+  chequear(M, ad.despues.pausas === 1 && ad.despues.reanudas === 1 && ad.despues.mostrados === 1, 'el juego recibe una pausa y una reanudación por anuncio');
+  chequear(M, ad.seguido.cb === 4 && ad.seguido.motivo === 'frecuencia', 'un segundo anuncio seguido se rechaza por frecuencia');
+  chequear(M, ad.mudoPrevio === true, 'si el jugador ya había silenciado el juego, sigue silenciado después del anuncio');
+  chequear(M, ad.tope.motivo === 'tope', 'hay un tope de anuncios por visita');
+  chequear(M, ad.r1 === 'ok' && ad.r2 === 'descartado' && ad.e.recompensas === 1, 'la recompensa solo se concede si el anuncio se vio completo');
+  chequear(M, ad.reg.filter((x) => x === 'reward').length === 2 && ad.reg.filter((x) => x === 'next').length === 2, 'AdSense recibe adBreak de tipo «next» y «reward» (hoy ' + ad.reg.join(',') + ')');
+  chequear(M, errores.length === 0, 'AdSense simulado: sin errores de consola ni de página' + (errores.length ? ': ' + errores.join(' || ') : ''));
+  await ctx.close();
+
+  // CrazyGames simulado: manda su SDK (sin temporizadores propios); un error no premia
+  ({ ctx, page, errores } = await abrir(browser));
+  const cg = await page.evaluate(async () => {
+    const espera = (ms) => new Promise((r) => setTimeout(r, ms)), reg = [], out = {};
+    window.CrazyGames = { SDK: { init: async () => { reg.push('init'); },
+      ad: { requestAd: (t, c) => { reg.push(t); c.adStarted(); reg.push('mudo:' + GGX.muted()); setTimeout(() => (window.__fallar ? c.adError('x') : c.adFinished()), 30); } },
+      game: { gameplayStart: () => reg.push('start'), gameplayStop: () => reg.push('stop') } } };
+    GGX.ads.configurar({ proveedor: 'crazygames' }); await espera(30);
+    window.dispatchEvent(new Event('pointerdown'));
+    let cb = 0; out.pidio = GGX.ads.intermedio('fin_de_partida', () => cb++); await espera(90);
+    out.pidio2 = GGX.ads.intermedio('fin_de_partida', () => cb++); await espera(90);          // sin espera ni separación propias: manda el SDK
+    window.__fallar = true; let r = null; GGX.ads.recompensa('vida', { ok: () => { r = 'ok'; }, no: (m) => { r = m; } }); await espera(90);
+    GGX.ads.jugando(true); GGX.ads.jugando(true); GGX.ads.jugando(false); GGX.ads.jugando(false);
+    out.cb = cb; out.r = r; out.reg = reg; out.mudo = GGX.muted(); out.e = GGX.ads.estado();
+    return out;
+  });
+  chequear(M, cg.reg[0] === 'init' && cg.pidio === true && cg.pidio2 === true && cg.cb === 2, 'CrazyGames: se inicializa el SDK y se piden anuncios sin temporizadores propios');
+  chequear(M, cg.reg.indexOf('midgame') >= 0 && cg.reg.indexOf('mudo:true') >= 0 && cg.mudo === false, 'CrazyGames: «midgame», sonido silenciado mientras suena y restituido al terminar');
+  chequear(M, cg.r === 'error' && cg.e.recompensas === 0, 'CrazyGames: si el anuncio con recompensa falla, no se premia');
+  chequear(M, cg.reg.filter((x) => x === 'start').length === 1 && cg.reg.filter((x) => x === 'stop').length === 1, 'CrazyGames: gameplayStart/Stop no se repiten dos veces seguidas');
+  chequear(M, errores.length === 0, 'CrazyGames simulado: sin errores de consola ni de página' + (errores.length ? ': ' + errores.join(' || ') : ''));
+  await ctx.close();
+
+  // Poki simulado (borrador, se confirma al aceptar el juego)
+  ({ ctx, page, errores } = await abrir(browser));
+  const pk = await page.evaluate(async () => {
+    const espera = (ms) => new Promise((r) => setTimeout(r, ms)), reg = [], out = {};
+    window.PokiSDK = { commercialBreak: (antes) => { antes(); reg.push('mudo:' + GGX.muted()); return new Promise((r) => setTimeout(r, 30)); },
+      rewardedBreak: (antes) => { antes(); return new Promise((r) => setTimeout(() => r(!!window.__ver), 30)); }, gameplayStart: () => reg.push('start'), gameplayStop: () => reg.push('stop') };
+    GGX.ads.configurar({ proveedor: 'poki' }); window.dispatchEvent(new Event('keydown'));
+    let cb = 0; GGX.ads.intermedio('fin_de_nivel', () => cb++); await espera(90);
+    window.__ver = true; let a = null; GGX.ads.recompensa('vida', { ok: () => { a = 'ok'; }, no: (m) => { a = m; } }); await espera(90);
+    window.__ver = false; let b = null; GGX.ads.recompensa('vida', { ok: () => { b = 'ok'; }, no: (m) => { b = m; } }); await espera(90);
+    return { cb, a, b, reg, mudo: GGX.muted() };
+  });
+  chequear(M, pk.cb === 1 && pk.reg.indexOf('mudo:true') >= 0 && pk.mudo === false, 'Poki: commercialBreak con sonido silenciado mientras dura y restituido después');
+  chequear(M, pk.a === 'ok' && pk.b === 'descartado', 'Poki: la recompensa depende de lo que devuelve rewardedBreak');
+  chequear(M, errores.length === 0, 'Poki simulado: sin errores de consola ni de página' + (errores.length ? ': ' + errores.join(' || ') : ''));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  const pasos = { nucleo, accesible, efectos, musica, marca };
+  const pasos = { nucleo, accesible, efectos, musica, marca, anuncios };
   for (const [nombre, f] of Object.entries(pasos)) {
-    const hay = nombre === 'nucleo' || (await (async () => { const { ctx, page } = await abrir(browser); const v = await page.evaluate((n) => (n === 'accesible' ? !!GGX.a11y : n === 'efectos' ? !!GGX.fx : n === 'musica' ? !!GGX.music : !!GGX.marca), nombre); await ctx.close(); return v; })());
+    const hay = nombre === 'nucleo' || (await (async () => { const { ctx, page } = await abrir(browser); const v = await page.evaluate((n) => (n === 'accesible' ? !!GGX.a11y : n === 'efectos' ? !!GGX.fx : n === 'musica' ? !!GGX.music : n === 'marca' ? !!GGX.marca : !!GGX.ads), nombre); await ctx.close(); return v; })());
     if (!hay) { chequear(nombre, false, 'el módulo «' + nombre + '» no está en la página de prueba'); continue; }
     try { await f(browser); } catch (e) { chequear(nombre, false, 'la prueba se detuvo: ' + e.message); }
   }
   await browser.close();
   const fallas = Object.values(resultado).reduce((n, g) => n + g.fallas, 0);
-  console.log(JSON.stringify({ nucleo: resultado.nucleo, modulos: { accesible: resultado.accesible, efectos: resultado.efectos, musica: resultado.musica, marca: resultado.marca }, fallas }));
+  console.log(JSON.stringify({ nucleo: resultado.nucleo, modulos: { accesible: resultado.accesible, efectos: resultado.efectos, musica: resultado.musica, marca: resultado.marca, anuncios: resultado.anuncios }, fallas }));
   process.exit(fallas ? 1 : 0);
 })().catch((e) => { console.error('FALLO GENERAL', e); process.exit(1); });

@@ -84,7 +84,7 @@ class PruebasDelMotorReal(unittest.TestCase):
     def test_el_tercer_juego_nace_en_lo_alto_de_la_escalera(self):
         n = motor.nivel_de(RAIZ, ficha('compas-gelatina'))
         self.assertGreaterEqual(n['nivel'], 4, n)
-        self.assertEqual({m[0] for m in motor.modulos_de(RAIZ, ficha('compas-gelatina'))}, {'accesible', 'efectos', 'musica', 'marca'})
+        self.assertEqual({m[0] for m in motor.modulos_de(RAIZ, ficha('compas-gelatina'))}, {'accesible', 'efectos', 'musica', 'marca', 'anuncios'})
 
     def test_la_escalera_es_coherente(self):
         esc = motor.escalera(RAIZ)
@@ -147,7 +147,7 @@ class PruebasDeMarca(unittest.TestCase):
     def test_el_modulo_esta_en_el_manifiesto_y_la_escalera_lo_pide(self):
         man = motor.manifiesto(RAIZ)
         self.assertEqual(man['marca']['pide'], ['accesible'])
-        self.assertEqual(list(man)[-1], 'marca')
+        self.assertEqual(list(man)[:4], ['accesible', 'efectos', 'musica', 'marca'])
         self.assertEqual(motor.escalera(RAIZ)['requisitos']['marca']['modulo'], 'marca')
 
     def test_la_guia_de_marca_dice_lo_que_esta_hecho_y_lo_que_espera_decision(self):
