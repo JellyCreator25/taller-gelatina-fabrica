@@ -158,7 +158,7 @@ def candidatas(raiz, specs, pts, modo, pol):
     ranking, en_espera, excluidas = [], [], []
     for idea, ev in nov.evaluar_ideas(raiz):
         iid = idea['id']
-        if (pathlib.Path(raiz) / 'juegos' / iid).exists() or (pathlib.Path(raiz) / 'plantillas' / iid).exists():
+        if nov.ya_construida(raiz, idea):
             excluidas.append({'id': iid, 'motivo': 'ya está construida'})
             continue
         if ev['veredicto'] not in r['factor_novedad']:

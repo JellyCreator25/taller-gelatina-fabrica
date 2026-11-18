@@ -57,6 +57,8 @@ class PruebasReales(Base):
     def test_las_ideas_del_cuaderno_son_validas_y_distintas(self):
         for idea, r in novedad.evaluar_ideas(RAIZ):
             self.assertEqual(r['errores'], [], idea['id'])
+            if novedad.ya_construida(RAIZ, idea):   # frente a su propio juego sería una variante: ya no es una idea por construir
+                continue
             self.assertEqual(r['veredicto'], 'distinto', idea['id'])
 
 

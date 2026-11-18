@@ -207,6 +207,11 @@ def cargar_ideas(raiz):
     return json.loads(ruta.read_text(encoding='utf-8')) if ruta.exists() else {'ideas': []}
 
 
+def ya_construida(raiz, idea):
+    """Una idea del cuaderno ya está construida cuando existe un juego o una plantilla con su mismo id (frente a ese juego sería, claro, una variante)."""
+    return (pathlib.Path(raiz) / 'juegos' / idea['id']).exists() or (pathlib.Path(raiz) / 'plantillas' / idea['id']).exists()
+
+
 def evaluar_ideas(raiz):
     """Cada idea del cuaderno de ideas frente a los juegos de la fábrica (sirve para decidir qué plantilla construir después)."""
     salida = []

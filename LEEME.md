@@ -12,6 +12,7 @@ Esta carpeta también es la memoria del proyecto. Quien la abra (tú o una sesi�
 |---|---|---|---|
 | `guerreros-gelatina` v1.4.0 | `gelatina` — simulador de batallas sandbox con 8 «Leyendas» (mitología y folclor), modo Reto con oro que crece por nivel; paquete `audio` | es, en, zh | Probado. Sin publicar. |
 | `torre-gelatina` v1.1.0 | `torre` — apilar bloques con timing, un solo toque | es, en, zh | Probado. Sin publicar. Riesgo «alto» de parecerse a un juego de fuera: solo para el sitio propio. |
+| `compas-gelatina` v1.0.0 | `compas` — ritmo de tres carriles con música que el motor compone solo (alegre, tensión, calma); nivel 5 de la escalera | es, en, zh | Probado. Todavía fuera del sitio y del plan de publicación: su lanzamiento es una decisión aparte (no antes del 4 de diciembre de 2026, con plan nuevo y tu aprobación). Riesgo «medio». |
 
 Cada juego sale en `salida/<id>/`:
 
@@ -57,7 +58,7 @@ Requisitos: Python 3 (con `pillow` para la imagen de las publicaciones), Node, e
 
 - El motor común carga, las tipografías incrustadas cargan sin error y no hay desplazamiento horizontal.
 - No hay errores de consola ni de página, y no se hace ninguna conexión externa.
-- El escenario propio de cada plantilla (`plantillas/<nombre>/prueba.js`), por ejemplo en Torre: rachas de aciertos perfectos, ensanchado de la torre, cortes, caída, récord guardado, cambio de idioma que se recuerda al recargar, y entradas reales (clic, toque, barra espaciadora). En Guerreros Gelatina: colocación con el ratón o el dedo, batalla completa y sonidos.
+- El escenario propio de cada plantilla (`plantillas/<nombre>/prueba.js`), por ejemplo en Torre: rachas de aciertos perfectos, ensanchado de la torre, cortes, caída, récord guardado, cambio de idioma que se recuerda al recargar, y entradas reales (clic, toque, barra espaciadora). En Guerreros Gelatina: colocación con el ratón o el dedo, batalla completa y sonidos. En Compás: una canción entera tocada con precisión de milisegundos (perfecto, bien, casi, pifia y fallo, multiplicador por racha), clic o toque, flechas, letras y barra espaciadora, cambio de ánimo y ventana de acierto amplia.
 - Los medios se generan en la misma pasada: capturas, portada (630×500 px CSS a doble densidad, 1260×1000) y clips.
 - La portada tiene dos estilos. El de siempre (`herramientas/portada.html`) usa un recorte de la batalla. El de héroes (`"estilo": "heroes"` en `portada` de juego.json, `herramientas/portada-heroes.html`) dibuja a los personajes grandes con el propio código del juego y los reparte según `portada.reparto`: `[unidad, equipo (0 azul, 1 rojo), x, y, escala, dirección (1 o -1), golpe (0 a 1)]` sobre un lienzo de 630×500. Solo funciona con plantillas que dejen `drawJelly` a mano (la de gelatina). Cambiar la portada cambia la huella del plan de publicación.
 
@@ -74,6 +75,10 @@ En los textos de `difusion` se usan dos marcas: `{ia}` (la frase que declara el 
 ### Parámetros de `torre`
 
 `colores` (la paleta por la que van pasando los bloques), `cielo` (de 2 a 4 colores, de abajo hacia arriba), `acento`, `ancho_inicial`, `alto_bloque`, `velocidad` (px/s al empezar), `aceleracion` (px/s extra por piso), `vmax`, `tolerancia` (px de margen para que cuente como perfecto), `meta_perfectos` (perfectos seguidos para que la torre empiece a ensancharse), `crecimiento` (px que recupera por acierto). El escenario mide 360 px de ancho.
+
+### Parámetros de `compas`
+
+`animos` (cada ánimo con su `semilla`: cambiar la semilla es otra canción; los ánimos válidos son los del módulo `musica`), `caida_ms` (cuánto tarda una gota en caer hasta la línea), `previo_ms`, `ventanas` (`perfecto`, `bien` y `casi`, en milisegundos a cada lado del instante justo), `ventana_amplia` (multiplicador de esas ventanas cuando el jugador activa la opción), `vueltas` (cuántas veces suena la partitura de ocho compases), `compases_demo` (largo de la canción con `?demo=1`, que usan las pruebas y los clips), `puntos`, `racha_por_nivel` (aciertos seguidos por cada escalón del multiplicador), `multiplicador_max`, `colores` (uno por carril) y `fondo`. Las gotas salen de la melodía que compone el motor, repartida entre los tres carriles según la altura de cada nota.
 
 ## Una plantilla nueva (otro género)
 

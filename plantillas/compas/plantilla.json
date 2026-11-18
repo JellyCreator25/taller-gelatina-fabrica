@@ -1,0 +1,12 @@
+{
+  "nombre": "compas",
+  "genero": "ritmo",
+  "verbo": "cronometrar",
+  "objetivo": "puntaje-maximo",
+  "entrada": [
+    "toque",
+    "teclado"
+  ],
+  "progresion": "puntaje-infinito",
+  "descripcion": "Ritmo de tres carriles: la canción la compone el motor (música generativa por ánimo) y de su melodía salen las gotas que hay que tocar en la línea."
+}

@@ -1,0 +1,62 @@
+Informe de pruebas · compas-gelatina v1.0.0
+
+— escritorio 1280×800
+ok     · el motor común (GGX) está cargado
+ok     · tipografías incrustadas: 4 en uso, 0 con error
+ok     · sin desplazamiento horizontal al abrir (0 px de más)
+  idioma al abrir: es · canción «alegre» a 112 bpm con 43 gotas
+  12 perfectos seguidos: 1400 puntos, multiplicador ×2 (aviso: «Multiplicador ×2»)
+  «bien» (110 ms): +120 puntos con ×2
+  «casi» (175 ms): +50 puntos y la racha se mantiene (13)
+  clic real → carril 2: «perfecto» (-18 ms)
+  flechas → carril 1: «perfecto» (-20 ms)
+  letras A S D → carril 0: «perfecto» (-18 ms)
+  barra espaciadora (carril central) → carril 1: «perfecto» (-6 ms)
+  toque sin gota: racha 18 → 0, puntos intactos (2570)
+  gota que se pasa: fallo 1, racha 0
+  final: «¡Nuevo récord!» · 2670 puntos · 44 % de precisión · mejor racha: 18 · 18 perfectos · 1 bien · 1 casi · 23 fallos
+  sonidos disparados: {"click":2,"coin":18,"merge":1,"pop":1,"error":24,"lose":1}
+  música: {"sonando":false,"animo":"alegre","bpm":112,"compases":9,"notas":98,"intensidad":0.3,"silencio":false}
+  «tensión»: 128 bpm, 36 gotas (la de «alegre» tenía 43) · ventana amplia activada
+  con ventana amplia, un toque 100 ms tarde cuenta como «perfecto» (sin ella era «bien»)
+  idiomas ofrecidos: Español · English · 中文
+  medida de «果冻节拍» a 32 px: 128 px con la pila china
+  tras recargar: idioma (zh), ánimo y ventana amplia se mantienen, el récord de «alegre» (2670) también, y ?lang=en lo cambia
+ok     · escenario completo {"puntos":2670}
+ok     · sin desplazamiento horizontal al terminar (0 px de más)
+ok     · sin errores de consola ni de página
+ok     · sin conexiones externas
+— celular 390×844
+ok     · el motor común (GGX) está cargado
+ok     · tipografías incrustadas: 4 en uso, 0 con error
+ok     · sin desplazamiento horizontal al abrir (0 px de más)
+  idioma al abrir: es · canción «alegre» a 112 bpm con 43 gotas
+  12 perfectos seguidos: 1400 puntos, multiplicador ×2 (aviso: «Multiplicador ×2»)
+  «bien» (109 ms): +120 puntos con ×2
+  «casi» (175 ms): +50 puntos y la racha se mantiene (13)
+  toque real → carril 2: «perfecto» (-6 ms)
+  flechas → carril 1: «perfecto» (-21 ms)
+  letras A S D → carril 0: «perfecto» (-21 ms)
+  barra espaciadora (carril central) → carril 1: «perfecto» (-9 ms)
+  toque sin gota: racha 18 → 0, puntos intactos (2570)
+  gota que se pasa: fallo 1, racha 0
+  final: «¡Nuevo récord!» · 2670 puntos · 44 % de precisión · mejor racha: 18 · 18 perfectos · 1 bien · 1 casi · 23 fallos
+  sonidos disparados: {"click":2,"coin":18,"merge":1,"pop":1,"error":24,"lose":1}
+  música: {"sonando":false,"animo":"alegre","bpm":112,"compases":9,"notas":98,"intensidad":0.3,"silencio":false}
+  «tensión»: 128 bpm, 36 gotas (la de «alegre» tenía 43) · ventana amplia activada
+  con ventana amplia, un toque 101 ms tarde cuenta como «perfecto» (sin ella era «bien»)
+  idiomas ofrecidos: Español · English · 中文
+  medida de «果冻节拍» a 32 px: 128 px con la pila china
+  tras recargar: idioma (zh), ánimo y ventana amplia se mantienen, el récord de «alegre» (2670) también, y ?lang=en lo cambia
+ok     · escenario completo {"puntos":2670}
+ok     · sin desplazamiento horizontal al terminar (0 px de más)
+ok     · sin errores de consola ni de página
+ok     · sin conexiones externas
+— portada
+ok     · portada.png generada (1260×1000)
+— clip principal 600×720
+ok     · clip.mp4 generado (27.5 s, 1148 KB) y clip.gif (2520 KB)
+— clip vertical (Shorts, Reels, TikTok)
+ok     · clip-vertical.mp4 generado (27.5 s, 1711 KB)
+
+Todo en orden

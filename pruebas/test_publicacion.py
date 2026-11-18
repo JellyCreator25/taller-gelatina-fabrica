@@ -1356,6 +1356,10 @@ def idea(iid, genero, verbo, objetivo, entrada, progresion, riesgo='medio', cost
     return d
 
 
+# Un género que la fábrica todavía no tiene: las pruebas de rumbo lo usan como «idea nueva» frente a los juegos reales de juegos/.
+# Cuando se construya un juego con ese género, hay que cambiarlo aquí por otro que siga sin existir.
+GENERO_SIN_CONSTRUIR = ('idle-incremental', 'elegir', 'construir-algo')
+
 # dos ideas que comparten rasgos, una con guerreros-gelatina y la otra con torre-gelatina, y por lo demás iguales
 IDEA_COMO_GUERREROS = idea('cercana-a-guerreros', 'tiro-arcade', 'colocar', 'sobrevivir', ['arrastrar'], 'niveles-con-oro')
 IDEA_COMO_TORRE = idea('cercana-a-torre', 'plataformas', 'soltar', 'llegar-a-la-meta', ['teclado'], 'puntaje-infinito')
@@ -1978,7 +1982,7 @@ class PruebasImportarCloudflare(BaseMetricas):
 
 class PruebasRumbo(BaseMetricas):
     def test_sin_datos_explora_y_dice_cuanto_falta(self):
-        self.ideas([idea('nueva', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos')])
+        self.ideas([idea('nueva', *GENERO_SIN_CONSTRUIR, ['toque'], 'desbloqueos')])
         r = self.recomendar()
         self.assertEqual(r['modo'], 'explorar')
         self.assertEqual([c['id'] for c in r['ranking']], ['nueva'])
@@ -1987,7 +1991,7 @@ class PruebasRumbo(BaseMetricas):
         self.assertIn('No hay ninguna métrica registrada', texto)
 
     def test_explorar_prefiere_lo_nuevo_barato_y_con_menos_riesgo_de_clon(self):
-        self.ideas([idea('cara-y-arriesgada', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos', riesgo='alto', costo='alto'),
+        self.ideas([idea('cara-y-arriesgada', *GENERO_SIN_CONSTRUIR, ['toque'], 'desbloqueos', riesgo='alto', costo='alto'),
                     idea('barata-y-segura', 'sandbox-creativo', 'dibujar', 'descubrir', ['arrastrar'], 'desbloqueos', riesgo='bajo', costo='bajo'),
                     idea('media', 'puzzle-fisico', 'apuntar', 'resolver-nivel', ['apuntar-y-disparar'], 'niveles-fijos')])
         self.assertEqual([c['id'] for c in self.recomendar()['ranking']], ['barata-y-segura', 'media', 'cara-y-arriesgada'])
@@ -2009,7 +2013,7 @@ class PruebasRumbo(BaseMetricas):
     def test_una_variante_de_un_juego_existente_nunca_se_recomienda(self):
         m = json.loads((self.raiz / 'juegos' / TORRE / 'juego.json').read_text(encoding='utf-8'))['mecanica']
         self.ideas([idea('torre-otra-vez', m['genero'], m['verbo'], m['objetivo'], ['toque'], 'niveles-fijos', riesgo='bajo', costo='bajo'),
-                    idea('otra', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos', riesgo='alto', costo='alto')])
+                    idea('otra', *GENERO_SIN_CONSTRUIR, ['toque'], 'desbloqueos', riesgo='alto', costo='alto')])
         r = self.recomendar()
         self.assertEqual([c['id'] for c in r['ranking']], ['otra'])
         self.assertEqual([e['id'] for e in r['excluidas']], ['torre-otra-vez'])
@@ -2017,7 +2021,7 @@ class PruebasRumbo(BaseMetricas):
 
     def test_una_idea_bloqueada_se_lista_aparte_y_una_ya_construida_se_omite(self):
         (self.raiz / 'plantillas' / 'ya-hecha').mkdir()
-        self.ideas([idea('bloqueada', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'desbloqueos', bloqueada_por='falta una revisión humana'),
+        self.ideas([idea('bloqueada', *GENERO_SIN_CONSTRUIR, ['toque'], 'desbloqueos', bloqueada_por='falta una revisión humana'),
                     idea('ya-hecha', 'sandbox-creativo', 'dibujar', 'descubrir', ['arrastrar'], 'desbloqueos'),
                     idea('libre', 'puzzle-fisico', 'apuntar', 'resolver-nivel', ['apuntar-y-disparar'], 'niveles-fijos')])
         r = self.recomendar()
@@ -2029,7 +2033,7 @@ class PruebasRumbo(BaseMetricas):
     def test_lo_parecido_se_penaliza_y_se_avisa_que_no_es_apto_para_portales(self):
         # mismo género y verbo que Guerreros, otro objetivo: no es variante, pero tampoco es un juego distinto
         self.ideas([idea('parecida', 'simulador-batalla', 'colocar', 'sobrevivir', ['toque'], 'niveles-con-oro'),
-                    idea('distinta', 'ritmo', 'cronometrar', 'puntaje-maximo', ['toque'], 'niveles-con-oro')])
+                    idea('distinta', *GENERO_SIN_CONSTRUIR, ['toque'], 'niveles-con-oro')])
         r = self.recomendar()
         por_id = {c['id']: c for c in r['ranking']}
         self.assertEqual((por_id['parecida']['novedad'], por_id['distinta']['novedad']), ('parecido', 'distinto'))

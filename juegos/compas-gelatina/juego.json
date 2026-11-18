@@ -1,0 +1,298 @@
+{
+  "id": "compas-gelatina",
+  "plantilla": "compas",
+  "version": "1.0.0",
+  "idiomas": [
+    "es",
+    "en",
+    "zh"
+  ],
+  "paquetes": [],
+  "fuentes": [
+    "Fredoka",
+    "Nunito Sans"
+  ],
+  "apoyo_url": "",
+  "motor": [
+    "accesible",
+    "efectos",
+    "musica",
+    "marca"
+  ],
+  "necesidades_motor": [],
+  "parametros": {
+    "animos": {
+      "alegre": {
+        "semilla": 11
+      },
+      "tension": {
+        "semilla": 23
+      },
+      "calma": {
+        "semilla": 5
+      }
+    },
+    "caida_ms": 1500,
+    "previo_ms": 300,
+    "ventanas": {
+      "perfecto": 70,
+      "bien": 130,
+      "casi": 200
+    },
+    "ventana_amplia": 1.5,
+    "vueltas": 2,
+    "compases_demo": 8,
+    "puntos": {
+      "perfecto": 100,
+      "bien": 60,
+      "casi": 25
+    },
+    "racha_por_nivel": 10,
+    "multiplicador_max": 4,
+    "colores": [
+      "#3dbd7d",
+      "#ff7fb0",
+      "#ffc247"
+    ],
+    "fondo": [
+      "#1d1240",
+      "#4b2377"
+    ]
+  },
+  "textos": {
+    "es": {
+      "titulo": "Compás Gelatina",
+      "aria_juego": "Zona de juego: caen gotas de gelatina al ritmo de la canción; toca el carril izquierdo, central o derecho cuando lleguen a la línea",
+      "inicio_titulo": "Compás Gelatina",
+      "inicio_texto": "Caen gotas de gelatina al ritmo de la melodía. Toca el carril (o usa las flechas, o las teclas A, S y D) justo cuando lleguen a la línea. Cada acierto seguido sube el multiplicador.",
+      "animo_titulo": "Elige el ánimo de la canción",
+      "amplia": "Ventana de acierto más amplia",
+      "animo_alegre": "Alegre",
+      "animo_tension": "Tensión",
+      "animo_calma": "Calma",
+      "jugar": "Jugar",
+      "otra_vez": "Otra canción igual",
+      "cambiar": "Cambiar ánimo",
+      "mejor": "Mejor",
+      "listo": "¡Listo!",
+      "perfecto": "¡Perfecto!",
+      "bien": "Bien",
+      "casi": "Casi",
+      "fallo": "¡Uy!",
+      "mult": "Multiplicador ×{n}",
+      "record": "¡Nuevo récord!",
+      "fin": "Fin de la canción",
+      "resumen": "{puntos} puntos · {precision} % de precisión · mejor racha: {racha}",
+      "detalle": "{perfectos} perfectos · {bien} bien · {casi} casi · {fallos} fallos"
+    },
+    "en": {
+      "titulo": "Jelly Tempo",
+      "aria_juego": "Play area: jelly drops fall to the beat of the song; tap the left, middle or right lane as they reach the line",
+      "inicio_titulo": "Jelly Tempo",
+      "inicio_texto": "Jelly drops fall to the beat of the melody. Tap the lane (or use the arrow keys, or A, S and D) right as they reach the line. Every hit in a row raises the multiplier.",
+      "animo_titulo": "Pick the mood of the song",
+      "amplia": "Wider hit window",
+      "animo_alegre": "Happy",
+      "animo_tension": "Tense",
+      "animo_calma": "Calm",
+      "jugar": "Play",
+      "otra_vez": "Same song again",
+      "cambiar": "Change mood",
+      "mejor": "Best",
+      "listo": "Get ready!",
+      "perfecto": "Perfect!",
+      "bien": "Good",
+      "casi": "Almost",
+      "fallo": "Oops!",
+      "mult": "Multiplier ×{n}",
+      "record": "New record!",
+      "fin": "Song over",
+      "resumen": "{puntos} points · {precision}% accuracy · best streak: {racha}",
+      "detalle": "{perfectos} perfect · {bien} good · {casi} almost · {fallos} missed"
+    },
+    "zh": {
+      "titulo": "果冻节拍",
+      "aria_juego": "游戏区域：果冻滴跟着歌曲的节奏落下，在它们到达线上的那一刻点击左、中、右三条轨道",
+      "inicio_titulo": "果冻节拍",
+      "inicio_texto": "果冻滴会跟着旋律的节奏落下。在它们落到线上的那一刻，点击对应的轨道（也可以用方向键，或按 A、S、D 键）。连续命中会提高倍率。",
+      "animo_titulo": "选择歌曲的氛围",
+      "amplia": "更宽松的判定",
+      "animo_alegre": "欢快",
+      "animo_tension": "紧张",
+      "animo_calma": "平静",
+      "jugar": "开始",
+      "otra_vez": "再来一遍",
+      "cambiar": "换个氛围",
+      "mejor": "最高",
+      "listo": "准备！",
+      "perfecto": "完美！",
+      "bien": "不错",
+      "casi": "差一点",
+      "fallo": "哎呀！",
+      "mult": "倍率 ×{n}",
+      "record": "新纪录！",
+      "fin": "歌曲结束",
+      "resumen": "{puntos} 分 · 准确率 {precision}% · 最长连击：{racha}",
+      "detalle": "完美 {perfectos} · 不错 {bien} · 差一点 {casi} · 漏掉 {fallos}"
+    }
+  },
+  "portada": {
+    "color_a": "#4b2377",
+    "color_b": "#ff7fb0",
+    "lema": {
+      "es": "Toca al compás.",
+      "en": "Tap to the beat.",
+      "zh": "跟着节拍点。"
+    },
+    "selector": "#stage",
+    "vertical": true
+  },
+  "ia": {
+    "codigo": true,
+    "graficos": true,
+    "texto": true,
+    "sonido": true
+  },
+  "precio": {
+    "modo": "donar",
+    "sugerido_usd": 2
+  },
+  "etiquetas": [
+    "Casual",
+    "Rhythm",
+    "Music",
+    "Cute",
+    "Colorful",
+    "Singleplayer",
+    "2D",
+    "Short",
+    "High Score",
+    "Relaxing"
+  ],
+  "clasificacion": "Apto para todo público: sin violencia, sin lenguaje fuerte, sin compras dentro del juego.",
+  "ficha": {
+    "es": {
+      "titulo": "Compás Gelatina",
+      "corta": "Tres gelatinas tambor y una canción que se compone sola: toca cada gota justo en la línea y sube el multiplicador. Partidas de menos de un minuto.",
+      "controles": "Toca el carril izquierdo, central o derecho de la pantalla, haz clic, o usa las flechas izquierda, abajo y derecha (también A, S y D, o la barra espaciadora para el carril central).",
+      "larga": "Un juego de ritmo que se juega directo en el navegador, sin descargas ni registro. Caen gotas de gelatina siguiendo la melodía de una canción y tienes que tocarlas justo cuando lleguen a la línea, sobre una de las tres gelatinas tambor.\n\n**Cómo funciona**\n\n- Tres carriles, uno por gelatina tambor: cada una lleva sus propias notas de la melodía, así que al subir o bajar por la escala vas saltando de una a otra.\n- Cada toque se califica como perfecto, bien o casi, según qué tan cerca estuvo del tiempo justo. Una gota que se te pasa cuenta como fallo y rompe la racha.\n- Cada diez aciertos seguidos sube el multiplicador de puntos, hasta ×4.\n- Eliges el ánimo de la canción (alegre, tensión o calma). La música se compone en tu navegador, sin archivos de audio: cada ánimo tiene su propia escala, su tempo y su melodía, y las gotas salen de esa melodía.\n- Cuanto mejor juegas, más instrumentos entran en la canción.\n- Tu mejor marca de cada ánimo se guarda en tu propio dispositivo.\n\n**Detalles**\n\n- Funciona en celular y en computadora.\n- Opción de ventana de acierto más amplia y panel de accesibilidad (menos movimiento y alto contraste).\n- Sonido sintetizado que puedes silenciar con un botón.\n- Español, inglés y chino.\n- Sin anuncios, sin cuentas, sin compras dentro del juego."
+    },
+    "en": {
+      "titulo": "Jelly Tempo",
+      "corta": "Three jelly drums and a song that composes itself: tap each drop right on the line and build up the multiplier. Runs under a minute.",
+      "controles": "Tap the left, middle or right lane of the screen, click, or use the left, down and right arrow keys (also A, S and D, or the space bar for the middle lane).",
+      "larga": "A rhythm game that plays right in your browser, with no downloads or sign-up. Jelly drops fall along the melody of a song and you tap them just as they reach the line, on one of the three jelly drums.\n\n**How it works**\n\n- Three lanes, one per jelly drum: each one carries its own notes of the melody, so as the tune climbs or falls you hop from one drum to the next.\n- Each tap is graded perfect, good or almost, depending on how close it was to the exact moment. A drop that slips past counts as a miss and breaks your streak.\n- Every ten hits in a row raises the score multiplier, up to ×4.\n- You pick the mood of the song (happy, tense or calm). The music is composed in your browser, with no audio files: each mood has its own scale, tempo and melody, and the drops come from that melody.\n- The better you play, the more instruments join the song.\n- Your best score for each mood is saved on your own device.\n\n**Details**\n\n- Works on phones and computers.\n- Wider hit window option and an accessibility panel (reduced motion and high contrast).\n- Synthesized sound you can mute with a button.\n- Spanish, English and Chinese.\n- No ads, no accounts, no in-game purchases."
+    },
+    "zh": {
+      "titulo": "果冻节拍",
+      "corta": "三个果冻鼓，加上一首会自己谱曲的歌：在果冻滴落到线上的那一刻点击它，倍率不断升高。一局不到一分钟。",
+      "controles": "点击屏幕的左、中、右轨道，或单击鼠标，也可以用左、下、右方向键（还有 A、S、D 键，空格键对应中间轨道）。",
+      "larga": "一款可以直接在浏览器里玩的节奏游戏，无需下载，也无需注册。果冻滴跟着歌曲的旋律落下，你要在它们到达线上的那一刻，点击三个果冻鼓中对应的那一个。\n\n**玩法**\n\n- 三条轨道，每个果冻鼓一条：每个鼓负责旋律里属于它的音，所以旋律上行或下行时，你就会在三个鼓之间来回跳动。\n- 每次点击都会按离准确时刻的远近评为完美、不错或差一点。漏掉的果冻滴算失误，并会中断连击。\n- 每连续命中十次，得分倍率就提高一级，最高 ×4。\n- 你可以选择歌曲的氛围（欢快、紧张或平静）。音乐在你的浏览器里现场谱成，没有音频文件：每种氛围都有自己的音阶、速度和旋律，果冻滴就来自这段旋律。\n- 你玩得越好，歌曲里加入的乐器就越多。\n- 每种氛围的最高纪录都保存在你自己的设备上。\n\n**细节**\n\n- 手机和电脑都能玩。\n- 可选择更宽松的判定，还有无障碍面板（减少动画和高对比度）。\n- 合成音效，可以用按钮静音。\n- 支持西班牙语、英语和中文。\n- 没有广告，没有账号，没有游戏内购买。"
+    }
+  },
+  "difusion": {
+    "es": {
+      "post_corto": "Hice un juego de ritmo con tres gelatinas tambor: la canción se compone sola y tú tocas las gotas al compás. Gratis, en el navegador: {enlace} ¿Cuántos puntos sacas? {ia}",
+      "post_comunidad_titulo": "Hice un juego de ritmo de gelatinas tambor cuya música se compone sola en el navegador (gratis)",
+      "post_comunidad": "Hola. Les comparto Compás Gelatina, un juego de ritmo para el navegador, sin descargas ni registro. Caen gotas siguiendo la melodía y las tocas justo en la línea sobre tres gelatinas tambor. La canción no es un archivo: el propio juego la compone (alegre, tensión o calma) y de su melodía salen las gotas; mientras mejor juegas, más instrumentos entran.\n\nMe interesa saber: ¿se siente justa la ventana de acierto? ¿Qué ánimo les gustó más? ¿Qué le agregarían?\n\n{ia}\n\nJuego: {enlace}",
+      "guion_video": [
+        "0-2 s · Texto en pantalla: «Tres gelatinas, una canción que se compone sola». Se ven las gotas cayendo hacia la línea.",
+        "2-12 s · Tocar gotas en el momento justo; que se vean los destellos, el multiplicador subiendo y cómo entran más instrumentos.",
+        "12-17 s · Un par de fallos a propósito: la racha se rompe y se vuelve a armar.",
+        "17-20 s · La pantalla final con el récord y el nombre del juego con «Gratis en el navegador». Sin música con derechos: usar la propia música del juego."
+      ],
+      "mensaje_clase": "Les comparto otro juego que armé: Compás Gelatina. Es de ritmo, se juega en el navegador sin descargar nada, y la música se compone sola. Toca las gotas justo en la línea y sube el multiplicador. ¿Quién saca más puntos? {enlace}",
+      "devlog_titulo": "Compás Gelatina ya está disponible",
+      "devlog": "Compás Gelatina ya se puede jugar. Es un juego de ritmo para el navegador con tres gelatinas tambor: caen gotas al compás de la melodía y las tocas justo en la línea.\n\nLa música se compone en tu navegador, sin archivos de audio, con tres ánimos (alegre, tensión y calma). Incluye multiplicador por racha, ventana de acierto más amplia como opción, panel de accesibilidad y mejor marca por ánimo guardada en tu dispositivo. Funciona en celular y en computadora, en español, inglés y chino.\n\nQué sigue: más ánimos y más canciones. Si tienes una idea, cuéntala en los comentarios.\n\n{ia}",
+      "descripcion_video": "Tres gelatinas tambor y una canción que se compone sola. Juego de ritmo, gratis en el navegador. {ia}"
+    },
+    "en": {
+      "post_corto": "I made a rhythm game with three jelly drums: the song composes itself and you tap the drops to the beat. Free in your browser: {enlace} How many points can you get? {ia}",
+      "post_comunidad_titulo": "I made a rhythm game with three jelly drums whose music composes itself in the browser (free)",
+      "post_comunidad": "Hi. I'm sharing Jelly Tempo, a rhythm game for the browser with no downloads or sign-up. Drops fall along the melody and you tap them right on the line over three jelly drums. The song isn't a file: the game composes it itself (happy, tense or calm) and the drops come from its melody; the better you play, the more instruments join in.\n\nI'd like to know: does the hit window feel fair? Which mood did you like best? What would you add?\n\n{ia}\n\nGame: {enlace}",
+      "guion_video": [
+        "0-2 s · On-screen text: «Three jellies, one song that composes itself». The drops fall toward the line.",
+        "2-12 s · Tap drops at the right moment; let the sparkles, the rising multiplier and the extra instruments show.",
+        "12-17 s · A couple of misses on purpose: the streak breaks and builds up again.",
+        "17-20 s · The final screen with the record and the game name with «Free in your browser». No licensed music: use the game's own music."
+      ],
+      "mensaje_clase": "Here's another game I made: Jelly Tempo. It's a rhythm game that plays in the browser, nothing to download, and the music composes itself. Tap the drops right on the line and build the multiplier. Who gets the most points? {enlace}",
+      "devlog_titulo": "Jelly Tempo is out now",
+      "devlog": "Jelly Tempo is now playable. It's a rhythm game for the browser with three jelly drums: drops fall to the beat of the melody and you tap them right on the line.\n\nThe music is composed in your browser, with no audio files, in three moods (happy, tense and calm). It has a streak multiplier, a wider hit window as an option, an accessibility panel and a best score per mood saved on your device. It works on phones and computers, in Spanish, English and Chinese.\n\nWhat's next: more moods and more songs. If you have an idea, tell me in the comments.\n\n{ia}",
+      "descripcion_video": "Three jelly drums and a song that composes itself. Rhythm game, free in your browser. {ia}"
+    },
+    "zh": {
+      "post_corto": "我做了一个有三个果冻鼓的节奏游戏：歌曲在你的浏览器里自己谱成，你跟着节拍点击果冻滴。免费，无需下载：{enlace} 你能拿多少分？{ia}",
+      "post_comunidad_titulo": "我做了一个三个果冻鼓的节奏游戏，音乐在浏览器里自己谱成（免费）",
+      "post_comunidad": "大家好。分享一下我做的《果冻节拍》，一款在浏览器里玩的节奏游戏，无需下载和注册。果冻滴跟着旋律落下，你在三个果冻鼓上，在它们到达线上的那一刻点击。歌曲不是文件：游戏自己谱成它（欢快、紧张或平静），果冻滴就来自这段旋律；你玩得越好，加入的乐器就越多。\n\n想听听大家的看法：判定的宽松程度合适吗？你们最喜欢哪种氛围？还想加什么？\n\n{ia}\n\n游戏链接：{enlace}",
+      "guion_video": [
+        "0-2 秒 · 屏幕文字：「三个果冻，一首自己谱成的歌」。画面中果冻滴落向判定线。",
+        "2-12 秒 · 在恰当的时机点击果冻滴，让火花、不断升高的倍率和逐渐加入的乐器都入镜。",
+        "12-17 秒 · 故意失误几次：连击中断，然后重新积累。",
+        "17-20 秒 · 带有纪录的结束画面，以及游戏名和「免费，浏览器直接玩」。不要使用有版权的音乐：用游戏自带的音乐。"
+      ],
+      "mensaje_clase": "给大家分享我做的另一个游戏：《果冻节拍》。这是一款在浏览器里玩的节奏游戏，不用下载，音乐会自己谱成。在果冻滴落到线上的那一刻点击它，让倍率不断升高。谁的分数最高？{enlace}",
+      "devlog_titulo": "《果冻节拍》现已上线",
+      "devlog": "《果冻节拍》现在可以玩了。这是一款在浏览器里玩的节奏游戏，有三个果冻鼓：果冻滴跟着旋律的节奏落下，你在它们到达线上的那一刻点击。\n\n音乐在你的浏览器里现场谱成，没有音频文件，有三种氛围（欢快、紧张和平静）。游戏包含连击倍率、可选的更宽松判定、无障碍面板，以及按氛围分别保存在你设备上的最高纪录。手机和电脑都能玩，支持西班牙语、英语和中文。\n\n接下来：更多氛围和更多歌曲。如果你有想法，欢迎在评论里告诉我。\n\n{ia}",
+      "descripcion_video": "三个果冻鼓，加上一首自己谱成的歌。节奏游戏，免费，浏览器即玩。{ia}"
+    }
+  },
+  "lanzamiento": {
+    "orden": 3,
+    "despues_de": "torre-gelatina",
+    "espera_semanas": "2 a 4"
+  },
+  "originalidad": {
+    "riesgo_portales": "medio",
+    "referencias": [
+      "Guitar Hero",
+      "Piano Tiles"
+    ],
+    "motivo": "Los juegos de ritmo con notas que caen hacia una línea son un género muy conocido, así que la mecánica base no es nueva. Lo propio es que la canción no es un archivo: el motor la compone en el navegador a partir de una semilla por ánimo, las gotas salen de su melodía y la música gana instrumentos con la racha; además trae panel de accesibilidad y la marca de la casa. Es un diferenciador real pero moderado.",
+    "diferenciador": {
+      "es": "una canción que se compone sola en tu navegador (alegre, tensión o calma) y de cuya melodía salen las gotas, con instrumentos que entran según tu racha, tres gelatinas tambor, panel de accesibilidad y textos en español, inglés y chino.",
+      "en": "a song that composes itself in your browser (happy, tense or calm) and whose melody the drops come from, with instruments that join in as your streak grows, three jelly drums, an accessibility panel and text in Spanish, English and Chinese.",
+      "zh": "一首在你的浏览器里自己谱成的歌（欢快、紧张或平静），果冻滴就来自它的旋律，随着连击增加会有更多乐器加入；还有三个果冻鼓、无障碍面板，以及西班牙语、英语和中文文本。"
+    }
+  },
+  "creacion": {
+    "herramientas": [
+      "Claude (Anthropic): programación, gráficos, textos y música generativa del juego, y sus pruebas automáticas."
+    ],
+    "decisiones_dueno": [
+      "Eligió que la fábrica cubra varios géneros y que cada juego nuevo mejore sobre el anterior. Todavía no hay decisiones de diseño suyas sobre este juego."
+    ],
+    "decisiones_claude": [
+      "El concepto (ritmo con tres carriles y música generada por el motor), las reglas, los parámetros, los textos en tres idiomas, el estilo visual y la música."
+    ]
+  },
+  "prueba": {
+    "escenario": "compas"
+  },
+  "mecanica": {
+    "genero": "ritmo",
+    "verbo": "cronometrar",
+    "objetivo": "puntaje-maximo",
+    "entrada": [
+      "toque",
+      "teclado"
+    ],
+    "progresion": "puntaje-infinito",
+    "ambientacion": "escenario-musical-nocturno",
+    "arte": "gelatina-vectorial",
+    "sistemas": [
+      "musica-generativa",
+      "carriles",
+      "multiplicador-por-racha",
+      "panel-de-accesibilidad"
+    ]
+  },
+  "novedades": [
+    {
+      "version": "1.0.0",
+      "es": "Primera versión: tres carriles, música que se compone sola en tres ánimos, multiplicador por racha, ventana de acierto más amplia como opción, panel de accesibilidad y mejor marca por ánimo guardada en tu dispositivo. En español, inglés y chino.",
+      "en": "First version: three lanes, music that composes itself in three moods, a streak multiplier, a wider hit window as an option, an accessibility panel and a best score per mood saved on your device. In Spanish, English and Chinese.",
+      "zh": "首个版本：三条轨道、会自己谱成的三种氛围音乐、连击倍率、可选的更宽松判定、无障碍面板，以及按氛围分别保存在你设备上的最高纪录。支持西班牙语、英语和中文。"
+    }
+  ]
+}

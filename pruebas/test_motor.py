@@ -75,12 +75,16 @@ class PruebasDelMotorReal(unittest.TestCase):
                 self.assertEqual(fabrica.chinos_fuera_de_gb2312(texto), set())
 
     def test_los_juegos_publicados_no_cambian_con_el_motor_nuevo(self):
-        import fabrica
-        for i in fabrica.ids():
+        for i in ('guerreros-gelatina', 'torre-gelatina'):   # los ya publicados; un juego en construcción sí declara su motor
             with self.subTest(i):
                 self.assertFalse(ficha(i).get('motor'), 'un juego ya publicado no cambia por que el motor crezca')
                 html = (RAIZ / 'salida' / i / 'index.html').read_text(encoding='utf-8')
                 self.assertNotIn('id="mod-', html)
+
+    def test_el_tercer_juego_nace_en_lo_alto_de_la_escalera(self):
+        n = motor.nivel_de(RAIZ, ficha('compas-gelatina'))
+        self.assertGreaterEqual(n['nivel'], 4, n)
+        self.assertEqual({m[0] for m in motor.modulos_de(RAIZ, ficha('compas-gelatina'))}, {'accesible', 'efectos', 'musica', 'marca'})
 
     def test_la_escalera_es_coherente(self):
         esc = motor.escalera(RAIZ)

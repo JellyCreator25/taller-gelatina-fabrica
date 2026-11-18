@@ -1,0 +1,351 @@
+<style>
+/* Compás · plantilla de ritmo con tres carriles. La canción la compone el motor (GGX.music) a partir de una semilla por ánimo, y las gotas salen de su melodía.
+   El tema (colores, ventanas de acierto, semillas) y los textos salen de juego.json. */
+:root {
+  --bg: #fbf3f8;
+  --surface: #ffffff;
+  --ink: #2a1740;
+  --ink-soft: #66507f;
+  --line: #e1cfe9;
+  --accent: #c2337a;
+  --accent-ink: #ffffff;
+  --focus: #1b5fe0;
+  --shadow: rgba(42, 23, 64, 0.3);
+  --cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "WenQuanYi Micro Hei";  /* chino: tipografías del sistema */
+  --font-display: 'Fredoka', var(--cjk), 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Nunito Sans', var(--cjk), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #150c24; --surface: #231537; --ink: #f3e8ff; --ink-soft: #bba6d6; --line: #3d2958;
+    --accent: #e0509a; --focus: #8db0ff; --shadow: rgba(0, 0, 0, 0.55); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #150c24; --surface: #231537; --ink: #f3e8ff; --ink-soft: #bba6d6; --line: #3d2958;
+  --accent: #e0509a; --focus: #8db0ff; --shadow: rgba(0, 0, 0, 0.55); color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); min-height: 100vh; }
+.app { --chrome: 92px; box-sizing: border-box; max-width: calc(min(520px, (100vh - var(--chrome)) * 0.5625) + 32px); margin: 0 auto; padding-block: 10px 14px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+h1 { margin: 0; font: 700 1.5rem/1.1 var(--font-display); text-wrap: balance; }
+.tools { display: flex; gap: 8px; }
+.stage {
+  position: relative; margin: 10px auto 0; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 22px; background: #1d1240;
+  width: 100%; box-shadow: 0 10px 30px var(--shadow);
+  touch-action: manipulation; user-select: none; -webkit-user-select: none; container-type: inline-size;
+}
+@supports (height: 100dvh) { .app { max-width: calc(min(520px, (100dvh - var(--chrome)) * 0.5625) + 32px); } }
+/* Celular acostado: el escenario sigue siendo vertical, así que el título y los botones pasan a un lado para dejarle toda la altura */
+@media (orientation: landscape) and (max-height: 520px) {
+  .app { --chrome: 24px; position: relative; padding-block: 8px; }
+  header { position: absolute; left: calc(100% + 4px); top: 8px; flex-direction: column; align-items: flex-start; gap: 10px; width: max-content; }
+  .stage { margin-top: 0; }
+}
+canvas { display: block; width: 100%; height: 100%; }
+.hud { position: absolute; inset: 12px 0 auto; text-align: center; pointer-events: none; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35); }
+#score { font: 700 3rem/1 var(--font-display); font-size: clamp(2rem, 13cqw, 3rem); }
+#mult { min-height: 1.3em; font: 700 1.3rem/1.3 var(--font-display); color: #ffe66b; }
+#best { font: 600 0.9rem var(--font-body); opacity: 0.92; }
+.overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px; padding: clamp(8px, 5cqw, 18px); text-align: center; background: linear-gradient(rgba(12, 6, 30, 0.2), rgba(12, 6, 30, 0.55)); }
+.overlay[hidden] { display: none; }
+.card { font-size: 16px; font-size: clamp(10px, 4.4cqw, 16px); background: var(--surface); color: var(--ink); border-radius: 1.25em; padding: 1.15em 1.3em; box-shadow: 0 12px 30px var(--shadow); max-width: 20em; }
+.card h2 { margin: 0 0 .35em; font: 700 1.5em/1.15 var(--font-display); text-wrap: balance; color: var(--accent); }
+.card p { margin: 0 0 .8em; color: var(--ink-soft); line-height: 1.4; text-wrap: pretty; }
+.card .detalle { font-size: .9em; margin-top: -.3em; }
+.animos { border: 0; margin: 0 0 .7em; padding: 0; }
+.animos legend { padding: 0; margin: 0 auto .35em; font: 700 .95em var(--font-display); color: var(--ink); }
+.animos .fila { display: flex; gap: .4em; justify-content: center; }
+.animos label { position: relative; flex: 1 1 0; }
+.animos input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.animos span { display: block; padding: .5em .3em; border: 2px solid var(--line); border-radius: .8em; font: 700 .95em var(--font-display); background: var(--surface); }
+.animos input:checked + span { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.animos input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+.amplia { display: flex; align-items: center; justify-content: center; gap: .5em; margin: 0 0 .9em; font-size: .92em; color: var(--ink-soft); cursor: pointer; text-align: left; }
+.amplia input { width: 1.2em; height: 1.2em; accent-color: var(--accent); flex: none; }
+.botones { display: flex; flex-wrap: wrap; gap: .5em; justify-content: center; }
+.btn { font: 700 1.05em var(--font-display); border: 0; border-radius: .9em; padding: .7em 1.4em; background: var(--accent); color: var(--accent-ink); cursor: pointer; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22); }
+.btn.sec { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.btn:hover { filter: brightness(1.07); }
+.btn:active { transform: translateY(1px); }
+.btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.firma { margin-top: .9em; display: flex; justify-content: center; }
+</style>
+
+<div class="app">
+  <header>
+    <h1 id="titulo"></h1>
+    <div class="tools" id="tools"></div>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="cv" role="img"></canvas>
+    <div class="hud"><div id="score">0</div><div id="mult"></div><div id="best"></div></div>
+    <div class="overlay" id="ovInicio">
+      <div class="card">
+        <h2 id="iT"></h2><p id="iP"></p>
+        <fieldset class="animos"><legend id="iA"></legend><div class="fila" id="animos"></div></fieldset>
+        <label class="amplia"><input type="checkbox" id="amplia"><span id="iW"></span></label>
+        <button type="button" class="btn" id="btnJugar"></button>
+        <div class="firma" id="firma"></div>
+      </div>
+    </div>
+    <div class="overlay" id="ovFin" hidden>
+      <div class="card">
+        <h2 id="fT"></h2><p id="fP"></p><p id="fD" class="detalle"></p>
+        <div class="botones"><button type="button" class="btn" id="btnOtra"></button><button type="button" class="btn sec" id="btnAnimo"></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const X = window.GGX, P = (window.JUEGO && window.JUEGO.parametros) || {};
+const W = 360, H = 640, LINEA = 505, GEL_Y = 552;
+const cfg = Object.assign({
+  animos: { alegre: { semilla: 11 }, tension: { semilla: 23 }, calma: { semilla: 5 } },
+  caida_ms: 1500, previo_ms: 300, ventanas: { perfecto: 70, bien: 130, casi: 200 }, ventana_amplia: 1.5, vueltas: 2, compases_demo: 8,
+  puntos: { perfecto: 100, bien: 60, casi: 25 }, racha_por_nivel: 10, multiplicador_max: 4,
+  colores: ['#3dbd7d', '#ff7fb0', '#ffc247'], fondo: ['#1d1240', '#4b2377'],
+}, P);
+const DEMO = /[?&]demo=1\b/.test(location.search);           // una canción corta (la usan las pruebas y el video)
+const $ = (id) => document.getElementById(id);
+const cv = $('cv'), c = cv.getContext('2d'), stage = $('stage');
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const quieto = () => !!(GGX.a11y && GGX.a11y.reducedMotion());
+const NIVELES = ['perfecto', 'bien', 'casi'];
+const ANIMOS = Object.keys(cfg.animos);
+
+/* ---------- Estado ---------- */
+const guardado = X.store.get('mejor', {}) || {};
+const S = { fase: 'inicio', animo: ANIMOS.includes(X.store.get('animo', 'alegre')) ? X.store.get('animo', 'alegre') : ANIMOS[0], amplia: !!X.store.get('amplia', false),
+  mejor: guardado && typeof guardado === 'object' ? guardado : {}, ch: null, t0: 0, tPausa: 0, musica: false, puntos: 0, combo: 0, mejorRacha: 0, mult: 1,
+  n: { perfecto: 0, bien: 0, casi: 0, fallo: 0, pifia: 0 }, ultimo: null, record: false, squish: [0, 0, 0], brillo: [0, 0, 0], anillos: [], tFin: 0, lastFrame: 0, pulso: 0 };
+
+/* ---------- La canción: el motor la compone y de su melodía salen las gotas ---------- */
+function armar(animo) {
+  const plan = GGX.music.plan((cfg.animos[animo] || {}).semilla || 1, { animo, compases: 8 });
+  const beat = 60000 / plan.bpm, notas = [];
+  plan.compases.forEach((cm, i) => cm.notas.forEach((n) => { if (n.voz === 'melodia') notas.push({ t: (i * 4 + n.t) * beat, midi: n.midi, compas: i }); }));
+  const alturas = [...new Set(notas.map((n) => n.midi))].sort((a, b) => a - b);
+  const carril = (m) => alturas.indexOf(m) % 3;      // cada carril lleva sus propias notas, repartidas de grave a agudo: una melodía que sube o baja cambia de carril a cada paso
+  const compases = DEMO ? cfg.compases_demo : 8 * cfg.vueltas, gotas = [];
+  for (let v = 0; v * 8 < compases; v++) for (const n of notas) {
+    if (v * 8 + n.compas >= compases) continue;
+    gotas.push({ t: n.t + v * 32 * beat + 50, lane: carril(n.midi), estado: 'pend' });   // +50 ms: el primer compás del motor arranca 50 ms después de start()
+  }
+  gotas.sort((a, b) => a.t - b.t || a.lane - b.lane);
+  return { bpm: plan.bpm, beat, gotas, fin: compases * 4 * beat + 50 + 900 };
+}
+const ahora = () => performance.now() - S.t0;
+const mult = () => Math.min(cfg.multiplicador_max, 1 + Math.floor(S.combo / cfg.racha_por_nivel));
+const ventana = (n) => cfg.ventanas[n] * (S.amplia ? cfg.ventana_amplia : 1);
+const carrilX = (l) => W / 6 + (W / 3) * l;
+
+/* ---------- Reglas ---------- */
+function reiniciar() {
+  S.ch = armar(S.animo);
+  Object.assign(S, { puntos: 0, combo: 0, mejorRacha: 0, mult: 1, ultimo: null, record: false, musica: false, anillos: [], n: { perfecto: 0, bien: 0, casi: 0, fallo: 0, pifia: 0 } });
+  GGX.fx.clear(); hud();
+}
+function comenzar() {
+  reiniciar();
+  S.fase = 'juego';
+  S.t0 = performance.now() + cfg.caida_ms + cfg.previo_ms;   // T negativo: las gotas todavía están cayendo hacia el primer golpe
+}
+function empezar() {
+  X.sfx('click', 0);
+  $('ovInicio').hidden = true; $('ovFin').hidden = true;
+  S.fase = 'sello';
+  GGX.marca.sello({ al_terminar: () => { if (S.fase === 'sello') comenzar(); } });   // la Gelatina saluda una vez por visita; con un toque se salta
+}
+function acierto(d, nivel, dt) {
+  const antes = mult();
+  d.estado = nivel;
+  S.n[nivel]++; S.puntos += cfg.puntos[nivel] * antes; S.ultimo = { nivel, dt: Math.round(dt), lane: d.lane };
+  if (nivel !== 'casi') { S.combo++; S.mejorRacha = Math.max(S.mejorRacha, S.combo); }
+  const x = carrilX(d.lane), m = mult();
+  X.sfx(nivel === 'perfecto' ? 'coin' : nivel === 'bien' ? 'pop' : 'click', 0, 1 + 0.05 * Math.min(S.combo, 12));
+  if (nivel === 'perfecto') GGX.fx.preset('chispas', x, LINEA); else if (nivel === 'bien') GGX.fx.burst(x, LINEA, { n: 6, color: ['#ffffff', cfg.colores[d.lane]], vel: 110, vida: 0.4, tam: 3 });
+  GGX.fx.text(x, LINEA - 46, X.t(nivel), { color: nivel === 'perfecto' ? '#ffe66b' : '#ffffff', px: 20 });
+  S.brillo[d.lane] = 1; S.anillos.push({ x, y: LINEA, r: 8, v: 1, c: cfg.colores[d.lane] });
+  if (m > antes) {                                       // sube el multiplicador: fiesta chica y aviso para lector de pantalla
+    GGX.fx.preset('confeti', W / 2, LINEA - 140); GGX.fx.flash('#ffffff', 160, 0.3); X.sfx('merge', 0);
+    GGX.a11y.announce(X.t('mult', { n: m }));
+  }
+  S.mult = m; GGX.music.intensidad(0.3 + 0.7 * clamp(S.combo / 30, 0, 1)); hud();
+}
+function fallo(d) {
+  d.estado = 'fallo'; S.n.fallo++; S.combo = 0; S.mult = 1; S.ultimo = { nivel: 'fallo', lane: d.lane };
+  GGX.fx.text(carrilX(d.lane), LINEA - 30, X.t('fallo'), { color: '#ff8a8a', px: 18 }); GGX.fx.shake(3, 140); X.sfx('error', 0);
+  GGX.music.intensidad(0.3); hud();
+}
+function toque(l) {
+  if (S.fase !== 'juego') return;
+  S.squish[l] = 1;
+  const T = ahora(), tope = ventana('casi');
+  let mejor = null;
+  for (const d of S.ch.gotas) {
+    if (d.estado !== 'pend' || d.lane !== l) continue;
+    if (d.t - T > tope) break;                           // las gotas van ordenadas: ninguna más cercana
+    if (T - d.t <= tope && (!mejor || Math.abs(T - d.t) < Math.abs(T - mejor.t))) mejor = d;
+  }
+  if (!mejor) {                                          // un toque sin gota cerca: rompe la racha, no quita puntos
+    S.n.pifia++; S.combo = 0; S.mult = 1; S.ultimo = { nivel: 'pifia', lane: l }; X.sfx('error', 60); GGX.music.intensidad(0.3); hud(); return;
+  }
+  const ad = Math.abs(T - mejor.t);
+  acierto(mejor, NIVELES.find((n) => ad <= ventana(n)) || 'casi', T - mejor.t);
+}
+function precision() {
+  const total = S.ch.gotas.length;
+  return total ? Math.round(100 * (S.n.perfecto + 0.6 * S.n.bien + 0.25 * S.n.casi) / total) : 0;
+}
+function fin() {
+  S.fase = 'fin'; S.tFin = performance.now(); GGX.music.stop();
+  const previo = Number(S.mejor[S.animo]) || 0;
+  S.record = S.puntos > previo;
+  if (S.record) { S.mejor[S.animo] = S.puntos; X.store.set('mejor', S.mejor); }
+  X.sfx(precision() >= 70 ? 'win' : 'lose', 0);
+  llenarFin(); $('ovFin').hidden = false; hud();
+  GGX.a11y.announce(X.t(S.record ? 'record' : 'fin') + '. ' + $('fP').textContent);
+  try { $('btnOtra').focus({ preventScroll: true }); } catch (e) { /* opcional */ }
+}
+function otra() { X.sfx('click', 0); $('ovFin').hidden = true; S.fase = 'sello'; GGX.marca.sello({ al_terminar: () => { if (S.fase === 'sello') comenzar(); } }); }
+function volverAlInicio() { X.sfx('click', 0); $('ovFin').hidden = true; $('ovInicio').hidden = false; S.fase = 'inicio'; reiniciar(); try { $('btnJugar').focus({ preventScroll: true }); } catch (e) { /* opcional */ } }
+
+/* ---------- Textos ---------- */
+function hud() {
+  $('score').textContent = S.puntos; $('mult').textContent = mult() > 1 ? '×' + mult() : '';
+  $('best').textContent = X.t('mejor') + ': ' + (Number(S.mejor[S.animo]) || 0);
+}
+function llenarFin() {
+  $('fT').textContent = X.t(S.record ? 'record' : 'fin');
+  $('fP').textContent = X.t('resumen', { puntos: S.puntos, precision: precision(), racha: S.mejorRacha });
+  $('fD').textContent = X.t('detalle', { perfectos: S.n.perfecto, bien: S.n.bien, casi: S.n.casi, fallos: S.n.fallo });
+}
+function textos() {
+  document.title = X.t('titulo'); $('titulo').textContent = X.t('titulo'); cv.setAttribute('aria-label', X.t('aria_juego'));
+  $('iT').textContent = X.t('inicio_titulo'); $('iP').textContent = X.t('inicio_texto'); $('iA').textContent = X.t('animo_titulo'); $('iW').textContent = X.t('amplia');
+  $('btnJugar').textContent = X.t('jugar'); $('btnOtra').textContent = X.t('otra_vez'); $('btnAnimo').textContent = X.t('cambiar');
+  for (const a of ANIMOS) $('animo-' + a).textContent = X.t('animo_' + a);
+  hud(); if (S.fase === 'fin') llenarFin();
+}
+function elegirAnimo(a) {
+  if (!ANIMOS.includes(a) || S.fase === 'juego') return;
+  S.animo = a; X.store.set('animo', a); reiniciar();
+}
+
+/* ---------- Simulación ---------- */
+function update(dt) {
+  GGX.fx.update(dt);
+  for (let i = 0; i < 3; i++) { S.squish[i] = Math.max(0, S.squish[i] - dt * 6); S.brillo[i] = Math.max(0, S.brillo[i] - dt * 3); }
+  for (const a of S.anillos) { a.r += 120 * dt; a.v -= dt * 2.4; }
+  S.anillos = S.anillos.filter((a) => a.v > 0);
+  S.pulso = quieto() ? 0 : S.ch ? Math.max(0, 1 - ((Math.max(0, ahora()) / S.ch.beat) % 1)) : 0;
+  if (S.fase !== 'juego') return;
+  const T = ahora();
+  if (!S.musica && T >= 0) {
+    S.musica = true;
+    for (const d of S.ch.gotas) d.t += T;      // el compás 1 de la canción empieza ahora (+50 ms del motor, ya sumados): las gotas se alinean con el sonido real
+    GGX.music.start({ animo: S.animo, semilla: (cfg.animos[S.animo] || {}).semilla || 1, intensidad: 0.3 });
+  }
+  const tope = ventana('casi');
+  for (const d of S.ch.gotas) {
+    if (d.estado !== 'pend') continue;
+    if (T - d.t > tope) fallo(d); else if (d.t - T > cfg.caida_ms) break;
+  }
+  if (T > S.ch.fin) fin();
+}
+
+/* ---------- Dibujo ---------- */
+function drawGota(x, y, col) {
+  c.fillStyle = 'rgba(255,255,255,0.18)'; c.beginPath(); c.ellipse(x, y + 4, 17, 20, 0, 0, 6.283); c.fill();
+  c.fillStyle = col; c.beginPath(); c.arc(x, y, 15, 0, 6.283); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.6)'; c.beginPath(); c.ellipse(x - 5, y - 6, 5, 3, -0.5, 0, 6.283); c.fill();
+}
+function draw() {
+  const s = cv.width / W;
+  c.setTransform(s, 0, 0, s, 0, 0);
+  const o = GGX.fx.offset();
+  c.translate(o.x, o.y);
+  const g = c.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, cfg.fondo[0]); g.addColorStop(1, cfg.fondo[1]);
+  c.fillStyle = g; c.fillRect(-10, -10, W + 20, H + 20);
+  if (S.pulso > 0) { c.fillStyle = 'rgba(255,160,220,' + (0.1 * S.pulso).toFixed(3) + ')'; c.fillRect(-10, -10, W + 20, H + 20); }
+  for (let i = 0; i < 3; i++) {                           // carriles
+    c.fillStyle = 'rgba(255,255,255,' + (0.05 + 0.16 * S.brillo[i]).toFixed(3) + ')'; c.fillRect(i * (W / 3) + 3, 0, W / 3 - 6, H);
+  }
+  c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 2; c.beginPath(); c.moveTo(0, LINEA); c.lineTo(W, LINEA); c.stroke();
+  if (S.ch && (S.fase === 'juego' || S.fase === 'fin')) {
+    const T = ahora();
+    for (const d of S.ch.gotas) {
+      if (d.estado === 'pend' || (d.estado === 'fallo' && T - d.t < 300)) {
+        const k = (T - (d.t - cfg.caida_ms)) / cfg.caida_ms;      // 0 arriba → 1 en la línea
+        if (k < 0) break;
+        drawGota(carrilX(d.lane), -20 + (LINEA + 20) * k + (d.estado === 'fallo' ? 24 * (k - 1) * 4 : 0), d.estado === 'fallo' ? '#8a7a99' : cfg.colores[d.lane]);
+      }
+    }
+  }
+  for (const a of S.anillos) { c.strokeStyle = a.c; c.globalAlpha = clamp(a.v, 0, 1); c.lineWidth = 3; c.beginPath(); c.arc(a.x, a.y, a.r, 0, 6.283); c.stroke(); }
+  c.globalAlpha = 1;
+  for (let i = 0; i < 3; i++) {                           // las tres gelatinas tambor
+    const q = S.squish[i] * (quieto() ? 0.35 : 1);
+    GGX.draw.jelly(c, carrilX(i), GEL_Y, 44, cfg.colores[i], { sx: 1 + 0.18 * q, sy: 1 - 0.3 * q, look: 0, blink: S.brillo[i] > 0.6 });
+  }
+  GGX.fx.draw(c, W, H);
+  if (S.fase === 'juego' && ahora() < -200) {
+    c.font = '700 34px Fredoka, ' + X.cjk + ', system-ui, sans-serif'; c.textAlign = 'center'; c.lineJoin = 'round'; c.lineWidth = 6; c.strokeStyle = 'rgba(20,10,40,0.6)';
+    c.strokeText(X.t('listo'), W / 2, H * 0.4); c.fillStyle = '#fff'; c.fillText(X.t('listo'), W / 2, H * 0.4);
+  }
+}
+
+/* ---------- Entradas y arranque ---------- */
+const carrilDe = (e) => { const r = stage.getBoundingClientRect(); return clamp(Math.floor(((e.clientX - r.left) / r.width) * 3), 0, 2); };
+stage.addEventListener('pointerdown', (e) => { if (S.fase !== 'juego' || e.target.closest('button, label, input')) return; e.preventDefault(); toque(carrilDe(e)); });
+const TECLAS = { ArrowLeft: 0, KeyA: 0, ArrowDown: 1, KeyS: 1, Space: 1, ArrowRight: 2, KeyD: 2 };
+window.addEventListener('keydown', (e) => {
+  if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+  const a = document.activeElement;
+  if (S.fase === 'juego' && e.code in TECLAS) { e.preventDefault(); toque(TECLAS[e.code]); return; }
+  if (a && a.closest && a.closest('button, a, input, select')) return;       // el control enfocado ya reacciona por su cuenta
+  if (e.code === 'Space' || e.code === 'Enter') {
+    if (S.fase === 'inicio') { e.preventDefault(); empezar(); }
+    else if (S.fase === 'fin' && performance.now() - S.tFin > 450) { e.preventDefault(); otra(); }
+  }
+});
+$('btnJugar').addEventListener('click', () => { if (S.fase === 'inicio') empezar(); });
+$('btnOtra').addEventListener('click', () => { if (S.fase === 'fin') otra(); });
+$('btnAnimo').addEventListener('click', () => { if (S.fase === 'fin') volverAlInicio(); });
+$('amplia').checked = S.amplia;
+$('amplia').addEventListener('change', (e) => { S.amplia = e.target.checked; X.store.set('amplia', S.amplia); });
+for (const a of ANIMOS) {                                  // un grupo de botones de opción: se maneja con flechas y se lee como grupo
+  const l = document.createElement('label'), i = document.createElement('input'), t = document.createElement('span');
+  i.type = 'radio'; i.name = 'animo'; i.value = a; i.checked = a === S.animo; t.id = 'animo-' + a;
+  i.addEventListener('change', () => elegirAnimo(a));
+  l.appendChild(i); l.appendChild(t); $('animos').appendChild(l);
+}
+function resize() {
+  const r = stage.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr));
+}
+if (window.ResizeObserver) new ResizeObserver(resize).observe(stage); else window.addEventListener('resize', resize);
+resize();
+X.ui.muteButton($('tools')); X.ui.langButton($('tools')); GGX.ui.accessButton($('tools')); X.ui.supportLink($('tools'));
+GGX.marca.distintivo($('firma'), { texto: true });
+X.onHide((oculta) => {                                      // pestaña oculta: el tiempo del juego se detiene (el motor ya suspende la música)
+  if (S.fase !== 'juego') return;
+  if (oculta) S.tPausa = performance.now(); else S.t0 += performance.now() - S.tPausa;
+});
+X.onLang(textos); textos(); reiniciar(); draw();            // primer cuadro ya pintado, sin destello negro
+let last = performance.now();
+function frame(now) { requestAnimationFrame(frame); const dt = Math.min(0.05, (now - last) / 1000); last = now; update(dt); draw(); }
+requestAnimationFrame(frame);
+window.__compas = { cfg, demo: DEMO, estado: () => {
+  const T = ahora(), pend = S.ch ? S.ch.gotas.filter((d) => d.estado === 'pend') : [];
+  return { fase: S.fase, T, animo: S.animo, bpm: S.ch.bpm, amplia: S.amplia, puntos: S.puntos, combo: S.combo, mejorRacha: S.mejorRacha, mult: mult(),
+    perfectos: S.n.perfecto, bien: S.n.bien, casi: S.n.casi, fallos: S.n.fallo, pifias: S.n.pifia, ultimo: S.ultimo, mejor: Number(S.mejor[S.animo]) || 0, record: S.record,
+    total: S.ch.gotas.length, pendientes: pend.length, siguiente: pend[0] ? { lane: pend[0].lane, t: pend[0].t } : null, proximas: pend.slice(0, 8).map((d) => ({ lane: d.lane, t: d.t })), musica: S.musica };
+} };
+})();
+</script>

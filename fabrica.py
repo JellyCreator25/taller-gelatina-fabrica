@@ -291,7 +291,7 @@ def ideas():
     print('Cuaderno de ideas frente a los juegos que ya existen (cada idea es un género por construir):')
     for idea, r in nov.evaluar_ideas(RAIZ):
         m = idea['mecanica']
-        frente = '; '.join('%s: %s' % (c['con'], c['veredicto']) for c in r['comparaciones'])
+        frente = 'ya construida' if nov.ya_construida(RAIZ, idea) else '; '.join('%s: %s' % (c['con'], c['veredicto']) for c in r['comparaciones'])
         print('  %-9s %-16s %-14s %-13s riesgo %-5s · %s' % (idea['id'], m['genero'], m['verbo'], m['objetivo'], idea.get('riesgo_estimado', '?'), frente))
         for e in r['errores']:
             print('     ERROR', e)
