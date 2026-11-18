@@ -104,23 +104,116 @@ class Bluesky:
         raise ErrorPublicacion('Bluesky rechazó el post (HTTP %d: %s)' % (r.status, r.texto(160)))
 
 
-def marcar_bot(ent, politica):
-    """Configuración de una sola vez (la recomienda la guía oficial de bots): pone la etiqueta propia «bot» en el perfil, conservando el resto del perfil."""
-    pds = ((politica.get('bluesky') or {}).get('pds') or 'https://bsky.social').rstrip('/')
-    jwt, did = _sesion(ent, pds)
-    aut = {'Authorization': 'Bearer ' + jwt}
+def _perfil_actual(ent, pds, did, aut):
+    """Perfil tal como está hoy (con el CID para no pisar un cambio hecho a mano entre la lectura y la escritura)."""
     r = ent.http('GET', pds + '/xrpc/com.atproto.repo.getRecord?repo=%s&collection=app.bsky.actor.profile&rkey=self' % did, aut)
     if r.status == 200:
-        perfil, cid = r.json().get('value', {}), r.json().get('cid')
-    elif r.status in (400, 404):
-        perfil, cid = {'$type': 'app.bsky.actor.profile'}, None
-    else:
-        raise ErrorPublicacion('Bluesky no devolvió el perfil (HTTP %d)' % r.status)
-    perfil['labels'] = {'$type': 'com.atproto.label.defs#selfLabels', 'values': [{'val': 'bot'}]}
+        return r.json().get('value', {}), r.json().get('cid')
+    if r.status in (400, 404):
+        return {'$type': 'app.bsky.actor.profile'}, None
+    raise ErrorPublicacion('Bluesky no devolvió el perfil (HTTP %d)' % r.status)
+
+
+def _guardar_perfil(ent, pds, did, aut, perfil, cid, que):
     cuerpo = {'repo': did, 'collection': 'app.bsky.actor.profile', 'rkey': 'self', 'record': perfil}
     if cid:
         cuerpo['swapRecord'] = cid
     r = ent.http('POST', pds + '/xrpc/com.atproto.repo.putRecord', dict(aut, **{'Content-Type': 'application/json'}), json.dumps(cuerpo).encode('utf-8'))
     if r.status != 200:
-        raise ErrorPublicacion('Bluesky no guardó la etiqueta (HTTP %d: %s)' % (r.status, r.texto(160)))
+        raise ErrorPublicacion('Bluesky no guardó %s (HTTP %d: %s)' % (que, r.status, r.texto(160)))
+
+
+def _con_etiqueta_bot(perfil):
+    """Pone «bot» entre las autoetiquetas del perfil sin quitar las que ya hubiera."""
+    valores = [v for v in ((perfil.get('labels') or {}).get('values') or []) if isinstance(v, dict) and v.get('val')]
+    if not any(v['val'] == 'bot' for v in valores):
+        valores.append({'val': 'bot'})
+    perfil['labels'] = {'$type': 'com.atproto.label.defs#selfLabels', 'values': valores}
+
+
+def marcar_bot(ent, politica):
+    """Configuración de una sola vez (la recomienda la guía oficial de bots): pone la etiqueta propia «bot» en el perfil, conservando el resto del perfil."""
+    pds = ((politica.get('bluesky') or {}).get('pds') or 'https://bsky.social').rstrip('/')
+    jwt, did = _sesion(ent, pds)
+    aut = {'Authorization': 'Bearer ' + jwt}
+    perfil, cid = _perfil_actual(ent, pds, did, aut)
+    perfil['labels'] = {'$type': 'com.atproto.label.defs#selfLabels', 'values': [{'val': 'bot'}]}
+    _guardar_perfil(ent, pds, did, aut, perfil, cid, 'la etiqueta')
     return 'etiqueta «bot» puesta en el perfil de %s' % did
+
+
+PESO_IMAGEN_PERFIL = 1_000_000    # Bluesky admite hasta 1 MB por avatar y por banner
+
+
+def datos_de_perfil(raiz):
+    """Lo que se pondrá en el perfil, leído de difusion/perfiles/ (que genera «fabrica.py perfiles») y revisado contra los límites. No toca la red."""
+    import pathlib
+    from .. import nucleo
+    carpeta = pathlib.Path(raiz) / 'difusion' / 'perfiles'
+    datos = nucleo.cargar_json(carpeta / 'perfiles.json', {})
+    bs = (datos.get('redes') or {}).get('bluesky') or {}
+    idioma = bs.get('idioma_recomendado') or 'es'
+    bio = (bs.get('bio') or {}).get(idioma)
+    nombre = (bs.get('nombre_visible') or {}).get(idioma)
+    limites = bs.get('limites') or {}
+    problemas = []
+    if not bio or not nombre:
+        problemas.append('difusion/perfiles/perfiles.json no trae la biografía o el nombre de Bluesky en «%s»: corre «python3 fabrica.py perfiles --texto»' % idioma)
+    else:
+        if tx.grafemas(bio) > limites.get('bio', 256):
+            problemas.append('la biografía mide %d grafemas (máximo %d)' % (tx.grafemas(bio), limites.get('bio', 256)))
+        if tx.grafemas(nombre) > limites.get('nombre', 64):
+            problemas.append('el nombre mide %d grafemas (máximo %d)' % (tx.grafemas(nombre), limites.get('nombre', 64)))
+        if 'bot' not in nombre.lower() and 'bot' not in bio.lower() and '机器人' not in nombre + bio:
+            problemas.append('ni el nombre ni la biografía dicen que es una cuenta automatizada')
+    imagenes = {}
+    for campo, archivo, ancho in (('avatar', 'avatar.png', 800), ('banner', 'banner.png', 1500)):
+        ruta = carpeta / archivo
+        if not ruta.is_file():
+            problemas.append('falta %s: corre «python3 fabrica.py perfiles»' % archivo)
+        else:
+            imagenes[campo] = (ruta, ancho)
+    if problemas:
+        raise ErrorPlan('; '.join(problemas))
+    return {'idioma': idioma, 'nombre': nombre, 'bio': bio, 'imagenes': imagenes}
+
+
+def resumen_de_perfil(raiz):
+    d = datos_de_perfil(raiz)
+    lineas = ['Nombre (%s): %s' % (d['idioma'], d['nombre']), 'Biografía (%d grafemas): %s' % (tx.grafemas(d['bio']), d['bio'])]
+    for campo, (ruta, _) in sorted(d['imagenes'].items()):
+        lineas.append('%s: %s (%d bytes)' % (campo.capitalize(), ruta.name, ruta.stat().st_size))
+    lineas.append('Conserva la etiqueta «bot» y el resto del perfil.')
+    return '\n'.join(lineas)
+
+
+def _subir_imagen(ent, pds, aut, ruta, ancho):
+    """PNG tal cual si cabe en 1 MB; si no, JPEG liviano. Devuelve la referencia que Bluesky espera en avatar/banner."""
+    datos, mime = ruta.read_bytes(), 'image/png'
+    if len(datos) > PESO_IMAGEN_PERFIL:
+        datos, mime = preparar_imagen(str(ruta), max_bytes=PESO_IMAGEN_PERFIL - 50000, ancho_max=ancho)
+    r = ent.http('POST', pds + '/xrpc/com.atproto.repo.uploadBlob', dict(aut, **{'Content-Type': mime}), datos)
+    if r.status != 200 or 'blob' not in r.json():
+        raise ErrorPublicacion('Bluesky no aceptó la imagen %s (HTTP %d: %s)' % (ruta.name, r.status, r.texto(120)))
+    return r.json()['blob']
+
+
+def actualizar_perfil(ent, politica, raiz):
+    """Pone nombre, biografía, avatar y banner de difusion/perfiles/ en el perfil, sin tocar el resto (fijado, fecha de alta…) y conservando la etiqueta «bot».
+    Es idempotente: si el perfil ya está así, no escribe. Revisa los textos antes de abrir sesión."""
+    d = datos_de_perfil(raiz)
+    pds = ((politica.get('bluesky') or {}).get('pds') or 'https://bsky.social').rstrip('/')
+    jwt, did = _sesion(ent, pds)
+    aut = {'Authorization': 'Bearer ' + jwt}
+    actual, cid = _perfil_actual(ent, pds, did, aut)
+    nuevo = dict(actual)
+    nuevo['$type'] = 'app.bsky.actor.profile'
+    nuevo['displayName'], nuevo['description'] = d['nombre'], d['bio']
+    for campo, (ruta, ancho) in d['imagenes'].items():
+        nuevo[campo] = _subir_imagen(ent, pds, aut, ruta, ancho)
+    _con_etiqueta_bot(nuevo)
+    if all(nuevo.get(k) == actual.get(k) for k in ('displayName', 'description', 'labels')) and all(
+            (nuevo.get(k) or {}).get('ref') == (actual.get(k) or {}).get('ref') for k in d['imagenes']):
+        return 'el perfil de %s ya estaba así: no se cambió nada' % did
+    _guardar_perfil(ent, pds, did, aut, nuevo, cid, 'el perfil')
+    return 'perfil de %s actualizado: nombre, biografía (%s), %s; etiqueta «bot» conservada' % (did, d['idioma'], ' y '.join(sorted(d['imagenes'])))

@@ -21,7 +21,7 @@ Taller Gelatina (bot)
 **Biografía:**
 
 ```
-Cuenta automatizada (bot) de Taller Gelatina: avisa de juegos y versiones nuevas. Juegos gratis para el navegador, hechos con ayuda de IA. No responde ni sigue cuentas; el contacto está en el sitio: https://taller-gelatina.pages.dev
+Cuenta automatizada (bot) de Taller Gelatina: avisa de juegos y versiones nuevas. Juegos chiquitos, gratis y con delirios de grandeza, hechos con ayuda de IA. No responde ni sigue cuentas; contacto en el sitio: https://taller-gelatina.pages.dev
 ```
 
 ### English
@@ -35,7 +35,7 @@ Taller Gelatina (bot)
 **Biografía:**
 
 ```
-Automated account (bot) of Taller Gelatina: announces new games and versions. Free browser games, made with the help of AI. It does not reply or follow accounts; contact is on the site: https://taller-gelatina.pages.dev
+Automated account (bot) of Taller Gelatina: announces new games and versions. Tiny games, free and with delusions of grandeur, made with the help of AI. It does not reply or follow accounts; contact is on the site: https://taller-gelatina.pages.dev
 ```
 
 ### 中文
@@ -49,7 +49,7 @@ Taller Gelatina（机器人）
 **Biografía:**
 
 ```
-Taller Gelatina 的自动账号（机器人）：发布新游戏和新版本的通知。免费网页游戏，借助人工智能制作。不回复也不关注账号；联系方式在网站上：https://taller-gelatina.pages.dev
+Taller Gelatina 的自动账号（机器人）：发布新游戏和新版本的通知。小小的游戏，免费，却野心满满，借助人工智能制作。不回复也不关注账号；联系方式在网站上：https://taller-gelatina.pages.dev
 ```
 
 ## Mastodon

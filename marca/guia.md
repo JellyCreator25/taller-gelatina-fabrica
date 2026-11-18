@@ -1,6 +1,6 @@
 # La marca: la Gelatina como insignia
 
-> Propuesta v1 (17 de noviembre de 2026), hecha a partir de tu pedido de que «la gelatina sea una insignia y no solo el tema». Lo que dice «Propuesta» espera tu visto bueno; lo demás ya está construido y probado.
+> v1.1 (18 de noviembre de 2026). Nació de tu pedido de que «la gelatina sea una insignia y no solo el tema». El 18 de noviembre decidiste la promesa, que la Gelatina siga sin nombre propio por ahora y que Guerreros reciba una actualización de calidad; todo eso está registrado abajo. Lo que sigue diciendo «Propuesta» espera tu visto bueno.
 
 ## La idea
 
@@ -10,7 +10,7 @@ Hasta ahora la gelatina era **el tema**: gelatinas que pelean, bloques de gelati
 
 Un juego de ritmo, un puzzle o un juego de cartas pueden no tener ninguna gelatina en su mecánica y aun así abrir con ella, llevar su distintivo y tener una en pantalla con algún papel. Así la marca crece con el catálogo en lugar de depender del primer juego.
 
-**Promesa (propuesta):** *Chiquita, gratis y con delirios de grandeza.* Sale de lo que ya funciona en las redes (232 KB contra 212 GB) y de la voz del personaje (`difusion/voz.md`). Es una línea para el perfil y el sitio; no se pone dentro de los juegos.
+**Promesa (decidida el 18 de noviembre):** *Juegos chiquitos, gratis y con delirios de grandeza.* Es un híbrido de dos propuestas: la voz del personaje (`difusion/voz.md`) y lo que ya funciona en las redes (232 KB contra 212 GB). Es una línea para el perfil y el sitio; no se pone dentro de los juegos. Ya está en la biografía y el banner de Bluesky (`difusion/perfiles/perfiles.md`, en español, inglés y chino); la cuenta la administra la fábrica, que los aplica con `python3 fabrica.py configurar bluesky-perfil`. En el sitio entrará con el próximo plan del sitio, para que la veas en su huella antes de que salga.
 
 ## Los elementos
 
@@ -42,11 +42,11 @@ Un juego de ritmo, un puzzle o un juego de cartas pueden no tener ninguna gelati
 **Falta (en la cola del motor, `python3 fabrica.py motor`):**
 
 - **Compás** (el tercer juego) será el primero en abrir con el sello y llevar distintivo: lo exige la escalera, que pide a cada juego nuevo un nivel más que el mejor ya publicado.
-- **Guerreros y Torre** no llevan sello porque ya salieron. Una versión nueva con sello, efectos y música es una actualización de calidad y, a la vez, una novedad que anunciar; la decisión de sacarla es tuya.
-- **Portadas y tarjetas** con el distintivo, y la promesa en el texto de perfil de Bluesky: cambian piezas que ya están aprobadas o publicadas, así que esperan tu visto bueno.
+- **Guerreros** (decidido el 18 de noviembre): se prepara la versión 1.5.0 con sello, efectos, música y accesibilidad, y se publica después de Compás, con plan nuevo y tu aprobación de su huella. **Torre** sigue sin cambios; una actualización suya sería otra decisión tuya.
+- **Portadas y tarjetas** con el distintivo: cambian piezas que ya están aprobadas o publicadas, así que esperan tu visto bueno.
 
-## Lo que te toca decidir
+## Decisiones
 
-1. ¿Te gusta la promesa «Chiquita, gratis y con delirios de grandeza.» o prefieres otra línea?
-2. ¿La Gelatina se queda sin nombre propio («la Gelatina») o le ponemos uno? Un nombre ayuda a las redes (puede tener opiniones, cumpleaños, rivales), pero es un compromiso largo.
-3. ¿Sacamos una actualización de calidad de Guerreros Gelatina con sello, efectos y música cuando termine la pausa entre lanzamientos?
+1. **Promesa:** «Juegos chiquitos, gratis y con delirios de grandeza.» (18 de noviembre).
+2. **Nombre de la Gelatina:** sin nombre propio por ahora («la Gelatina»). Se retoma después del lanzamiento de Compás, cuando haya aparecido en tres juegos. Un nombre ayudaría a las redes (podría tener opiniones, cumpleaños, rivales), pero es un compromiso largo y hay que revisarlo contra conflictos: «Blup», que era la idea natural por el sonido de la marca, se parece a «Blupi», una mascota que ya existe.
+3. **Guerreros Gelatina v1.5.0:** aprobada para prepararse y publicarse después de Compás.

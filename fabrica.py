@@ -30,7 +30,7 @@ Uso:
   python3 fabrica.py publicar ID --ejecutar --aprobar HUELLA   (publica EXACTAMENTE lo que esa huella cubre)
   python3 fabrica.py resolver ACCION salio|no-salio       (anota qué pasó con un envío que quedó en duda)
   python3 fabrica.py calendario [--aprobar HUELLA_DEL_LOTE | --ejecutar | --medir]   (publicaciones propias del calendario: se aprueban por lote y salen en su fecha; --medir anota likes, reposts y respuestas)
-  python3 fabrica.py configurar bluesky-bot|mastodon-bot [--ejecutar]   (ajuste de una sola vez en la cuenta del bot)
+  python3 fabrica.py configurar bluesky-bot|bluesky-perfil|mastodon-bot [--ejecutar]   (ajustes en la cuenta del bot; bluesky-perfil pone bio, nombre, avatar y banner)
   python3 fabrica.py motor [probar]           (el motor que crece solo: techo, juegos por nivel y cola de mejoras; «probar» corre las pruebas del motor y guarda motor/informe.json)
   python3 fabrica.py calidad [id|todos]       (en qué nivel de la escalera de calidad está cada juego, qué le falta y qué nivel se le exige para lanzarse)
 """
@@ -453,11 +453,18 @@ def configurar(que):
     from publicacion import red
     from publicacion.adaptadores import bluesky, mastodon
     tareas = {'bluesky-bot': (bluesky.marcar_bot, ['BSKY_IDENTIFIER', 'BSKY_APP_PASSWORD'], 'poner la etiqueta «bot» en el perfil de Bluesky (conserva el resto del perfil)'),
+              'bluesky-perfil': (lambda ent, politica: bluesky.actualizar_perfil(ent, politica, RAIZ), ['BSKY_IDENTIFIER', 'BSKY_APP_PASSWORD'],
+                                 'poner nombre, biografía, avatar y banner de difusion/perfiles/ en el perfil de Bluesky (conserva la etiqueta «bot» y el resto del perfil)'),
               'mastodon-bot': (mastodon.marcar_bot, ['MASTODON_INSTANCE', 'MASTODON_TOKEN'], 'marcar la cuenta de Mastodon como bot')}
     if que not in tareas:
         sys.exit('Ajustes disponibles: ' + ', '.join(sorted(tareas)))
     funcion, secretos, descripcion = tareas[que]
     print('Va a %s. Claves que lee del entorno: %s.' % (descripcion, ', '.join(secretos)))
+    if que == 'bluesky-perfil':   # lo que se pondrá, revisado contra los límites, sin abrir sesión: así la corrida en seco ya sirve para aprobarlo
+        try:
+            print(bluesky.resumen_de_perfil(RAIZ))
+        except nucleo.ErrorPlan as e:
+            sys.exit('[configurar] ' + str(e))
     if '--ejecutar' not in sys.argv:
         print('(no cambió nada; agrega --ejecutar para hacerlo)')
         return

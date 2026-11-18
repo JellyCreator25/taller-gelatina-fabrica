@@ -1,17 +1,19 @@
 name: Configurar cuenta de bot
-# Ajuste de una sola vez, DESPUÉS de crear la cuenta y guardar sus claves en el Environment «produccion»:
-# pone la etiqueta «bot» en el perfil (Bluesky) o marca la cuenta como bot (Mastodon). No publica nada.
+# Ajustes de la cuenta, DESPUÉS de crearla y guardar sus claves en el Environment «produccion»:
+#   bluesky-bot: pone la etiqueta «bot» en el perfil · bluesky-perfil: pone nombre, biografía, avatar y banner de difusion/perfiles/
+#   (conserva la etiqueta y el resto del perfil) · mastodon-bot: marca la cuenta como bot. Ninguno publica un post.
 #   1) Córrelo sin marcar «ejecutar»: solo dice qué haría y qué claves faltan.
 #   2) Córrelo marcando «ejecutar»: hace el ajuste.
 on:
   workflow_dispatch:
     inputs:
       cuenta:
-        description: 'Cuenta que se declarará como bot'
+        description: 'Ajuste que se hará en la cuenta'
         required: true
         type: choice
         options:
           - bluesky-bot
+          - bluesky-perfil
           - mastodon-bot
       ejecutar:
         description: 'Hacer el ajuste de verdad (sin marcar: solo muestra qué haría)'
@@ -32,7 +34,7 @@ jobs:
         run: |
           python3 -m venv .venv
           .venv/bin/pip install --quiet pillow
-      - name: Declarar la cuenta como bot
+      - name: Ajustar la cuenta
         env:
           CUENTA: ${{ inputs.cuenta }}
           EJECUTAR: ${{ inputs.ejecutar }}
@@ -42,7 +44,7 @@ jobs:
           MASTODON_TOKEN: ${{ secrets.MASTODON_TOKEN }}
         shell: bash   # con pipefail: si la fábrica falla, el paso falla (sin esto, «| tee» oculta el error y la corrida sale en verde)
         run: |
-          case "$CUENTA" in (bluesky-bot|mastodon-bot) ;; (*) echo "Cuenta no reconocida"; exit 1;; esac
+          case "$CUENTA" in (bluesky-bot|bluesky-perfil|mastodon-bot) ;; (*) echo "Cuenta no reconocida"; exit 1;; esac
           if [ "$EJECUTAR" = "true" ]; then
             .venv/bin/python -I fabrica.py configurar "$CUENTA" --ejecutar | tee -a "$GITHUB_STEP_SUMMARY"
           else

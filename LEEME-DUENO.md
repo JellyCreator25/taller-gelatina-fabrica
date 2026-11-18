@@ -58,7 +58,7 @@ Mientras esos datos tengan el valor de ejemplo, la fábrica se niega a publicar.
 
 | Canal | Claves (secrets) | Una sola vez, aparte de las claves |
 |---|---|---|
-| Bluesky | `BSKY_IDENTIFIER`, `BSKY_APP_PASSWORD` | Cuenta propia de la fábrica y contraseña de aplicación (no la principal). Con las claves en el entorno, `python3 fabrica.py configurar bluesky-bot --ejecutar` pone la etiqueta «bot» en el perfil. |
+| Bluesky | `BSKY_IDENTIFIER`, `BSKY_APP_PASSWORD` | Cuenta propia de la fábrica y contraseña de aplicación (no la principal). Con las claves en el entorno, `python3 fabrica.py configurar bluesky-bot --ejecutar` pone la etiqueta «bot» en el perfil, y `configurar bluesky-perfil --ejecutar` pone nombre, biografía, avatar y banner. |
 | Mastodon | `MASTODON_INSTANCE`, `MASTODON_TOKEN` | Cuenta en una instancia que permita bots; `configurar mastodon-bot --ejecutar` marca la cuenta como bot. |
 | Telegram | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Un bot (con BotFather) y un canal propio donde sea administrador. |
 | Discord | `DISCORD_WEBHOOK_URL` | Un webhook en un servidor tuyo. Solo en servidores donde tengas permiso. |
@@ -86,10 +86,10 @@ Cada vez que cambian, hay que volver a subir `dist/sitio.zip` a Cloudflare Pages
 
 **A. Bluesky (unos 10 minutos).**
 1. Crea la cuenta en bsky.app con un correo tuyo. Usuario sugerido: `tallergelatina` (si está libre, queda `tallergelatina.bsky.social`).
-2. *Editar perfil*: sube `avatar.png` y `banner.png`; copia el nombre y la biografía del bloque «Bluesky» de `perfiles.md` (en español).
+2. No hace falta editar el perfil: nombre, biografía, avatar y banner los pone la fábrica en el paso 5 (tú no pegas nada).
 3. *Ajustes → Privacidad y seguridad → Contraseñas de aplicación → Añadir*. Llámala `fabrica`; si aparece la opción de acceso a mensajes directos, déjala sin marcar. Copia la contraseña (`xxxx-xxxx-xxxx-xxxx`): se muestra una sola vez.
 4. En GitHub, entorno `produccion`, guarda `BSKY_IDENTIFIER` (el usuario completo, `tallergelatina.bsky.social`) y `BSKY_APP_PASSWORD`.
-5. *Actions → Configurar cuenta de bot*: elige `bluesky-bot` y córrelo primero sin marcar «ejecutar» (solo muestra qué haría) y luego marcándolo (pone la etiqueta «bot» en el perfil).
+5. *Actions → Configurar cuenta de bot*: córrelo con `bluesky-bot` (pone la etiqueta «bot») y con `bluesky-perfil` (pone nombre, biografía, avatar y banner de `difusion/perfiles/`, conservando la etiqueta). Cada uno se corre primero sin marcar «ejecutar» (solo muestra qué haría) y luego marcándolo. Si cambia la promesa o el banner, se regeneran con `python3 fabrica.py perfiles` y se vuelve a correr `bluesky-perfil`.
 6. Agrega `"bluesky"` a `canales` en `publicacion/politica.json`.
 
 **B. Canal de Telegram (unos 10 minutos).**
@@ -142,7 +142,7 @@ El camino para crecer es una **plantilla nueva** (otro género), no otra ficha d
 
 Cada juego nuevo tiene que sentirse mejor que el anterior, y eso lo exige la fábrica, no la buena voluntad: hay una **escalera de calidad** (1 Base, 2 Con sonido, 3 Con jugo y accesible, 4 Con música, 5 Con marca) y un juego nuevo no puede lanzarse si no está al menos un nivel por encima del mejor ya publicado. El motor crece con módulos opcionales (accesibilidad, efectos, música, marca) que se prueban en un navegador real, y una **cola de mejoras** que se calcula sola dice qué sigue. Guerreros y Torre salieron antes de la escalera y no cambian. Detalle: `LEEME.md`, sección «El motor que crece solo».
 
-La **marca** es la Gelatina como insignia (no solo como tema): `marca/guia.md` tiene la idea, los elementos y tres decisiones que te tocan (la promesa, si la Gelatina tiene nombre propio y si sacamos una versión nueva de Guerreros con sello, efectos y música).
+La **marca** es la Gelatina como insignia (no solo como tema): `marca/guia.md` tiene la idea, los elementos y lo que ya decidiste: la promesa «Juegos chiquitos, gratis y con delirios de grandeza.», que la Gelatina siga sin nombre propio por ahora y que Guerreros reciba una versión nueva con sello, efectos y música después de Compás.
 
 ## Publicaciones del calendario
 
