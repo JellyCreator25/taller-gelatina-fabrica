@@ -1,0 +1,30 @@
+{
+ "fuente": "519af7cd56adf951",
+ "modulos": {
+  "accesible": {
+   "fallas": 0,
+   "fallos": [],
+   "pruebas": 16,
+   "version": "1.0.0"
+  },
+  "efectos": {
+   "fallas": 0,
+   "fallos": [],
+   "pruebas": 10,
+   "version": "1.0.0"
+  },
+  "musica": {
+   "fallas": 0,
+   "fallos": [],
+   "pruebas": 10,
+   "version": "1.0.0"
+  }
+ },
+ "nucleo": {
+  "fallas": 0,
+  "fallos": [],
+  "pruebas": 6,
+  "version": "1.1.0"
+ },
+ "ok": true
+}

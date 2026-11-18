@@ -1,0 +1,26 @@
+{
+  "nota": "Módulos opcionales del motor. Un juego usa los que declara en juego.json → «motor». El núcleo (motor/ggx.js) no cambia: un juego sin «motor» se construye byte por byte como siempre. El orden de este archivo es el orden de carga.",
+  "modulos": {
+    "accesible": {
+      "version": "1.0.0",
+      "archivo": "accesible.js",
+      "pide": [],
+      "aporta": ["menos movimiento", "alto contraste", "anuncios para lector de pantalla", "botón de accesibilidad"],
+      "desde": "2026-11-17"
+    },
+    "efectos": {
+      "version": "1.0.0",
+      "archivo": "efectos.js",
+      "pide": ["accesible"],
+      "aporta": ["partículas", "textos flotantes", "sacudida de pantalla", "destellos"],
+      "desde": "2026-11-17"
+    },
+    "musica": {
+      "version": "1.0.0",
+      "archivo": "musica.js",
+      "pide": [],
+      "aporta": ["música de fondo compuesta por semilla", "cuatro ánimos", "intensidad por capas"],
+      "desde": "2026-11-17"
+    }
+  }
+}

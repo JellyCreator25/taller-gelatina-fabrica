@@ -36,4 +36,21 @@ En espera (algo que solo una persona puede resolver):
 
 Recomendar no es lanzar: un juego nuevo sigue sujeto a la revisión de novedad, a la pausa entre lanzamientos y a tu aprobación con la huella.
 
+## Motor: calidad y qué sigue
+
+Techo del motor hoy: nivel 4 de 5. Mejor juego publicado: nivel 2. Pruebas del motor: al día.
+
+Niveles: 1 Base · 2 Con sonido · 3 Con jugo y accesible · 4 Con música · 5 Con marca
+
+- guerreros-gelatina: nivel 2 (Con sonido) — falta: Módulo «accesible»: menos movimiento, alto contraste y anuncios para lector de pantalla (declarado en «motor» y llamado por el código del juego).
+- torre-gelatina: nivel 2 (Con sonido) — falta: Módulo «accesible»: menos movimiento, alto contraste y anuncios para lector de pantalla (declarado en «motor» y llamado por el código del juego).
+
+Lo que sigue para el motor:
+1. Construir el módulo «marca» (nivel 5) — Convierte la gelatina en insignia: cualquiera reconoce un juego del Taller en los primeros segundos (decisión del dueño, 17 nov).
+2. Actualizar «guerreros-gelatina» del nivel 2 al 4 — Una versión nueva con lo que le falta (accesible, efectos, musica) mejora el juego y da una novedad que anunciar.
+
+## Bluesky: qué ha funcionado
+
+Todavía no hay publicaciones medidas: se miden a las 24 horas y a los 3 días de salir.
+
 Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow, bluesky.

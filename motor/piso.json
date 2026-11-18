@@ -1,0 +1,10 @@
+{
+ "nota": "Lo mejor ya publicado: el juego nuevo debe estar un nivel por encima, sin pasar del techo del motor. Solo sube (lo actualiza `python3 fabrica.py ciclo` desde el libro de publicación). Los juegos «heredados» salieron antes de que existiera la escalera y no tienen nivel mínimo, pero tampoco pueden bajar del que ya tienen.",
+ "heredados": [
+  "guerreros-gelatina",
+  "torre-gelatina"
+ ],
+ "niveles": {
+  "guerreros-gelatina": 2
+ }
+}

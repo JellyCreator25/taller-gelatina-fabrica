@@ -9,6 +9,7 @@ Todo lo que el autor debe completar queda marcado con la palabra PENDIENTE; mien
 import json
 import pathlib
 import re
+import sys
 
 import json_fmt
 import novedad
@@ -254,6 +255,7 @@ def nuevo_juego(raiz, juego_id, plantilla):
     p = 'PENDIENTE'
     spec = {
         'id': juego_id, 'plantilla': plantilla, 'version': '0.1.0', 'idiomas': idiomas, 'paquetes': [], 'fuentes': ['Fredoka', 'Nunito Sans'], 'apoyo_url': '',
+        'motor': _modulos_del_motor(raiz), 'necesidades_motor': [],
         'parametros': {}, 'textos': TEXTOS_BASE,
         'portada': {'color_a': '#2f6bdc', 'color_b': '#e04a34', 'lema': {i: p for i in idiomas}, 'selector': '#cv'},
         'ia': {'codigo': True, 'graficos': True, 'texto': True, 'sonido': False},
@@ -270,6 +272,14 @@ def nuevo_juego(raiz, juego_id, plantilla):
     destino.mkdir(parents=True)
     json_fmt.guardar(destino / 'juego.json', spec)
     return destino
+
+
+def _modulos_del_motor(raiz):
+    """Un juego nuevo parte con TODOS los módulos del motor declarados: cada juego debe sentirse mejor que el anterior. Quitar uno exige una razón, y
+    declararlo no basta: el nivel de calidad solo cuenta lo que el código del juego llama (python3 fabrica.py calidad ID)."""
+    sys.path.insert(0, str(pathlib.Path(raiz) / 'herramientas'))
+    import motor
+    return list(motor.manifiesto(raiz))
 
 
 pendientes = novedad.pendientes

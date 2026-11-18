@@ -1,0 +1,71 @@
+{
+  "nota": "La escalera de calidad. Cada nivel pide requisitos medibles; un juego está en el nivel más alto cuyos requisitos (y los de todos los anteriores) cumple. Un requisito con «modulo» cuenta cuando el juego lo declara en «motor», su código lo llama (comprobación estática: el patrón «uso» aparece en la plantilla o en sus paquetes, para que declarar un módulo sin usarlo no suba de nivel) y ese módulo existe en motor/modulos.json y sus pruebas del motor están vigentes (motor/informe.json). El juego nuevo debe llegar al menos un nivel por encima del mejor juego ya publicado, sin pasar del techo (el nivel más alto que el motor soporta hoy). Para subir el techo se agrega un módulo y un nivel; ver motor/ideas.json. Convención: el código del juego llama a los módulos con el nombre completo (GGX.fx…, no un alias), así la comprobación no se confunde con variables propias del juego.",
+  "requisitos": {
+    "idiomas": {
+      "texto": "Tres idiomas completos (es, en, zh).",
+      "modulo": null
+    },
+    "sonido": {
+      "texto": "Efectos de sonido propios (GGX.sfx en la plantilla o un paquete de audio) o el módulo de música.",
+      "modulo": null
+    },
+    "accesible": {
+      "texto": "Módulo «accesible»: menos movimiento, alto contraste y anuncios para lector de pantalla (declarado en «motor» y llamado por el código del juego).",
+      "modulo": "accesible",
+      "uso": "GGX\\.a11y\\.|GGX\\.ui\\.accessButton"
+    },
+    "efectos": {
+      "texto": "Módulo «efectos»: partículas, textos flotantes, sacudida y destellos que respetan «menos movimiento» (declarado en «motor» y llamado por el código del juego).",
+      "modulo": "efectos",
+      "uso": "GGX\\.fx\\."
+    },
+    "musica": {
+      "texto": "Módulo «musica»: música de fondo compuesta por semilla, con intensidad por capas (declarado en «motor» y llamado por el código del juego).",
+      "modulo": "musica",
+      "uso": "GGX\\.music\\.start\\("
+    },
+    "marca": {
+      "texto": "Módulo «marca»: el sello de la gelatina (entrada, sonido y distintivo) que reconoce a un juego del Taller (declarado en «motor» y llamado por el código del juego).",
+      "modulo": "marca",
+      "uso": "GGX\\.marca\\."
+    }
+  },
+  "niveles": [
+    {
+      "n": 1,
+      "nombre": "Base",
+      "requiere": [
+        "idiomas"
+      ]
+    },
+    {
+      "n": 2,
+      "nombre": "Con sonido",
+      "requiere": [
+        "sonido"
+      ]
+    },
+    {
+      "n": 3,
+      "nombre": "Con jugo y accesible",
+      "requiere": [
+        "accesible",
+        "efectos"
+      ]
+    },
+    {
+      "n": 4,
+      "nombre": "Con música",
+      "requiere": [
+        "musica"
+      ]
+    },
+    {
+      "n": 5,
+      "nombre": "Con marca",
+      "requiere": [
+        "marca"
+      ]
+    }
+  ]
+}

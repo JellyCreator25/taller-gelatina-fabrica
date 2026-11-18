@@ -33,5 +33,5 @@ jobs:
         run: |
           git config user.name "fabrica-de-juegos"
           git config user.email "fabrica-de-juegos@users.noreply.github.com"
-          git add publicacion/PENDIENTE.md metricas/registro.csv
+          git add publicacion/PENDIENTE.md metricas/registro.csv motor/piso.json
           git diff --cached --quiet || { git commit -m "Estado del ciclo" && git push; }

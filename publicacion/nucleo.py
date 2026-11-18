@@ -264,6 +264,8 @@ def compuertas(ctx, plan, plan_problemas, ahora):
         p.append('la ficha todavía tiene campos PENDIENTE')
     errores, _ = revisar_kit.revisar(ctx.raiz, ctx.id)
     p += ['kit: %s' % e for e in errores]
+    import motor as motor_calidad
+    p += motor_calidad.compuerta(ctx.raiz, ctx.spec, ctx.libro.entradas(), ctx.tipo)
     activos = set(ctx.politica.get('canales', []))
     if 'sitio-propio' in activos:
         if _marca_de_ejemplo(ctx.sitio.get('proyecto')):

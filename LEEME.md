@@ -86,6 +86,18 @@ Una plantilla es una carpeta en `plantillas/<nombre>/`:
 
 El motor común (`motor/ggx.js`, expuesto como `GGX`) ofrece: `store` (localStorage con prefijo del juego y respaldo en memoria), `t`/`setLang`/`onLang` (textos por idioma), `sfx` (efectos sintetizados con WebAudio; sin archivos de audio), botones de silencio, idioma y apoyo, `ads` (adaptador vacío), `rng(semilla)` y la gelatina de la casa (`draw.jelly`). No hay analítica, cookies ni red.
 
+## El motor que crece solo
+
+Cada juego nuevo debe sentirse con más presupuesto que el anterior, y el motor común crece para que eso sea posible sin reescribir nada:
+
+- **Módulos opcionales** (`motor/modulos/`, lista y orden de carga en `motor/modulos.json`): `accesible` (menos movimiento, alto contraste, anuncios para lector de pantalla), `efectos` (partículas, textos flotantes, sacudida, destellos) y `musica` (música de fondo compuesta por semilla, con intensidad por capas). Un juego los declara en `juego.json → motor` y su código los llama con el nombre completo (`GGX.fx…`, `GGX.music…`). El núcleo (`motor/ggx.js`) no cambia: un juego sin `motor` se construye byte por byte como siempre (hay una prueba que lo comprueba).
+- **Escalera de calidad** (`motor/escalera.json`): niveles con requisitos medibles (1 Base · 2 Con sonido · 3 Con jugo y accesible · 4 Con música · 5 Con marca). Un módulo solo cuenta si el juego lo declara, su código lo llama y el motor tiene pruebas vigentes de él. `python3 fabrica.py calidad [id|todos]` dice en qué nivel está cada juego y qué le falta.
+- **Piso que solo sube** (`motor/piso.json`): el juego nuevo debe llegar al menos un nivel por encima del mejor ya publicado, sin pasar del techo del motor; si no, la compuerta de publicación lo frena con el motivo. Guerreros Gelatina y Torre Gelatina salieron antes de la escalera: no tienen mínimo, pero no pueden bajar. `ciclo` actualiza el piso desde el libro de publicación.
+- **Pruebas del motor** (`python3 fabrica.py motor probar`): corren el núcleo y cada módulo en un Chromium real y guardan `motor/informe.json`, atado a la huella del código. Si el motor, un módulo o el guion de pruebas cambian y no se vuelven a correr, el informe deja de estar vigente: las pruebas unitarias fallan y ningún juego que use módulos sale.
+- **Cola de mejoras** (`python3 fabrica.py motor`, y sección «Motor» de `PENDIENTE.md`): se calcula sola — pruebas vencidas, juegos por debajo de su nivel, módulos que faltan para el siguiente nivel, pedidos de los juegos (`necesidades_motor`) y, al llegar al techo, la primera idea sin construir de `motor/ideas.json`. Subir una actualización de calidad a un juego ya publicado es también una novedad que anunciar.
+
+Un juego nuevo (`nuevo ID PLANTILLA`) parte con todos los módulos declarados; declararlos no basta para subir de nivel.
+
 ## Idiomas
 
 Cada juego declara `idiomas` (hoy es, en y zh) y trae sus textos por idioma en `juego.json → textos`. El motor común ofrece el selector, recuerda la elección y respeta `?lang=xx`; el sitio genera una página por idioma (`/es/`, `/en/`, `/zh/`, con `hreflang`, el chino como `zh-Hans`). La prueba de cada plantilla revisa los tres idiomas en pantalla. El chino lo escribió Claude: necesita revisión de una persona nativa antes de promocionar en ese idioma.
@@ -148,7 +160,7 @@ Los flujos de GitHub (`.github/workflows/`) ejecutan esto con las claves en el e
 
 ## Ciclo semanal
 
-`python3 fabrica.py ciclo` reconstruye, revisa kits, mide novedad, genera el sitio y escribe `publicacion/PENDIENTE.md`: por juego, qué está listo para aprobar o qué lo bloquea, y las tres ideas siguientes. No usa claves ni publica. `--probar` añade las pruebas en navegador.
+`python3 fabrica.py ciclo` reconstruye, revisa kits, mide novedad, genera el sitio y escribe `publicacion/PENDIENTE.md`: por juego, qué está listo para aprobar o qué lo bloquea, las tres ideas siguientes, el estado del motor (techo, niveles y cola de mejoras) y qué ha funcionado en Bluesky. No usa claves ni publica. `--probar` añade las pruebas en navegador.
 
 ## Difusión
 

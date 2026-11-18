@@ -31,6 +31,8 @@ Uso:
   python3 fabrica.py resolver ACCION salio|no-salio       (anota qué pasó con un envío que quedó en duda)
   python3 fabrica.py calendario [--aprobar HUELLA_DEL_LOTE | --ejecutar | --medir]   (publicaciones propias del calendario: se aprueban por lote y salen en su fecha; --medir anota likes, reposts y respuestas)
   python3 fabrica.py configurar bluesky-bot|mastodon-bot [--ejecutar]   (ajuste de una sola vez en la cuenta del bot)
+  python3 fabrica.py motor [probar]           (el motor que crece solo: techo, juegos por nivel y cola de mejoras; «probar» corre las pruebas del motor y guarda motor/informe.json)
+  python3 fabrica.py calidad [id|todos]       (en qué nivel de la escalera de calidad está cada juego, qué le falta y qué nivel se le exige para lanzarse)
 """
 import base64
 import json
@@ -176,6 +178,18 @@ def construir(juego_id):
         sys.exit('La plantilla %s tiene caracteres chinos fuera de GB2312: %s' % (spec['plantilla'], ' '.join(sorted(fuera))))
     inyeccion = ('<script>window.GGX_CONFIG=%s;window.JUEGO=%s;</script>\n<script id="ggx">\n%s</script>\n'
                  % (js_json(cfg), js_json({'parametros': spec.get('parametros', {}), 'textos': spec.get('textos', {})}), ggx))
+    # Módulos opcionales del motor (juego.json → «motor»): después del núcleo y antes del código del juego. Sin «motor», nada cambia.
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import motor as motor_mod
+    try:
+        modulos = motor_mod.modulos_de(RAIZ, spec)
+    except motor_mod.ErrorMotor as e:
+        sys.exit('%s: %s' % (spec['id'], e))
+    for nombre, _, texto in modulos:
+        fuera = chinos_fuera_de_gb2312(texto)
+        if fuera:
+            sys.exit('El módulo %s tiene caracteres chinos fuera de GB2312: %s' % (nombre, ' '.join(sorted(fuera))))
+        inyeccion += '<script id="mod-%s">\n%s</script>\n' % (nombre, texto)
     m = re.search(r'^<script', cuerpo, re.M)
     cuerpo = (cuerpo[:m.start()] + inyeccion + cuerpo[m.start():]) if m else (cuerpo + inyeccion)
 
@@ -578,6 +592,15 @@ def ciclo():
     except Exception as e:      # un registro dañado no debe impedir el resto del estado, pero sí quedar a la vista y hacer fallar el ciclo
         errores.append('rumbo: %s' % e)
         L += ['No se pudo calcular el rumbo: %s' % e]
+    L += ['', '## Motor: calidad y qué sigue', '']
+    try:
+        import motor as motor_mod
+        juegos, entradas = _juegos_y_libro()
+        motor_mod.sincronizar(RAIZ, entradas)      # el piso solo sube: lo mejor ya publicado queda anotado en motor/piso.json
+        L += motor_mod.informe_de_estado(RAIZ, entradas, juegos)
+    except Exception as e:
+        errores.append('motor: %s' % e)
+        L += ['No se pudo calcular el estado del motor: %s' % e]
     L += ['', '## Bluesky: qué ha funcionado', '']
     try:
         from publicacion import resultados
@@ -597,11 +620,58 @@ def ciclo():
         sys.exit('[ciclo] %d paso(s) fallaron' % len(errores))
 
 
+def _juegos_y_libro():
+    nucleo, _ = _publicacion()
+    libro = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl')
+    return [cargar(i) for i in ids()], libro.entradas()
+
+
+def motor_cmd(args):
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import motor as motor_mod
+    if args and args[0] == 'probar':
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix='ggx-motor-') as tmp:
+            pagina = pathlib.Path(tmp) / 'prueba.html'
+            pagina.write_text(motor_mod.pagina_de_prueba(RAIZ), encoding='utf-8')
+            r = subprocess.run(['node', str(RAIZ / 'herramientas' / 'probar_motor.js'), str(pagina)], cwd=str(RAIZ), capture_output=True, text=True)
+        lineas = [l for l in r.stdout.splitlines() if l.startswith('{')]
+        if not lineas:
+            sys.exit('[motor] las pruebas no devolvieron resultado (¿están node y playwright?):\n%s' % (r.stderr or r.stdout)[-600:])
+        inf = motor_mod.escribir_informe(RAIZ, json.loads(lineas[-1]))
+        print('[motor] núcleo v%s: %d pruebas, %d fallas' % (inf['nucleo']['version'], inf['nucleo']['pruebas'], inf['nucleo']['fallas']))
+        for n, m in inf['modulos'].items():
+            print('[motor] módulo %-10s v%s: %d pruebas, %d fallas' % (n, m['version'], m['pruebas'], m['fallas']))
+        for fallo in inf['nucleo']['fallos'] + [f for m in inf['modulos'].values() for f in m['fallos']]:
+            print('  FALLA · ' + fallo)
+        if not inf['ok']:
+            sys.exit('[motor] hay pruebas del motor que fallan')
+        print('[motor] todo en orden (huella %s)' % inf['fuente'])
+        return
+    if args and args[0] != 'estado':
+        sys.exit('Uso: python3 fabrica.py motor [estado|probar]')
+    juegos, entradas = _juegos_y_libro()
+    print('\n'.join(motor_mod.informe_de_estado(RAIZ, entradas, juegos)))
+
+
+def calidad_cmd(objetivo):
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import motor as motor_mod
+    _, entradas = _juegos_y_libro()
+    for i in seleccion(objetivo):
+        spec = cargar(i)
+        n = motor_mod.nivel_de(RAIZ, spec)
+        print('%s: nivel %d (%s) · se le exige %d para lanzarse%s' % (i, n['nivel'], n['nombre'], motor_mod.exigido(RAIZ, spec, entradas),
+                                                                      ' (heredado: sin mínimo)' if i in motor_mod._piso(RAIZ).get('heredados', []) else ''))
+        for r, ok in n['cumplidos'].items():
+            print('   [%s] %s' % ('x' if ok else ' ', motor_mod.escalera(RAIZ)['requisitos'][r]['texto']))
+
+
 def lista():
     print('Fichas:')
     for i in ids():
         s = cargar(i)
-        print('  %-24s plantilla=%-10s v%-7s idiomas=%s paquetes=%s' % (i, s['plantilla'], s['version'], ','.join(s['idiomas']), ','.join(s.get('paquetes', [])) or '-'))
+        print('  %-24s plantilla=%-10s v%-7s idiomas=%s paquetes=%s motor=%s' % (i, s['plantilla'], s['version'], ','.join(s['idiomas']), ','.join(s.get('paquetes', [])) or '-', ','.join(s.get('motor', [])) or '-'))
     print('Plantillas:', ', '.join(sorted(p.name for p in (RAIZ / 'plantillas').iterdir() if p.is_dir())))
 
 
@@ -632,6 +702,10 @@ if __name__ == '__main__':
         metricas_cmd(sys.argv[2:])
     elif orden == 'rumbo':
         rumbo_cmd(sys.argv[2:])
+    elif orden == 'motor':
+        motor_cmd(sys.argv[2:])
+    elif orden == 'calidad':
+        calidad_cmd(objetivo)
     elif orden == 'huella':
         huella(objetivo)
     elif orden == 'publicar':
