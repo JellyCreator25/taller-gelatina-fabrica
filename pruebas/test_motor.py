@@ -152,7 +152,7 @@ class PruebasDeMarca(unittest.TestCase):
 
     def test_la_guia_de_marca_dice_lo_que_esta_hecho_y_lo_que_espera_decision(self):
         guia = (RAIZ / 'marca' / 'guia.md').read_text(encoding='utf-8')
-        for tema in ('## La idea', '## Los elementos', '## Cómo se usa', '## Dónde ya está y dónde falta', '## Lo que te toca decidir'):
+        for tema in ('## La idea', '## Los elementos', '## Cómo se usa', '## Dónde ya está y dónde falta', '## Decisiones'):
             self.assertIn(tema, guia)
         for pieza in ('GGX.marca.sello', 'GGX.marca.blup', 'GGX.marca.distintivo', 'marca/*.svg', 'difusion/voz.md'):
             self.assertIn(pieza, guia)

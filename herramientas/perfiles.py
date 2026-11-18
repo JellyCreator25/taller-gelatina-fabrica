@@ -27,30 +27,30 @@ PESO_MAXIMO_IMAGEN = 1_000_000          # Bluesky admite hasta 1 MB por avatar y
 TEXTOS = {
     'es': {
         'nombre_visible': '{nombre} (bot)',
-        'bluesky': 'Cuenta automatizada (bot) de {nombre}: avisa de juegos y versiones nuevas. Juegos gratis para el navegador, hechos con ayuda de IA. No responde ni sigue cuentas; el contacto está en el sitio: {url}',
+        'bluesky': 'Cuenta automatizada (bot) de {nombre}: avisa de juegos y versiones nuevas. Juegos chiquitos, gratis y con delirios de grandeza, hechos con ayuda de IA. No responde ni sigue cuentas; contacto en el sitio: {url}',
         'mastodon': 'Cuenta automatizada (bot) de {nombre}. Publica avisos de juegos nuevos y de versiones nuevas: juegos gratis para el navegador, sin descargas, hechos con ayuda de inteligencia artificial. No responde mensajes, no sigue cuentas y no impulsa publicaciones. Todos los juegos y el contacto están en {url}',
         'telegram_titulo': '{nombre} · Juegos gratis',
         'telegram': 'Avisos automáticos de {nombre}: juegos nuevos y versiones nuevas. Juegos gratis para el navegador, hechos con ayuda de IA. Canal publicado por un bot. Juegos y contacto: {url}',
         'campos': [('Web', '{url}'), ('Cuenta', 'Automatizada (bot)'), ('Hecho con', 'Ayuda de IA'), ('Idiomas', 'Español · English · 中文')],
-        'banner': ['Juegos gratis para el navegador', 'Free browser games'],
+        'banner': ['Juegos chiquitos, gratis y con delirios de grandeza.', 'Tiny games, free and with delusions of grandeur.'],
     },
     'en': {
         'nombre_visible': '{nombre} (bot)',
-        'bluesky': 'Automated account (bot) of {nombre}: announces new games and versions. Free browser games, made with the help of AI. It does not reply or follow accounts; contact is on the site: {url}',
+        'bluesky': 'Automated account (bot) of {nombre}: announces new games and versions. Tiny games, free and with delusions of grandeur, made with the help of AI. It does not reply or follow accounts; contact is on the site: {url}',
         'mastodon': 'Automated account (bot) of {nombre}. It posts announcements of new games and new versions: free browser games, no downloads, made with the help of artificial intelligence. It does not reply to messages, follow accounts or boost posts. All the games and the contact are at {url}',
         'telegram_titulo': '{nombre} · Free games',
         'telegram': 'Automatic announcements from {nombre}: new games and new versions. Free browser games, made with the help of AI. Channel published by a bot. Games and contact: {url}',
         'campos': [('Web', '{url}'), ('Account', 'Automated (bot)'), ('Made with', 'AI help'), ('Languages', 'Español · English · 中文')],
-        'banner': ['Free browser games', 'Juegos gratis para el navegador'],
+        'banner': ['Tiny games, free and with delusions of grandeur.', 'Juegos chiquitos, gratis y con delirios de grandeza.'],
     },
     'zh': {
         'nombre_visible': '{nombre}（机器人）',
-        'bluesky': '{nombre} 的自动账号（机器人）：发布新游戏和新版本的通知。免费网页游戏，借助人工智能制作。不回复也不关注账号；联系方式在网站上：{url}',
+        'bluesky': '{nombre} 的自动账号（机器人）：发布新游戏和新版本的通知。小小的游戏，免费，却野心满满，借助人工智能制作。不回复也不关注账号；联系方式在网站上：{url}',
         'mastodon': '{nombre} 的自动账号（机器人）。发布新游戏和新版本的通知：免费网页游戏，无需下载，借助人工智能制作。不回复消息，不关注账号，不转发帖子。所有游戏和联系方式见 {url}',
         'telegram_titulo': '{nombre} · 免费游戏',
         'telegram': '{nombre} 的自动通知：新游戏和新版本。免费网页游戏，借助人工智能制作。本频道由机器人发布。游戏和联系方式：{url}',
         'campos': [('网站', '{url}'), ('账号', '自动账号（机器人）'), ('制作方式', '借助人工智能'), ('语言', 'Español · English · 中文')],
-        'banner': ['Free browser games', 'Juegos gratis para el navegador'],
+        'banner': ['Tiny games, free and with delusions of grandeur.', 'Juegos chiquitos, gratis y con delirios de grandeza.'],
     },
 }
 
@@ -197,7 +197,7 @@ def html_banner(fuentes, nombre, linea1, linea2):
     svg = "<svg xmlns='http://www.w3.org/2000/svg' width='1500' height='500' viewBox='0 0 1500 500' style='position:absolute;left:0;top:0'>%s</svg>" % jaleas
     texto = ("<div style=\"position:absolute;left:92px;top:118px;width:760px\">"
              "<div style=\"font:700 112px/1.05 'Fredoka',sans-serif;color:#c2337a;letter-spacing:-1px\">%s</div>"
-             "<div style=\"margin-top:22px;font:700 40px/1.2 'Nunito Sans',sans-serif;color:#1c2a23\">%s</div>"
+             "<div style=\"margin-top:22px;font:700 40px/1.2 'Nunito Sans',sans-serif;color:#1c2a23;text-wrap:balance\">%s</div>"
              "<div style=\"margin-top:6px;font:700 30px/1.2 'Nunito Sans',sans-serif;color:#4d5f55\">%s</div></div>" % (esc(nombre), esc(linea1), esc(linea2)))
     return _html(svg + texto, fuentes, 1500, 500)
 

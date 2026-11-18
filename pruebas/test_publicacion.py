@@ -996,6 +996,21 @@ class PruebasComandos(Base):
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertIn('no cambió nada', r.stdout)
 
+    def test_configurar_el_perfil_de_bluesky_en_seco_muestra_lo_que_pondra_sin_tocar_la_red(self):
+        datos = json.loads((self.p.raiz / 'difusion' / 'perfiles' / 'perfiles.json').read_text(encoding='utf-8'))['redes']['bluesky']
+        r = self.fabrica('configurar', 'bluesky-perfil')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn(datos['bio'][datos['idioma_recomendado']], r.stdout)
+        self.assertIn(datos['nombre_visible'][datos['idioma_recomendado']], r.stdout)
+        self.assertIn('Avatar: avatar.png', r.stdout)
+        self.assertIn('Banner: banner.png', r.stdout)
+        self.assertIn('no cambió nada', r.stdout)
+
+    def test_configurar_el_perfil_de_bluesky_sin_claves_falla_claro(self):
+        r = self.fabrica('configurar', 'bluesky-perfil', '--ejecutar')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('BSKY_IDENTIFIER', r.stderr)
+
     def test_configurar_ejecutar_sin_claves_falla_claro(self):
         r = self.fabrica('configurar', 'bluesky-bot', '--ejecutar')
         self.assertNotEqual(r.returncode, 0)
@@ -1285,9 +1300,10 @@ class PruebasCoherencia(unittest.TestCase):
         self.assertLessEqual(claves, {x for a in ADAPTADORES for x in a.secretos})
         self.assertIn('environment: produccion', texto)
         fabrica = (RAIZ / 'fabrica.py').read_text(encoding='utf-8')
-        for opcion in re.findall(r'^          - ([a-z-]+-bot)$', texto, re.M):
-            self.assertIn("'%s':" % opcion, fabrica, 'el flujo ofrece una cuenta que «configurar» no conoce: ' + opcion)
-        self.assertEqual(sorted(re.findall(r'^          - ([a-z-]+-bot)$', texto, re.M)), ['bluesky-bot', 'mastodon-bot'])
+        for opcion in re.findall(r'^          - ([a-z-]+)$', texto, re.M):
+            self.assertIn("'%s':" % opcion, fabrica, 'el flujo ofrece un ajuste que «configurar» no conoce: ' + opcion)
+        self.assertEqual(sorted(re.findall(r'^          - ([a-z-]+)$', texto, re.M)), ['bluesky-bot', 'bluesky-perfil', 'mastodon-bot'])
+        self.assertIn('(bluesky-bot|bluesky-perfil|mastodon-bot)', texto)
 
     def test_los_pasos_que_pasan_por_tee_usan_pipefail_para_no_ocultar_los_fallos(self):
         import re
@@ -1316,6 +1332,78 @@ class PruebasEtiquetaBot(Base):
         self.assertEqual((cuerpo['collection'], cuerpo['rkey'], cuerpo['swapRecord']), ('app.bsky.actor.profile', 'self', 'bafyperfil'))
         self.assertEqual(cuerpo['record']['displayName'], 'Taller')
         self.assertEqual(cuerpo['record']['labels'], {'$type': 'com.atproto.label.defs#selfLabels', 'values': [{'val': 'bot'}]})
+
+    # --- perfil completo de Bluesky (bio, nombre, avatar, banner) ---
+
+    OBTENER = 'https://bsky.social/xrpc/com.atproto.repo.getRecord'
+    SUBIR = 'https://bsky.social/xrpc/com.atproto.repo.uploadBlob'
+    ESCRIBIR = 'https://bsky.social/xrpc/com.atproto.repo.putRecord'
+
+    def _red_de_perfil(self, previo, cid='bafyperfil'):
+        import hashlib
+        self.p.red.al('GET', self.OBTENER, resp(200, {'value': previo, 'cid': cid}))
+        self.p.red.al('POST', self.SUBIR, lambda u, c, cuerpo: resp(200, {'blob': {'$type': 'blob', 'ref': {'$link': 'bafk' + hashlib.sha1(cuerpo).hexdigest()[:12]},
+                                                                                'mimeType': c.get('Content-Type'), 'size': len(cuerpo)}}))
+        self.p.red.al('POST', self.ESCRIBIR, resp(200, {}))
+
+    def _datos_de_bluesky(self):
+        return json.loads((self.p.raiz / 'difusion' / 'perfiles' / 'perfiles.json').read_text(encoding='utf-8'))['redes']['bluesky']
+
+    def test_el_perfil_de_bluesky_recibe_textos_e_imagenes_y_conserva_lo_demas(self):
+        from publicacion.adaptadores import bluesky
+        previo = {'$type': 'app.bsky.actor.profile', 'displayName': 'viejo', 'description': 'viejo', 'createdAt': '2026-11-01T00:00:00.000Z',
+                  'pinnedPost': {'uri': 'at://did:plc:abc123/app.bsky.feed.post/3kfijo', 'cid': 'bafyfijo'},
+                  'labels': {'$type': 'com.atproto.label.defs#selfLabels', 'values': [{'val': 'otra'}]}}
+        self._red_de_perfil(previo)
+        bluesky.actualizar_perfil(self.p.ent(), {}, self.p.raiz)
+        (c,) = self.p.red.a('POST', self.ESCRIBIR)
+        cuerpo = json.loads(c['cuerpo'])
+        r = cuerpo['record']
+        d = self._datos_de_bluesky()
+        self.assertEqual((cuerpo['collection'], cuerpo['rkey'], cuerpo['swapRecord']), ('app.bsky.actor.profile', 'self', 'bafyperfil'))
+        self.assertEqual((r['displayName'], r['description']), (d['nombre_visible']['es'], d['bio']['es']))
+        self.assertEqual((r['createdAt'], r['pinnedPost']), (previo['createdAt'], previo['pinnedPost']))
+        self.assertEqual([v['val'] for v in r['labels']['values']], ['otra', 'bot'])
+        self.assertEqual({k: r[k]['mimeType'] for k in ('avatar', 'banner')}, {'avatar': 'image/png', 'banner': 'image/png'})
+        self.assertNotEqual(r['avatar']['ref'], r['banner']['ref'])
+        self.assertEqual(len(self.p.red.a('POST', self.SUBIR)), 2)
+
+    def test_si_el_perfil_de_bluesky_ya_esta_asi_no_se_escribe_otra_vez(self):
+        from publicacion.adaptadores import bluesky
+        self._red_de_perfil({'$type': 'app.bsky.actor.profile'})
+        bluesky.actualizar_perfil(self.p.ent(), {}, self.p.raiz)
+        (c,) = self.p.red.a('POST', self.ESCRIBIR)
+        self._red_de_perfil(json.loads(c['cuerpo'])['record'])
+        mensaje = bluesky.actualizar_perfil(self.p.ent(), {}, self.p.raiz)
+        self.assertEqual(len(self.p.red.a('POST', self.ESCRIBIR)), 1)
+        self.assertIn('ya estaba así', mensaje)
+
+    def test_el_perfil_de_bluesky_revisa_los_textos_antes_de_abrir_sesion(self):
+        from publicacion.adaptadores import bluesky
+        from publicacion.nucleo import ErrorPlan
+        ruta = 'difusion/perfiles/perfiles.json'
+        self.p.editar(ruta, lambda x: x['redes']['bluesky']['bio'].update(es='a' * 300))
+        with self.assertRaisesRegex(ErrorPlan, 'grafemas'):
+            bluesky.actualizar_perfil(self.p.ent(), {}, self.p.raiz)
+        self.p.editar(ruta, lambda x: x['redes']['bluesky']['bio'].update(es='Juegos chiquitos.'))
+        self.p.editar(ruta, lambda x: x['redes']['bluesky']['nombre_visible'].update(es='Taller Gelatina'))
+        with self.assertRaisesRegex(ErrorPlan, 'automatizada'):
+            bluesky.actualizar_perfil(self.p.ent(), {}, self.p.raiz)
+        self.assertEqual(self.p.red.llamadas, [])
+
+    def test_el_perfil_de_bluesky_reduce_una_imagen_que_pasa_de_1_mb(self):
+        import os
+        from PIL import Image
+        from publicacion.adaptadores import bluesky
+        grande = self.p.raiz / 'difusion' / 'perfiles' / 'avatar.png'
+        Image.frombytes('RGB', (800, 800), os.urandom(800 * 800 * 3)).save(grande)
+        self.assertGreater(grande.stat().st_size, bluesky.PESO_IMAGEN_PERFIL)
+        self._red_de_perfil({'$type': 'app.bsky.actor.profile'})
+        bluesky.actualizar_perfil(self.p.ent(), {}, self.p.raiz)
+        subidas = self.p.red.a('POST', self.SUBIR)
+        avatar = [c for c in subidas if c['cab'].get('Content-Type') == 'image/jpeg']
+        self.assertEqual(len(avatar), 1)
+        self.assertLessEqual(len(avatar[0]['cuerpo']), bluesky.PESO_IMAGEN_PERFIL)
 
     def test_mastodon_marca_la_cuenta_como_bot(self):
         from publicacion.adaptadores import mastodon
