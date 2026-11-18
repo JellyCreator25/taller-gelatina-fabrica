@@ -151,10 +151,9 @@ footer.pie p{margin:4px 0}
 
 
 def favicon():
-    return ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>"
-            "<ellipse cx='32' cy='37' rx='27' ry='22' fill='#15804f'/>"
-            "<ellipse cx='23' cy='32' rx='6' ry='7' fill='#fff'/><ellipse cx='41' cy='32' rx='6' ry='7' fill='#fff'/>"
-            "<circle cx='24.5' cy='33.5' r='3' fill='#14251b'/><circle cx='42.5' cy='33.5' r='3' fill='#14251b'/></svg>\n")
+    """El ícono del sitio es la Gelatina de la casa (herramientas/marca.py): la misma que ve el jugador en el sello de cada juego."""
+    import marca
+    return marca.emblema('verde', 'f') + '\n'
 
 
 # ---------------------------------------------------------------------------------------------------------------------

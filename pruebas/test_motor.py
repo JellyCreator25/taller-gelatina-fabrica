@@ -104,6 +104,58 @@ class PruebasDelMotorReal(unittest.TestCase):
         self.assertIn('motor/piso.json', yml)
 
 
+class PruebasDeMarca(unittest.TestCase):
+    """La insignia: un solo dibujo, usado igual en el módulo, los archivos de marca/ y el ícono del sitio."""
+
+    def test_el_modulo_lleva_exactamente_el_dibujo_de_marca_py(self):
+        import marca
+        fuente = (RAIZ / 'motor' / 'modulos' / 'marca.js').read_text(encoding='utf-8')
+        plantilla = marca.plantilla_para_modulo()
+        self.assertNotIn('"', plantilla)
+        self.assertIn('"%s"' % plantilla, fuente, 'si cambia el dibujo en herramientas/marca.py hay que cambiarlo igual en motor/modulos/marca.js')
+        for color, (claro, oscuro, cachete) in marca.COLORES.items():
+            if color != 'verde':
+                self.assertIn("'%s', '%s', '%s'" % (claro, oscuro, cachete), fuente, 'el color %s del módulo coincide con marca.py' % color)
+
+    def test_los_archivos_de_marca_estan_al_dia_y_son_svg_validos(self):
+        import marca
+        import xml.etree.ElementTree as ET
+        esperado = {'emblema.svg': marca.emblema('verde'), 'emblema-rosa.svg': marca.emblema('rosa'), 'emblema-amarilla.svg': marca.emblema('amarilla'), 'emblema-mono.svg': marca.emblema_mono()}
+        for nombre, svg in esperado.items():
+            with self.subTest(nombre):
+                texto = (RAIZ / 'marca' / nombre).read_text(encoding='utf-8')
+                self.assertEqual(texto, svg + '\n', 'regenera con `python3 herramientas/marca.py`')
+                raiz = ET.fromstring(texto)
+                self.assertTrue(raiz.tag.endswith('svg'))
+        self.assertIn('currentColor', esperado['emblema-mono.svg'])
+        self.assertNotIn('#', esperado['emblema-mono.svg'].replace('url(#', '').replace("fill='#000'", '').replace("fill='#fff'", '').replace("stroke='#000'", ''), 'la versión de una tinta no lleva colores propios')
+
+    def test_dos_emblemas_en_una_pagina_no_comparten_degradado(self):
+        import marca
+        self.assertNotEqual(marca.emblema('verde', 'a'), marca.emblema('verde', 'b'))
+        self.assertIn("id='ga'", marca.emblema('verde', 'a'))
+
+    def test_el_icono_del_sitio_es_la_gelatina(self):
+        import sitio
+        self.assertIn('Taller Gelatina', sitio.favicon())
+        self.assertIn('linearGradient', sitio.favicon())
+
+    def test_el_modulo_esta_en_el_manifiesto_y_la_escalera_lo_pide(self):
+        man = motor.manifiesto(RAIZ)
+        self.assertEqual(man['marca']['pide'], ['accesible'])
+        self.assertEqual(list(man)[-1], 'marca')
+        self.assertEqual(motor.escalera(RAIZ)['requisitos']['marca']['modulo'], 'marca')
+
+    def test_la_guia_de_marca_dice_lo_que_esta_hecho_y_lo_que_espera_decision(self):
+        guia = (RAIZ / 'marca' / 'guia.md').read_text(encoding='utf-8')
+        for tema in ('## La idea', '## Los elementos', '## Cómo se usa', '## Dónde ya está y dónde falta', '## Lo que te toca decidir'):
+            self.assertIn(tema, guia)
+        for pieza in ('GGX.marca.sello', 'GGX.marca.blup', 'GGX.marca.distintivo', 'marca/*.svg', 'difusion/voz.md'):
+            self.assertIn(pieza, guia)
+        for archivo in ('emblema.svg', 'emblema-rosa.svg', 'emblema-amarilla.svg', 'emblema-mono.svg'):
+            self.assertTrue((RAIZ / 'marca' / archivo).exists())
+
+
 class PruebasDeNivel(Proyecto):
     def spec(self, motores):
         s = ficha()
@@ -121,18 +173,19 @@ class PruebasDeNivel(Proyecto):
         self.assertEqual(motor.nivel_de(self.tmp, self.spec(['accesible']))['nivel'], 2, 'usarlo en el código no basta si el juego no lo declara en «motor»')
 
     def test_el_nivel_sube_con_los_modulos_que_el_juego_usa(self):
-        self.usar('accesible', 'efectos', 'musica')
+        self.usar('accesible', 'efectos', 'musica', 'marca')
         self.assertEqual(motor.nivel_de(self.tmp, self.spec([]))['nivel'], 2)
         self.assertEqual(motor.nivel_de(self.tmp, self.spec(['accesible']))['nivel'], 2)            # un nivel pide todos sus requisitos
         self.assertEqual(motor.nivel_de(self.tmp, self.spec(['accesible', 'efectos']))['nivel'], 3)
         self.assertEqual(motor.nivel_de(self.tmp, self.spec(['accesible', 'efectos', 'musica']))['nivel'], 4)
-        self.assertEqual(motor.techo(self.tmp), 4)
+        self.assertEqual(motor.nivel_de(self.tmp, self.spec(['accesible', 'efectos', 'musica', 'marca']))['nivel'], 5)
+        self.assertEqual(motor.techo(self.tmp), 5)
 
     def test_sin_sonido_propio_un_juego_se_queda_en_el_nivel_1_y_sin_los_tres_idiomas_en_el_0(self):
         s = ficha()
         s['paquetes'] = []                                       # la plantilla de gelatina saca su sonido del paquete «audio»
         self.assertEqual(motor.nivel_de(self.tmp, s)['nivel'], 1)
-        self.usar('accesible', 'efectos', 'musica')
+        self.usar('accesible', 'efectos', 'musica', 'marca')
         self.assertEqual(motor.nivel_de(self.tmp, dict(s, motor=['accesible', 'efectos']))['nivel'], 1, 'los niveles son una escalera: sin el 2 no se llega al 3')
         self.assertEqual(motor.nivel_de(self.tmp, dict(s, motor=['musica']))['nivel'], 2, 'la música cuenta como sonido')
         self.assertEqual(motor.nivel_de(self.tmp, ficha('torre-gelatina'))['nivel'], 2, 'la plantilla de la torre llama a GGX.sfx')
@@ -205,7 +258,7 @@ class PruebasDeConstruccion(Proyecto):
 class PruebasDeCompuerta(Proyecto):
     def setUp(self):
         super().setUp()
-        self.usar('accesible', 'efectos', 'musica')
+        self.usar('accesible', 'efectos', 'musica', 'marca')
 
     def nuevo(self, motores, id='compas'):
         s = ficha()
@@ -223,6 +276,9 @@ class PruebasDeCompuerta(Proyecto):
         self.assertEqual(motor.compuerta(self.tmp, self.nuevo(['accesible', 'efectos']), LANZADO, 'lanzamiento'), [])
 
     def test_sin_juegos_publicados_el_primero_solo_necesita_el_nivel_1(self):
+        piso = self.json('motor/piso.json')
+        piso['niveles'] = {}                                       # una fábrica recién nacida: ni el libro ni el piso guardado tienen juegos
+        self.escribir('motor/piso.json', piso)
         self.assertEqual(motor.exigido(self.tmp, self.nuevo([]), []), 1)
         self.assertEqual(motor.compuerta(self.tmp, self.nuevo([]), [], 'lanzamiento'), [])
 
@@ -230,7 +286,10 @@ class PruebasDeCompuerta(Proyecto):
         piso = self.json('motor/piso.json')
         piso['niveles'] = {'otro': 4}
         self.escribir('motor/piso.json', piso)
-        self.assertEqual(motor.exigido(self.tmp, self.nuevo([]), LANZADO), 4, 'el techo es 4: no se puede exigir un 5 que el motor no soporta')
+        self.assertEqual(motor.exigido(self.tmp, self.nuevo([]), LANZADO), 5)
+        piso['niveles'] = {'otro': 5}
+        self.escribir('motor/piso.json', piso)
+        self.assertEqual(motor.exigido(self.tmp, self.nuevo([]), LANZADO), 5, 'el techo es 5: no se puede exigir un 6 que el motor no soporta')
 
     def test_un_juego_heredado_no_tiene_minimo_pero_no_puede_bajar(self):
         s = ficha()
@@ -249,12 +308,12 @@ class PruebasDeCompuerta(Proyecto):
         self.assertEqual(motor.sincronizar(self.tmp, LANZADO)['niveles']['guerreros-gelatina'], 4, 'el nivel del juego hoy es 2, pero lo ya alcanzado no se pierde')
         self.assertEqual(self.json('motor/piso.json')['niveles']['guerreros-gelatina'], 4)
         s = ficha()
-        s['motor'] = ['accesible', 'efectos', 'musica']
+        s['motor'] = ['accesible', 'efectos', 'musica', 'marca']
         self.escribir('juegos/guerreros-gelatina/juego.json', s)
         piso['niveles'] = {'guerreros-gelatina': 2}
         self.escribir('motor/piso.json', piso)
-        self.assertEqual(motor.sincronizar(self.tmp, LANZADO)['niveles']['guerreros-gelatina'], 4, 'si el juego mejora, el piso sube')
-        self.assertEqual(self.json('motor/piso.json')['niveles']['guerreros-gelatina'], 4)
+        self.assertEqual(motor.sincronizar(self.tmp, LANZADO)['niveles']['guerreros-gelatina'], 5, 'si el juego mejora, el piso sube')
+        self.assertEqual(self.json('motor/piso.json')['niveles']['guerreros-gelatina'], 5)
 
     def test_solo_cuentan_los_lanzamientos_que_de_verdad_salieron(self):
         malos = [{'juego': 'a', 'lanzamiento': True, 'resultado': 'error', 'tipo': 'desplegar'}, {'juego': 'b', 'lanzamiento': False, 'resultado': 'ok', 'tipo': 'desplegar'},
@@ -283,7 +342,7 @@ class PruebasDeCompuerta(Proyecto):
 class PruebasDeCola(Proyecto):
     def setUp(self):
         super().setUp()
-        self.usar('accesible', 'efectos', 'musica')
+        self.usar('accesible', 'efectos', 'musica', 'marca')
 
     def cola(self, juegos=None, entradas=None):
         return motor.cola(self.tmp, LANZADO if entradas is None else entradas, juegos if juegos is not None else [ficha()])
@@ -294,12 +353,24 @@ class PruebasDeCola(Proyecto):
         self.assertEqual(c[0]['tipo'], 'pruebas')
         self.assertIn('probar', c[0]['por_que'])
 
+    def nivel_sin_modulo(self):
+        """Agrega a la copia un nivel 6 que pide un módulo que aún no existe («retos», que sí está en el respaldo de ideas)."""
+        esc = self.json('motor/escalera.json')
+        esc['niveles'].append({'n': 6, 'nombre': 'Con retos', 'requiere': ['retos']})
+        esc['requisitos']['retos'] = {'texto': 'Módulo «retos».', 'modulo': 'retos', 'uso': r'GGX\.retos\.'}
+        self.escribir('motor/escalera.json', esc)
+
     def test_con_el_motor_al_dia_lo_siguiente_es_el_modulo_que_falta_del_siguiente_nivel(self):
+        self.nivel_sin_modulo()
         c = self.cola()
         self.assertEqual([i['tipo'] for i in c][:2], ['modulo', 'actualizacion'])
-        self.assertIn('marca', c[0]['titulo'])
-        self.assertIn('nivel 5', c[0]['titulo'])
-        self.assertIn('accesible', c[1]['por_que'])                  # lo que le falta al juego publicado para llegar al techo
+        self.assertIn('retos', c[0]['titulo'])
+        self.assertIn('nivel 6', c[0]['titulo'])
+        self.assertIn('Da una razón para volver mañana', c[0]['por_que'])        # la razón sale del respaldo de ideas
+        self.assertIn('accesible', c[1]['por_que'])                              # lo que le falta al juego publicado para llegar al techo (5)
+
+    def test_con_todo_construido_solo_queda_actualizar_los_juegos_publicados(self):
+        self.assertEqual([i['tipo'] for i in self.cola()], ['actualizacion'])
 
     def test_un_juego_por_salir_por_debajo_de_lo_exigido_es_lo_primero(self):
         nuevo = ficha()
@@ -316,22 +387,20 @@ class PruebasDeCola(Proyecto):
         self.assertIn('rebotes con física', pedidos[0])
 
     def test_al_llegar_al_techo_se_abre_un_nivel_con_la_primera_idea_sin_construir(self):
-        esc = self.json('motor/escalera.json')
-        esc['niveles'] = esc['niveles'][:4]
-        del esc['requisitos']['marca']
-        self.escribir('motor/escalera.json', esc)
         piso = self.json('motor/piso.json')
-        piso['niveles'] = {'otro': 4}
+        piso['niveles'] = {'otro': 5}
         self.escribir('motor/piso.json', piso)
         c = self.cola(entradas=[])
         niveles = [i for i in c if i['tipo'] == 'nivel']
         self.assertEqual(len(niveles), 1)
-        self.assertIn('Abrir el nivel 5', niveles[0]['titulo'])
-        self.assertIn('marca', niveles[0]['titulo'])
+        self.assertIn('Abrir el nivel 6', niveles[0]['titulo'])
+        self.assertIn('retos', niveles[0]['titulo'])
+        self.assertNotIn('marca', ''.join(i['modulo'] for i in json.loads((self.tmp / 'motor' / 'ideas.json').read_text(encoding='utf-8'))['ideas']),
+                         'una idea que ya es módulo sale del respaldo')
 
     def test_el_resumen_de_estado_se_puede_leer(self):
         texto = '\n'.join(motor.informe_de_estado(self.tmp, LANZADO, [ficha(), ficha('torre-gelatina')]))
-        self.assertIn('Techo del motor hoy: nivel 4 de 5', texto)
+        self.assertIn('Techo del motor hoy: nivel 5 de 5', texto)
         self.assertIn('Pruebas del motor: al día', texto)
         self.assertIn('guerreros-gelatina: nivel 2', texto)
         self.assertIn('Lo que sigue para el motor', texto)

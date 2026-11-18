@@ -1,5 +1,5 @@
 {
- "fuente": "519af7cd56adf951",
+ "fuente": "4b047d161eb1f816",
  "modulos": {
   "accesible": {
    "fallas": 0,
@@ -11,6 +11,12 @@
    "fallas": 0,
    "fallos": [],
    "pruebas": 10,
+   "version": "1.0.0"
+  },
+  "marca": {
+   "fallas": 0,
+   "fallos": [],
+   "pruebas": 16,
    "version": "1.0.0"
   },
   "musica": {

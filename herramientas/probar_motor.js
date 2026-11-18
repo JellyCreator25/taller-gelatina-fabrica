@@ -171,16 +171,84 @@ async function musica(browser) {
   await ctx.close();
 }
 
+async function marca(browser) {
+  const M = 'marca';
+  let { ctx, page, errores } = await abrir(browser);
+  const r = await page.evaluate(() => {
+    const m = GGX.marca, dp = new DOMParser();
+    const doc = dp.parseFromString(m.svg('prueba'), 'image/svg+xml');
+    const valido = !doc.querySelector('parsererror') && doc.documentElement.tagName === 'svg';
+    const ojos = doc.querySelectorAll('ellipse[rx="16"]').length;
+    const rosa = m.svg('r', 'rosa').includes('#c2337a') && !m.svg('r', 'rosa').includes('#15804f');
+    const dos = document.createElement('div'); dos.innerHTML = m.svg('uno') + m.svg('dos');
+    const ids = [...dos.querySelectorAll('linearGradient')].map((g) => g.id);
+    const el = m.emblema(64);
+    const d = m.distintivo(document.body, { texto: true });
+    return { valido, ojos, rosa, ids: ids.join(','), ancho: el.style.width, etiqueta: d.getAttribute('aria-label'), rol: d.getAttribute('role'), texto: d.textContent, nombre: m.nombre,
+      svgOculto: d.querySelector('svg').getAttribute('aria-hidden') };
+  });
+  chequear(M, r.valido && r.ojos === 2, 'el emblema es un SVG válido con sus dos ojos');
+  chequear(M, r.rosa, 'el emblema se puede pintar de rosa sin que quede verde');
+  chequear(M, r.ids === 'guno,gdos', 'dos emblemas en la misma página no comparten degradado');
+  chequear(M, r.ancho === '64px', 'emblema(px) respeta el tamaño pedido');
+  chequear(M, r.rol === 'img' && r.etiqueta === 'Taller Gelatina' && r.texto === 'Taller Gelatina' && r.svgOculto === 'true', 'el distintivo se anuncia una sola vez, como imagen con nombre');
+  // sello completo (un gesto antes para que el sonido esté permitido)
+  await page.mouse.click(50, 50);
+  const t0 = Date.now();
+  const durante = await page.evaluate(async () => {
+    const p = GGX.marca.sello({ al_terminar: () => { window.__terminó = true; } });
+    await new Promise((r) => setTimeout(r, 200));
+    const visible = !!document.querySelector('.ggx-sello') && document.querySelector('.ggx-sello .nom').textContent === 'Taller Gelatina' && document.querySelector('.ggx-sello').getAttribute('aria-hidden') === 'true';
+    const res = await p;
+    return { visible, res, terminó: window.__terminó === true, blups: GGX.marca.estado().blups };
+  });
+  const dur = Date.now() - t0;
+  chequear(M, durante.visible, 'el sello se ve, dice el nombre y es decorativo (aria-hidden)');
+  chequear(M, durante.res.omitido === false && durante.res.saltado === false && durante.terminó, 'el sello termina solo y avisa con al_terminar');
+  chequear(M, dur > 1200 && dur < 2600, 'dura alrededor de 1,4 s (' + dur + ' ms)');
+  chequear(M, durante.blups === 1, 'suena el «blup» una vez');
+  await sleep(400);
+  chequear(M, (await page.locator('.ggx-sello').count()) === 0, 'el sello se retira solo de la página');
+  const otra = await page.evaluate(async () => { const r = await GGX.marca.sello(); return { r, sellos: GGX.marca.estado().sellos }; });
+  chequear(M, otra.r.omitido === true && otra.sellos === 1, 'una vez por visita: la segunda llamada no vuelve a mostrarlo');
+  // saltarlo con un toque
+  const salto = await page.evaluate(async () => {
+    const t = performance.now(); const p = GGX.marca.sello({ forzar: true });
+    await new Promise((r) => setTimeout(r, 120));
+    document.querySelector('.ggx-sello').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    const res = await p; return { res, ms: performance.now() - t };
+  });
+  chequear(M, salto.res.saltado === true && salto.ms < 600, 'un toque salta el sello (' + Math.round(salto.ms) + ' ms)');
+  await sleep(350);
+  const tecla = await page.evaluate(async () => { const p = GGX.marca.sello({ forzar: true }); await new Promise((r) => setTimeout(r, 100)); window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); return (await p).saltado; });
+  chequear(M, tecla === true, 'una tecla también salta el sello');
+  await sleep(350);
+  const mudo = await page.evaluate(async () => { GGX.setMuted(true); const a = GGX.marca.estado().blups; const sono = GGX.marca.blup(); GGX.setMuted(false); return { sono, igual: GGX.marca.estado().blups === a }; });
+  chequear(M, mudo.sono === false && mudo.igual, 'con el juego en silencio, el «blup» no suena');
+  chequear(M, errores.length === 0, 'sin errores de consola ni de página' + (errores.length ? ': ' + errores.join(' || ') : ''));
+  await ctx.close();
+  // con «menos movimiento»: quieto, sin animación
+  ({ ctx, page } = await abrir(browser, { reducedMotion: 'reduce' }));
+  const q = await page.evaluate(async () => {
+    const t = performance.now(); const p = GGX.marca.sello();
+    await new Promise((r) => setTimeout(r, 100));
+    const el = document.querySelector('.ggx-sello'); const quieto = el.hasAttribute('data-quieto'); const anim = getComputedStyle(el.querySelector('.gel')).animationName;
+    const res = await p; return { quieto, anim, ms: performance.now() - t, res };
+  });
+  chequear(M, q.quieto && q.anim === 'none' && q.ms < 1100 && q.res.saltado === false, 'con «reducir movimiento» el sello no se anima y dura menos de un segundo (' + Math.round(q.ms) + ' ms)');
+  await ctx.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  const pasos = { nucleo, accesible, efectos, musica };
+  const pasos = { nucleo, accesible, efectos, musica, marca };
   for (const [nombre, f] of Object.entries(pasos)) {
-    const hay = nombre === 'nucleo' || (await (async () => { const { ctx, page } = await abrir(browser); const v = await page.evaluate((n) => (n === 'accesible' ? !!GGX.a11y : n === 'efectos' ? !!GGX.fx : !!GGX.music), nombre); await ctx.close(); return v; })());
+    const hay = nombre === 'nucleo' || (await (async () => { const { ctx, page } = await abrir(browser); const v = await page.evaluate((n) => (n === 'accesible' ? !!GGX.a11y : n === 'efectos' ? !!GGX.fx : n === 'musica' ? !!GGX.music : !!GGX.marca), nombre); await ctx.close(); return v; })());
     if (!hay) { chequear(nombre, false, 'el módulo «' + nombre + '» no está en la página de prueba'); continue; }
     try { await f(browser); } catch (e) { chequear(nombre, false, 'la prueba se detuvo: ' + e.message); }
   }
   await browser.close();
   const fallas = Object.values(resultado).reduce((n, g) => n + g.fallas, 0);
-  console.log(JSON.stringify({ nucleo: resultado.nucleo, modulos: { accesible: resultado.accesible, efectos: resultado.efectos, musica: resultado.musica }, fallas }));
+  console.log(JSON.stringify({ nucleo: resultado.nucleo, modulos: { accesible: resultado.accesible, efectos: resultado.efectos, musica: resultado.musica, marca: resultado.marca }, fallas }));
   process.exit(fallas ? 1 : 0);
 })().catch((e) => { console.error('FALLO GENERAL', e); process.exit(1); });

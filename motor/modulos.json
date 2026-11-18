@@ -5,21 +5,51 @@
       "version": "1.0.0",
       "archivo": "accesible.js",
       "pide": [],
-      "aporta": ["menos movimiento", "alto contraste", "anuncios para lector de pantalla", "botón de accesibilidad"],
+      "aporta": [
+        "menos movimiento",
+        "alto contraste",
+        "anuncios para lector de pantalla",
+        "botón de accesibilidad"
+      ],
       "desde": "2026-11-17"
     },
     "efectos": {
       "version": "1.0.0",
       "archivo": "efectos.js",
-      "pide": ["accesible"],
-      "aporta": ["partículas", "textos flotantes", "sacudida de pantalla", "destellos"],
+      "pide": [
+        "accesible"
+      ],
+      "aporta": [
+        "partículas",
+        "textos flotantes",
+        "sacudida de pantalla",
+        "destellos"
+      ],
       "desde": "2026-11-17"
     },
     "musica": {
       "version": "1.0.0",
       "archivo": "musica.js",
       "pide": [],
-      "aporta": ["música de fondo compuesta por semilla", "cuatro ánimos", "intensidad por capas"],
+      "aporta": [
+        "música de fondo compuesta por semilla",
+        "cuatro ánimos",
+        "intensidad por capas"
+      ],
+      "desde": "2026-11-17"
+    },
+    "marca": {
+      "version": "1.0.0",
+      "archivo": "marca.js",
+      "pide": [
+        "accesible"
+      ],
+      "aporta": [
+        "sello de entrada",
+        "sonido de marca",
+        "distintivo",
+        "emblema en tres colores"
+      ],
       "desde": "2026-11-17"
     }
   }

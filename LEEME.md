@@ -90,13 +90,17 @@ El motor común (`motor/ggx.js`, expuesto como `GGX`) ofrece: `store` (localStor
 
 Cada juego nuevo debe sentirse con más presupuesto que el anterior, y el motor común crece para que eso sea posible sin reescribir nada:
 
-- **Módulos opcionales** (`motor/modulos/`, lista y orden de carga en `motor/modulos.json`): `accesible` (menos movimiento, alto contraste, anuncios para lector de pantalla), `efectos` (partículas, textos flotantes, sacudida, destellos) y `musica` (música de fondo compuesta por semilla, con intensidad por capas). Un juego los declara en `juego.json → motor` y su código los llama con el nombre completo (`GGX.fx…`, `GGX.music…`). El núcleo (`motor/ggx.js`) no cambia: un juego sin `motor` se construye byte por byte como siempre (hay una prueba que lo comprueba).
+- **Módulos opcionales** (`motor/modulos/`, lista y orden de carga en `motor/modulos.json`): `accesible` (menos movimiento, alto contraste, anuncios para lector de pantalla), `efectos` (partículas, textos flotantes, sacudida, destellos), `musica` (música de fondo compuesta por semilla, con intensidad por capas) y `marca` (la Gelatina como insignia: sello de entrada, «blup» y distintivo; ver `marca/guia.md`). Un juego los declara en `juego.json → motor` y su código los llama con el nombre completo (`GGX.fx…`, `GGX.music…`). El núcleo (`motor/ggx.js`) no cambia: un juego sin `motor` se construye byte por byte como siempre (hay una prueba que lo comprueba).
 - **Escalera de calidad** (`motor/escalera.json`): niveles con requisitos medibles (1 Base · 2 Con sonido · 3 Con jugo y accesible · 4 Con música · 5 Con marca). Un módulo solo cuenta si el juego lo declara, su código lo llama y el motor tiene pruebas vigentes de él. `python3 fabrica.py calidad [id|todos]` dice en qué nivel está cada juego y qué le falta.
 - **Piso que solo sube** (`motor/piso.json`): el juego nuevo debe llegar al menos un nivel por encima del mejor ya publicado, sin pasar del techo del motor; si no, la compuerta de publicación lo frena con el motivo. Guerreros Gelatina y Torre Gelatina salieron antes de la escalera: no tienen mínimo, pero no pueden bajar. `ciclo` actualiza el piso desde el libro de publicación.
 - **Pruebas del motor** (`python3 fabrica.py motor probar`): corren el núcleo y cada módulo en un Chromium real y guardan `motor/informe.json`, atado a la huella del código. Si el motor, un módulo o el guion de pruebas cambian y no se vuelven a correr, el informe deja de estar vigente: las pruebas unitarias fallan y ningún juego que use módulos sale.
 - **Cola de mejoras** (`python3 fabrica.py motor`, y sección «Motor» de `PENDIENTE.md`): se calcula sola — pruebas vencidas, juegos por debajo de su nivel, módulos que faltan para el siguiente nivel, pedidos de los juegos (`necesidades_motor`) y, al llegar al techo, la primera idea sin construir de `motor/ideas.json`. Subir una actualización de calidad a un juego ya publicado es también una novedad que anunciar.
 
 Un juego nuevo (`nuevo ID PLANTILLA`) parte con todos los módulos declarados; declararlos no basta para subir de nivel.
+
+## La marca
+
+La gelatina es la insignia del Taller, no solo el tema de un juego: `marca/guia.md` explica la idea, los elementos (emblema en cuatro versiones, sello, «blup», distintivo, firma y voz) y las reglas de uso. El emblema se dibuja una sola vez en `herramientas/marca.py` (`python3 herramientas/marca.py` regenera `marca/*.svg`); el módulo `marca` del motor y el ícono del sitio llevan el mismo dibujo, y una prueba lo verifica.
 
 ## Idiomas
 
