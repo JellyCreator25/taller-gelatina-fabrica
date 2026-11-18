@@ -264,6 +264,39 @@ module.exports = {
       log('  tras recargar el idioma se mantiene (' + ultimo + ') y ?lang=en lo cambia');
       idiomas = langs;
     }
-    return { colocados: azul, reto, accesibilidad, idiomas };
+    // Anuncios (módulo apagado por defecto): con un portal simulado, el botón del cartel de resultado pide UN anuncio entre batallas, el juego espera a que termine
+    // y sigue; la batalla en sí nunca se interrumpe. Sin proveedor (todo lo anterior) los botones ya actuaron como siempre. Va al final: parte de un Reto nuevo.
+    let anuncios = null;
+    if (!video) {
+      await page.click('#mReto');
+      await page.click('button[data-t="caballero"]');
+      await cv.scrollIntoViewIfNeeded();
+      const caja = await cv.boundingBox();
+      await page.mouse.click(caja.x + caja.width * (vertical ? 0.5 : 0.2), caja.y + caja.height * (vertical ? 0.8 : 0.5));
+      await sleep(150);
+      await page.evaluate(() => {
+        window.__reg = [];
+        window.CrazyGames = { SDK: { init: async () => {}, game: { gameplayStart() { window.__reg.push('start'); }, gameplayStop() { window.__reg.push('stop'); } },
+          ad: { requestAd: (tipo, c) => { window.__reg.push(tipo); c.adStarted(); window.__reg.push('pausa:' + document.documentElement.hasAttribute('data-anuncio') + ',nivel:' + window.GuerrerosGelatina.api.state.level);
+            setTimeout(() => c.adFinished(), 250); } } } };
+        window.GGX.ads.configurar({ proveedor: 'crazygames' });
+      });
+      await sleep(150);
+      await page.click('#btnFight');
+      await page.evaluate(() => { window.GuerrerosGelatina.api.state.units.forEach((u) => { if (u.team === 1) u.dead = true; }); });
+      await page.waitForSelector('#bBtns [data-act="next"]', { timeout: 20000 });
+      await page.click('#bBtns [data-act="next"]');
+      await page.waitForFunction(() => window.GuerrerosGelatina.api.state.level === 2, null, { timeout: 5000 });
+      const reg = await page.evaluate(() => window.__reg.slice());
+      assert(reg.filter((x) => x === 'midgame').length === 1, 'se esperaba un solo anuncio entre batallas y el registro dice ' + JSON.stringify(reg));
+      assert(reg.includes('pausa:true,nivel:1'), 'durante el anuncio el juego debía estar en pausa y todavía en el nivel 1: ' + JSON.stringify(reg));
+      assert(reg.indexOf('start') >= 0 && reg.indexOf('stop') > reg.indexOf('start'), 'gameplayStart/gameplayStop no se llamaron en orden: ' + JSON.stringify(reg));
+      assert(reg.indexOf('stop') < reg.indexOf('midgame'), 'el anuncio no debía pedirse antes de que terminara la batalla: ' + JSON.stringify(reg));
+      await page.evaluate(() => { window.GGX.ads.configurar({ proveedor: 'ninguno' }); delete window.CrazyGames; });
+      anuncios = { pedidos: reg.length };
+      log('  anuncio entre batallas con portal simulado: ' + JSON.stringify(reg));
+    }
+
+    return { colocados: azul, reto, accesibilidad, idiomas, anuncios };
   },
 };

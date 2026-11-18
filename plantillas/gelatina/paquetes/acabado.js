@@ -1,6 +1,7 @@
 /* Pack Acabado 1.0.0 · el acabado de Guerreros Gelatina con el motor común: accesibilidad, efectos, música que se compone sola y el sello de la marca.
    Solo usa la API abierta (eventos y api.*) y los módulos del motor (GGX.a11y, GGX.fx, GGX.music, GGX.marca). Si falta alguno de los cuatro, no hace
-   nada y el juego sigue igual. Para quitarlo, borra «acabado» de "paquetes" y los cuatro módulos de "motor" en juego.json. */
+   nada y el juego sigue igual. Con el módulo «anuncios» (opcional) también deja un corte natural para un anuncio entre batallas, pero solo se usa si el
+   juego sale con un proveedor (una versión para portal): sin proveedor no cambia nada. Para quitarlo, borra «acabado» de "paquetes" y los módulos de "motor" en juego.json. */
 (function () {
   'use strict';
   const gg = window.GuerrerosGelatina, GGX = window.GGX;
@@ -107,6 +108,22 @@
           e.stopImmediatePropagation(); e.preventDefault();
           conSello(() => { if (S.phase === 'place') pelear.click(); });
         }, true);
+      }
+      /* ---- Anuncios (módulo opcional, apagado por defecto): un corte natural entre batallas, en el cartel de resultado ---- */
+      if (GGX.ads && GGX.ads.intermedio && GGX.ads.estado) {
+        g.on('battle:start', () => GGX.ads.jugando(true));
+        g.on('battle:end', () => GGX.ads.jugando(false));
+        const cartel = $('bBtns');
+        const momento = { next: 'fin_de_nivel', rematch: 'fin_de_partida', restart: 'fin_de_partida', fresh: 'fin_de_partida' };   // los botones que llevan a otra batalla; ninguno abre un menú
+        let dejarPasar = false;
+        if (cartel) {
+          cartel.addEventListener('click', (e) => {
+            const b = e.target.closest ? e.target.closest('button') : null;
+            if (dejarPasar || !b || !momento[b.dataset.act] || GGX.ads.estado().proveedor === 'ninguno') return;   // sin proveedor el botón actúa como siempre
+            e.stopImmediatePropagation(); e.preventDefault();
+            GGX.ads.intermedio(momento[b.dataset.act], () => { dejarPasar = true; try { b.click(); } finally { dejarPasar = false; } });
+          }, true);
+        }
       }
       const pie = $('packs');
       if (pie && pie.parentNode) {

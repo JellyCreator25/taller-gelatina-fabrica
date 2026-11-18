@@ -92,18 +92,29 @@ class LoQueSeLeInyectaAUnJuego(unittest.TestCase):
 
 
 class LosJuegosRealesSalenComoSiempre(unittest.TestCase):
-    def test_solo_compas_tiene_los_ganchos_y_los_publicados_no_cambian(self):
-        self.assertEqual(monetizar.juegos_con_ganchos(RAIZ, fabrica), ['compas-gelatina'])
-        for publicado in ('guerreros-gelatina', 'torre-gelatina'):
-            self.assertNotIn('anuncios', ficha(publicado).get('motor', []), '%s ya está publicado: sumarle anuncios es una versión nueva y la aprueba el dueño' % publicado)
+    def test_los_ganchos_estan_en_compas_y_en_la_actualizacion_de_guerreros(self):
+        self.assertEqual(monetizar.juegos_con_ganchos(RAIZ, fabrica), ['compas-gelatina', 'guerreros-gelatina'])
+
+    def test_un_juego_publicado_solo_suma_anuncios_en_una_version_nueva(self):
+        import re
+        libro = [json.loads(l) for l in (RAIZ / 'publicacion' / 'libro.jsonl').read_text(encoding='utf-8').splitlines() if l.strip()]
+        for juego in ('guerreros-gelatina', 'torre-gelatina'):
+            if 'anuncios' not in ficha(juego).get('motor', []):
+                continue
+            publicadas = [tuple(int(x) for x in m.group(1).split('.')) for e in libro
+                          for m in [re.search(r'(?:^|:)%s:(\d+\.\d+\.\d+)(?::|$)' % re.escape(juego), str(e.get('accion', '')))] if m]
+            self.assertTrue(publicadas, '%s no tiene una versión publicada en el libro con la que comparar' % juego)
+            self.assertGreater(tuple(int(x) for x in ficha(juego)['version'].split('.')), max(publicadas),
+                               '%s ya está publicado: sumarle anuncios es una versión nueva y la aprueba el dueño' % juego)
 
     def test_con_la_politica_apagada_el_juego_no_lleva_configuracion_de_anuncios(self):
-        html = (RAIZ / 'salida' / 'compas-gelatina' / 'index.html').read_text(encoding='utf-8')
-        # assertFalse(x in html) y no assertNotIn: si falla, no vuelca 200 KB de HTML en pantalla
-        self.assertFalse('"anuncios":' in html, 'no debe llevar configuración de anuncios con la política apagada')
-        self.assertFalse('googlesyndication' in html, 'no debe llevar la dirección del script de AdSense')
-        self.assertFalse('sdk.crazygames.com' in html, 'no debe llevar la dirección del SDK de ningún portal')
-        self.assertTrue('id="mod-anuncios"' in html, 'el módulo va dentro, apagado')
+        for juego in ('compas-gelatina', 'guerreros-gelatina'):
+            html = (RAIZ / 'salida' / juego / 'index.html').read_text(encoding='utf-8')
+            # assertFalse(x in html) y no assertNotIn: si falla, no vuelca 200 KB de HTML en pantalla
+            self.assertFalse('"anuncios":' in html, juego + ': no debe llevar configuración de anuncios con la política apagada')
+            self.assertFalse('googlesyndication' in html, juego + ': no debe llevar la dirección del script de AdSense')
+            self.assertFalse('sdk.crazygames.com' in html, juego + ': no debe llevar la dirección del SDK de ningún portal')
+            self.assertTrue('id="mod-anuncios"' in html, juego + ': el módulo va dentro, apagado')
 
 
 class QueFalta(unittest.TestCase):
@@ -169,7 +180,7 @@ class VersionesParaPortales(unittest.TestCase):
 
     def test_sin_ganchos_no_hay_version(self):
         with self.assertRaises(monetizar.ErrorMonetizacion):
-            monetizar.variantes(RAIZ, fabrica, 'guerreros-gelatina')
+            monetizar.variantes(RAIZ, fabrica, 'torre-gelatina')
 
     def test_poki_no_se_arma_hasta_tener_su_documentacion(self):
         with self.assertRaises(monetizar.ErrorMonetizacion):

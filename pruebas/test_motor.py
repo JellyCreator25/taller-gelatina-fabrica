@@ -95,7 +95,7 @@ class PruebasDelMotorReal(unittest.TestCase):
                 html = (RAIZ / 'salida' / i / 'index.html').read_text(encoding='utf-8')
                 if i == 'guerreros-gelatina' and real(i)['version'] != '1.4.0':
                     # Guerreros 1.5.0: actualización aprobada por Max, se publica después de Compás con su propio plan
-                    self.assertEqual(sorted(real(i)['motor']), ['accesible', 'efectos', 'marca', 'musica'])
+                    self.assertEqual(sorted(real(i)['motor']), ['accesible', 'anuncios', 'efectos', 'marca', 'musica'])   # «anuncios» va apagado: sin proveedor no cambia nada
                     self.assertIn('id="mod-marca"', html)
                 else:
                     self.assertFalse(real(i).get('motor'), 'un juego ya publicado no cambia por que el motor crezca')

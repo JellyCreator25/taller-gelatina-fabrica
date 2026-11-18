@@ -5,9 +5,9 @@ ok     · el motor común (GGX) está cargado
 ok     · tipografías incrustadas: 4 en uso, 0 con error
 ok     · sin desplazamiento horizontal al abrir (0 px de más)
   sello al primer ¡Pelear! y música «aventura» a 104 bpm
-  batalla terminada en 10.6 s reales · ¡Ganó el Azul!
-  sonidos disparados: {"click":22,"pop":16,"error":1,"horn":1,"hit":74,"boom":12,"zap":8,"hurt":27,"land":3,"merge":7,"heal":1,"whoosh":3,"win":1}
-  al ganar: 82 efectos vivos y anuncio «¡Nivel 1 superado!. Te quedó 1 guerrero. Mejor nivel: 1. En el nivel 2 recibes +150 de oro: tendrás 1,150.»
+  batalla terminada en 7.8 s reales · ¡Ganó el Azul!
+  sonidos disparados: {"click":22,"pop":16,"error":1,"horn":1,"hit":61,"boom":7,"hurt":23,"land":4,"zap":8,"heal":2,"merge":4,"whoosh":2,"win":1}
+  al ganar: 82 efectos vivos y anuncio «¡Nivel 1 superado! Te quedó 1 guerrero. Mejor nivel: 1. En el nivel 2 recibes +150 de oro: tendrás 1,150.»
   oro del jugador en Reto: nivel 1 → 1000, nivel 2 → 1150 (oro libre 1000)
   accesibilidad: marca de bando en alto contraste; con menos movimiento sacudida 0 y partículas 0 (normal: 12 y 10)
   idiomas ofrecidos: Español · English · 中文
@@ -16,7 +16,8 @@ ok     · sin desplazamiento horizontal al abrir (0 px de más)
   modo Libre revisado en es, en, zh
   frases de las 8 Leyendas revisadas en es, en, zh
   tras recargar el idioma se mantiene (zh) y ?lang=en lo cambia
-ok     · escenario completo {"colocados":16,"reto":{"nivel1":1000,"nivel2":1150,"libre_nivel2":1000},"accesibilidad":{"marca_alto_contraste":true,"quieto":{"sac":0,"creadas":0},"normal":{"sac":12,"creadas":10}},"idiomas":["es","en","zh"]}
+  anuncio entre batallas con portal simulado: ["start","stop","midgame","pausa:true,nivel:1"]
+ok     · escenario completo {"colocados":16,"reto":{"nivel1":1000,"nivel2":1150,"libre_nivel2":1000},"accesibilidad":{"marca_alto_contraste":true,"quieto":{"sac":0,"creadas":0},"normal":{"sac":12,"creadas":10}},"idiomas":["es","en","zh"],"anuncios":{"pedidos":4}}
 ok     · sin desplazamiento horizontal al terminar (0 px de más)
 ok     · sin errores de consola ni de página
 ok     · sin conexiones externas
@@ -25,9 +26,9 @@ ok     · el motor común (GGX) está cargado
 ok     · tipografías incrustadas: 4 en uso, 0 con error
 ok     · sin desplazamiento horizontal al abrir (0 px de más)
   sello al primer ¡Pelear! y música «aventura» a 104 bpm
-  batalla terminada en 8.8 s reales · ¡Ganó el Azul!
-  sonidos disparados: {"click":19,"pop":13,"error":1,"horn":1,"hit":68,"boom":13,"land":2,"zap":14,"hurt":20,"heal":3,"merge":3,"win":1}
-  al ganar: 82 efectos vivos y anuncio «¡Nivel 1 superado!. Te quedó 1 guerrero. Mejor nivel: 1. En el nivel 2 recibes +150 de oro: tendrás 1,150.»
+  batalla terminada en 7.8 s reales · ¡Ganó el Rojo!
+  sonidos disparados: {"click":19,"pop":13,"error":1,"horn":1,"hit":60,"boom":6,"land":3,"zap":5,"merge":4,"hurt":22,"heal":2,"win":1}
+  al ganar: 82 efectos vivos y anuncio «¡Nivel 1 superado! Te quedó 1 guerrero. Mejor nivel: 1. En el nivel 2 recibes +150 de oro: tendrás 1,150.»
   oro del jugador en Reto: nivel 1 → 1000, nivel 2 → 1150 (oro libre 1000)
   accesibilidad: marca de bando en alto contraste; con menos movimiento sacudida 0 y partículas 0 (normal: 12 y 10)
   idiomas ofrecidos: Español · English · 中文
@@ -36,10 +37,20 @@ ok     · sin desplazamiento horizontal al abrir (0 px de más)
   modo Libre revisado en es, en, zh
   frases de las 8 Leyendas revisadas en es, en, zh
   tras recargar el idioma se mantiene (zh) y ?lang=en lo cambia
-ok     · escenario completo {"colocados":13,"reto":{"nivel1":1000,"nivel2":1150,"libre_nivel2":1000},"accesibilidad":{"marca_alto_contraste":true,"quieto":{"sac":0,"creadas":0},"normal":{"sac":12,"creadas":10}},"idiomas":["es","en","zh"]}
+  anuncio entre batallas con portal simulado: ["start","stop","midgame","pausa:true,nivel:1"]
+ok     · escenario completo {"colocados":13,"reto":{"nivel1":1000,"nivel2":1150,"libre_nivel2":1000},"accesibilidad":{"marca_alto_contraste":true,"quieto":{"sac":0,"creadas":0},"normal":{"sac":12,"creadas":10}},"idiomas":["es","en","zh"],"anuncios":{"pedidos":4}}
 ok     · sin desplazamiento horizontal al terminar (0 px de más)
 ok     · sin errores de consola ni de página
 ok     · sin conexiones externas
-— (modo rápido: sin portada ni clips)
+— portada
+ok     · portada.png generada (1260×1000)
+— clip principal 960×600
+  sello al primer ¡Pelear! y música «aventura» a 104 bpm
+  sonidos disparados: {"click":20,"pop":16,"horn":1,"hit":75,"boom":13,"zap":12,"merge":5,"land":4,"hurt":21,"heal":1,"whoosh":1}
+ok     · clip.mp4 generado (26.0 s, 1550 KB) y clip.gif (1955 KB)
+— clip vertical (Shorts, Reels, TikTok)
+  sello al primer ¡Pelear! y música «aventura» a 104 bpm
+  sonidos disparados: {"click":17,"pop":13,"error":1,"horn":1,"hit":75,"boom":16,"land":2,"zap":8,"merge":5,"hurt":18,"whoosh":1}
+ok     · clip-vertical.mp4 generado (24.4 s, 1306 KB)
 
 Todo en orden
