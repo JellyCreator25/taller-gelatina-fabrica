@@ -1,14 +1,21 @@
 {
   "id": "guerreros-gelatina",
   "plantilla": "gelatina",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "idiomas": [
     "es",
     "en",
     "zh"
   ],
   "paquetes": [
-    "audio"
+    "audio",
+    "acabado"
+  ],
+  "motor": [
+    "accesible",
+    "efectos",
+    "musica",
+    "marca"
   ],
   "fuentes": [
     "Fredoka",
@@ -59,6 +66,11 @@
       "parches_error": "Parches: {ok} ({mal} con error)",
       "pack_base": "Base",
       "pack_audio": "Audio",
+      "pack_acabado": "Acabado",
+      "a11y_inicio": "¡Comienza la batalla!",
+      "fx_pelea": "¡A pelear!",
+      "fx_nivel": "¡Nivel {n}!",
+      "fx_record": "¡Récord! Nivel {n}",
       "pack_leyendas": "Pack Leyendas",
       "pista_poner": "Pon al menos un guerrero en cada bando.",
       "pista_reto": "Toca o arrastra en tu zona azul para colocar guerreros. Cuando estés listo, pulsa ¡Pelear!",
@@ -152,6 +164,11 @@
       "parches_error": "Patches: {ok} ({mal} with errors)",
       "pack_base": "Base",
       "pack_audio": "Audio",
+      "pack_acabado": "Finish",
+      "a11y_inicio": "The battle begins!",
+      "fx_pelea": "Fight!",
+      "fx_nivel": "Level {n}!",
+      "fx_record": "New best! Level {n}",
       "pack_leyendas": "Legends Pack",
       "pista_poner": "Place at least one warrior on each side.",
       "pista_reto": "Tap or drag inside your blue zone to place warriors. When you are ready, press Fight!",
@@ -245,6 +262,11 @@
       "parches_error": "补丁：{ok}（{mal} 个出错）",
       "pack_base": "基础",
       "pack_audio": "音效",
+      "pack_acabado": "完善",
+      "a11y_inicio": "战斗开始！",
+      "fx_pelea": "开战！",
+      "fx_nivel": "第 {n} 关！",
+      "fx_record": "新纪录！第 {n} 关",
       "pack_leyendas": "传说包",
       "pista_poner": "每一方至少要放一名战士。",
       "pista_reto": "在你的蓝色区域点击或拖动来放置战士。准备好后，点“开战！”。",
@@ -347,19 +369,19 @@
       "titulo": "Guerreros Gelatina",
       "corta": "Coloca guerreros de gelatina, pulsa ¡Pelear! y mira el caos. Con 8 Leyendas de la mitología y el folclor, cada una con su poder.",
       "controles": "Elige un guerrero en la bandeja, toca o haz clic en tu zona del campo para colocarlo y pulsa ¡Pelear!. Durante la batalla puedes pausar, cambiar la velocidad o detenerla.",
-      "larga": "Un simulador de batallas de gelatina que se juega directo en el navegador, sin descargas ni registro. Coloca a tus guerreros, pulsa ¡Pelear! y mira cómo se desata el caos.\n\n**Qué hay dentro**\n\n- 6 guerreros base: Campesino, Arquero, Caballero, Bruja, Pollo bomba y Gigante.\n- 8 Leyendas con poder propio, tomadas de la mitología, el folclor y la literatura clásica: Zeus (tormenta de rayos), Medusa (petrifica a los enemigos), Anubis (devuelve a la vida a los recién caídos), Hércules (pisotón de área y furia), Merlín (convierte a los enemigos más fuertes en ranas), Robin Hood (flechas triples y tiro certero), La Llorona (su lamento aterra a los enemigos) y Drácula (se cura con la sangre que drena).\n- Modo Reto: niveles con rivales cada vez más fuertes; en cada nivel recibes más oro (+150) para sumar guerreros, y se guarda tu mejor nivel.\n- Modo Libre: arma los dos bandos con 1,000, 2,500 o 5,000 de oro y deja que se enfrenten.\n- Funciona en celular y en computadora, con tema claro u oscuro y sonido que puedes silenciar.\n- En español, inglés y chino, con selector de idioma.\n\n**Cómo se juega**\n\nElige un guerrero en la bandeja, toca o haz clic en tu zona del campo para colocarlo (cada guerrero cuesta oro) y pulsa ¡Pelear!. Puedes pausar y cambiar la velocidad durante la batalla.\n\n**Hecho para crecer**\n\nEl juego tiene una API abierta: se le pueden añadir paquetes de unidades, poderes y parches con un script extra."
+      "larga": "Un simulador de batallas de gelatina que se juega directo en el navegador, sin descargas ni registro. Coloca a tus guerreros, pulsa ¡Pelear! y mira cómo se desata el caos.\n\n**Qué hay dentro**\n\n- 6 guerreros base: Campesino, Arquero, Caballero, Bruja, Pollo bomba y Gigante.\n- 8 Leyendas con poder propio, tomadas de la mitología, el folclor y la literatura clásica: Zeus (tormenta de rayos), Medusa (petrifica a los enemigos), Anubis (devuelve a la vida a los recién caídos), Hércules (pisotón de área y furia), Merlín (convierte a los enemigos más fuertes en ranas), Robin Hood (flechas triples y tiro certero), La Llorona (su lamento aterra a los enemigos) y Drácula (se cura con la sangre que drena).\n- Modo Reto: niveles con rivales cada vez más fuertes; en cada nivel recibes más oro (+150) para sumar guerreros, y se guarda tu mejor nivel.\n- Modo Libre: arma los dos bandos con 1,000, 2,500 o 5,000 de oro y deja que se enfrenten.\n- Funciona en celular y en computadora, con tema claro u oscuro, sonido y música que puedes silenciar, y con opciones de menos movimiento y alto contraste.\n- En español, inglés y chino, con selector de idioma.\n\n**Cómo se juega**\n\nElige un guerrero en la bandeja, toca o haz clic en tu zona del campo para colocarlo (cada guerrero cuesta oro) y pulsa ¡Pelear!. Puedes pausar y cambiar la velocidad durante la batalla.\n\n**Hecho para crecer**\n\nEl juego tiene una API abierta: se le pueden añadir paquetes de unidades, poderes y parches con un script extra."
     },
     "en": {
       "titulo": "Jelly Warriors",
       "corta": "Place jelly warriors, press Fight! and watch the chaos. With 8 Legends from mythology and folklore, each with its own power.",
       "controles": "Pick a warrior from the tray, tap or click your zone of the field to place it, then press Fight!. During the battle you can pause, change the speed or stop it.",
-      "larga": "A jelly battle simulator that plays right in your browser, with no downloads or sign-up. Place your warriors, press Fight! and watch the chaos break loose.\n\n**What is inside**\n\n- 6 base warriors: Peasant, Archer, Knight, Witch, Bomb Chicken and Giant.\n- 8 Legends with powers of their own, drawn from mythology, folklore and classic literature: Zeus (lightning storm), Medusa (turns enemies to stone), Anubis (brings the recently fallen back to life), Hercules (area stomp and rage), Merlin (turns the strongest enemies into frogs), Robin Hood (triple arrows and a sure shot), La Llorona (her wail terrifies enemies) and Dracula (heals on the blood he drains).\n- Challenge mode: levels with ever stronger rivals; each level gives you more gold (+150) to add warriors, and your best level is saved.\n- Sandbox mode: build both sides with 1,000, 2,500 or 5,000 gold and let them clash.\n- Plays on phones and computers, with a light or dark theme and sound you can mute.\n- In Spanish, English and Chinese, with a language selector.\n\n**How to play**\n\nPick a warrior from the tray, tap or click your zone of the field to place it (every warrior costs gold) and press Fight!. You can pause and change the speed during the battle.\n\n**Built to grow**\n\nThe game has an open API: unit packs, powers and patches can be added with one extra script."
+      "larga": "A jelly battle simulator that plays right in your browser, with no downloads or sign-up. Place your warriors, press Fight! and watch the chaos break loose.\n\n**What is inside**\n\n- 6 base warriors: Peasant, Archer, Knight, Witch, Bomb Chicken and Giant.\n- 8 Legends with powers of their own, drawn from mythology, folklore and classic literature: Zeus (lightning storm), Medusa (turns enemies to stone), Anubis (brings the recently fallen back to life), Hercules (area stomp and rage), Merlin (turns the strongest enemies into frogs), Robin Hood (triple arrows and a sure shot), La Llorona (her wail terrifies enemies) and Dracula (heals on the blood he drains).\n- Challenge mode: levels with ever stronger rivals; each level gives you more gold (+150) to add warriors, and your best level is saved.\n- Sandbox mode: build both sides with 1,000, 2,500 or 5,000 gold and let them clash.\n- Plays on phones and computers, with a light or dark theme, sound and music you can mute, and options for less motion and high contrast.\n- In Spanish, English and Chinese, with a language selector.\n\n**How to play**\n\nPick a warrior from the tray, tap or click your zone of the field to place it (every warrior costs gold) and press Fight!. You can pause and change the speed during the battle.\n\n**Built to grow**\n\nThe game has an open API: unit packs, powers and patches can be added with one extra script."
     },
     "zh": {
       "titulo": "果冻战士",
       "corta": "摆好果冻战士，点“开战！”，看混战爆发。内含 8 位取材于神话和民间传说的传说人物，各有专属能力。",
       "controles": "从下方列表里选一名战士，点击或单击你那一侧的战场来放置，然后点“开战！”。战斗中可以暂停、调速或停止。",
-      "larga": "一款可以直接在浏览器里玩的果冻战斗模拟器，无需下载，也无需注册。摆好你的战士，点“开战！”，看混战爆发。\n\n**游戏内容**\n\n- 6 名基础战士：农夫、弓箭手、骑士、女巫、炸弹鸡和巨人。\n- 8 位拥有专属能力的传说人物，取材于神话、民间传说和经典文学：宙斯（雷暴）、美杜莎（把敌人变成石头）、阿努比斯（让刚倒下的盟友复活）、赫拉克勒斯（范围践踏和狂怒）、梅林（把最强的敌人变成青蛙）、罗宾汉（三连箭和精准一击）、哭泣女人（哀号让敌人惊恐逃窜）和德古拉（用吸取的血液恢复生命）。\n- 挑战模式：对手一关比一关强；每过一关你会多得金币（+150）来增加战士，并保存你的最高关卡。\n- 自由模式：给双方各 1,000、2,500 或 5,000 金币来组建队伍，然后让它们对决。\n- 手机和电脑都能玩，支持浅色和深色主题，声音可以静音。\n- 支持西班牙语、英语和中文，可随时切换语言。\n\n**玩法**\n\n从下方列表里选一名战士，点击或单击你那一侧的战场来放置（每名战士都要花金币），然后点“开战！”。战斗中可以暂停和调速。\n\n**为成长而设计**\n\n游戏有开放的 API：只需多加一个脚本，就能添加新的战士包、能力和补丁。"
+      "larga": "一款可以直接在浏览器里玩的果冻战斗模拟器，无需下载，也无需注册。摆好你的战士，点“开战！”，看混战爆发。\n\n**游戏内容**\n\n- 6 名基础战士：农夫、弓箭手、骑士、女巫、炸弹鸡和巨人。\n- 8 位拥有专属能力的传说人物，取材于神话、民间传说和经典文学：宙斯（雷暴）、美杜莎（把敌人变成石头）、阿努比斯（让刚倒下的盟友复活）、赫拉克勒斯（范围践踏和狂怒）、梅林（把最强的敌人变成青蛙）、罗宾汉（三连箭和精准一击）、哭泣女人（哀号让敌人惊恐逃窜）和德古拉（用吸取的血液恢复生命）。\n- 挑战模式：对手一关比一关强；每过一关你会多得金币（+150）来增加战士，并保存你的最高关卡。\n- 自由模式：给双方各 1,000、2,500 或 5,000 金币来组建队伍，然后让它们对决。\n- 手机和电脑都能玩，支持浅色和深色主题，声音和音乐可以静音，还有减少动效和高对比度选项。\n- 支持西班牙语、英语和中文，可随时切换语言。\n\n**玩法**\n\n从下方列表里选一名战士，点击或单击你那一侧的战场来放置（每名战士都要花金币），然后点“开战！”。战斗中可以暂停和调速。\n\n**为成长而设计**\n\n游戏有开放的 API：只需多加一个脚本，就能添加新的战士包、能力和补丁。"
     }
   },
   "difusion": {
@@ -434,10 +456,12 @@
       "Pidió que el juego mejorara a sus referencias («siempre el punto deberá ser un upgrade») e incluyera personajes célebres con poderes: de ahí las 8 Leyendas.",
       "Pidió dejar el código abierto para poder añadir DLC y parchar con facilidad: de ahí la API abierta y los paquetes.",
       "Pidió ver cómo se veía el juego durante las pruebas, para seguir el avance.",
-      "Pidió pensar en monetizarlo y construir una fábrica que genere y prepare juegos; eligió «varios géneros» y que Claude actúe como creador y distribuidor, con su intervención al mínimo."
+      "Pidió pensar en monetizarlo y construir una fábrica que genere y prepare juegos; eligió «varios géneros» y que Claude actúe como creador y distribuidor, con su intervención al mínimo.",
+      "El 18 de noviembre de 2026 aprobó una actualización de calidad (sello de marca, efectos, música y accesibilidad), para prepararla ya y publicarla después del lanzamiento de Compás, con su aprobación del plan."
     ],
     "decisiones_claude": [
-      "El diseño concreto de cada Leyenda y de su poder, el balance, el estilo visual de la gelatina, el sonido sintetizado y las pruebas."
+      "El diseño concreto de cada Leyenda y de su poder, el balance, el estilo visual de la gelatina, el sonido sintetizado y las pruebas.",
+      "En la versión 1.5.0: la música (ánimo «aventura», más intensa con la batalla reñida), los efectos, que el sello de la marca salga al primer ¡Pelear! de la visita, y la marca de bando por forma en alto contraste."
     ]
   },
   "prueba": {
@@ -467,6 +491,12 @@
       "es": "Disponible en español, inglés y chino. Incluye 6 guerreros base, 8 Leyendas con poderes propios, un modo Reto con niveles (cada nivel te da más oro para comprar más guerreros) y un modo Libre para armar los dos bandos. El sonido se puede silenciar.",
       "en": "Available in Spanish, English and Chinese. Includes 6 base warriors, 8 Legends with their own powers, a Challenge mode with levels (each level gives you more gold to buy more warriors) and a Free mode to build both sides. Sound can be muted.",
       "zh": "提供西班牙语、英语和中文。包含 6 名基础战士、8 位带专属能力的传说人物、带关卡的挑战模式（每过一关都会多给金币，可以买更多战士）和可以自己组队的自由模式。声音可以静音。"
+    },
+    {
+      "version": "1.5.0",
+      "es": "Acabado nuevo: música que se compone sola y se pone más intensa cuanto más reñida va la batalla, chispas y confeti en los golpes y las victorias, y el sello de la Gelatina al abrir tu primera batalla de la visita. Ahora hay un botón de accesibilidad con menos movimiento y alto contraste (con alto contraste, los bandos también se distinguen por su forma), y el lector de pantalla anuncia el inicio y el resultado de cada batalla. Los guerreros, los poderes y el balance no cambian.",
+      "en": "New finish: music that composes itself and gets more intense the closer the battle is, sparks and confetti on hits and wins, and the Gelatina seal when you open your first battle of the visit. There is now an accessibility button with less motion and high contrast (with high contrast, the sides are also told apart by shape), and screen readers announce the start and the result of each battle. Warriors, powers and balance are unchanged.",
+      "zh": "全新的收尾打磨：会自己谱成、战况越胶着越激烈的音乐，命中和获胜时的火花与彩纸，以及每次访问第一场战斗开始时的果冻徽章。新增无障碍按钮，可选减少动效和高对比度（高对比度下，双方还会用形状区分），读屏软件会播报每场战斗的开始和结果。战士、能力和平衡都没有改变。"
     }
   ]
 }

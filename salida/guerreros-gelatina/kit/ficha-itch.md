@@ -1,4 +1,4 @@
-# Ficha de itch.io · Guerreros Gelatina (v1.4.0)
+# Ficha de itch.io · Guerreros Gelatina (v1.5.0)
 
 Se copia y pega en «Edit game». Los ajustes salen de la documentación de itch.io (revísalos si su panel cambió).
 
@@ -49,7 +49,7 @@ Un simulador de batallas de gelatina que se juega directo en el navegador, sin d
 - 8 Leyendas con poder propio, tomadas de la mitología, el folclor y la literatura clásica: Zeus (tormenta de rayos), Medusa (petrifica a los enemigos), Anubis (devuelve a la vida a los recién caídos), Hércules (pisotón de área y furia), Merlín (convierte a los enemigos más fuertes en ranas), Robin Hood (flechas triples y tiro certero), La Llorona (su lamento aterra a los enemigos) y Drácula (se cura con la sangre que drena).
 - Modo Reto: niveles con rivales cada vez más fuertes; en cada nivel recibes más oro (+150) para sumar guerreros, y se guarda tu mejor nivel.
 - Modo Libre: arma los dos bandos con 1,000, 2,500 o 5,000 de oro y deja que se enfrenten.
-- Funciona en celular y en computadora, con tema claro u oscuro y sonido que puedes silenciar.
+- Funciona en celular y en computadora, con tema claro u oscuro, sonido y música que puedes silenciar, y con opciones de menos movimiento y alto contraste.
 - En español, inglés y chino, con selector de idioma.
 
 **Cómo se juega**
@@ -82,7 +82,7 @@ A jelly battle simulator that plays right in your browser, with no downloads or 
 - 8 Legends with powers of their own, drawn from mythology, folklore and classic literature: Zeus (lightning storm), Medusa (turns enemies to stone), Anubis (brings the recently fallen back to life), Hercules (area stomp and rage), Merlin (turns the strongest enemies into frogs), Robin Hood (triple arrows and a sure shot), La Llorona (her wail terrifies enemies) and Dracula (heals on the blood he drains).
 - Challenge mode: levels with ever stronger rivals; each level gives you more gold (+150) to add warriors, and your best level is saved.
 - Sandbox mode: build both sides with 1,000, 2,500 or 5,000 gold and let them clash.
-- Plays on phones and computers, with a light or dark theme and sound you can mute.
+- Plays on phones and computers, with a light or dark theme, sound and music you can mute, and options for less motion and high contrast.
 - In Spanish, English and Chinese, with a language selector.
 
 **How to play**
@@ -115,7 +115,7 @@ Made with the help of AI (code, graphics, text and sound).
 - 8 位拥有专属能力的传说人物，取材于神话、民间传说和经典文学：宙斯（雷暴）、美杜莎（把敌人变成石头）、阿努比斯（让刚倒下的盟友复活）、赫拉克勒斯（范围践踏和狂怒）、梅林（把最强的敌人变成青蛙）、罗宾汉（三连箭和精准一击）、哭泣女人（哀号让敌人惊恐逃窜）和德古拉（用吸取的血液恢复生命）。
 - 挑战模式：对手一关比一关强；每过一关你会多得金币（+150）来增加战士，并保存你的最高关卡。
 - 自由模式：给双方各 1,000、2,500 或 5,000 金币来组建队伍，然后让它们对决。
-- 手机和电脑都能玩，支持浅色和深色主题，声音可以静音。
+- 手机和电脑都能玩，支持浅色和深色主题，声音和音乐可以静音，还有减少动效和高对比度选项。
 - 支持西班牙语、英语和中文，可随时切换语言。
 
 **玩法**

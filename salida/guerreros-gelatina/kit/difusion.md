@@ -1,4 +1,4 @@
-# Difusión · Guerreros Gelatina (v1.4.0)
+# Difusión · Guerreros Gelatina (v1.5.0)
 
 Qué es: el plan para que este juego llegue a la gente. Trae las reglas de cada canal tal como las leí el 12 de noviembre de 2026 en sus páginas oficiales, el texto que corresponde a cada uno, un calendario y un banco de respuestas. Nada de esto publica por sí solo: lo público lleva tu «sí» (ver `plan-lanzamiento.md`).
 

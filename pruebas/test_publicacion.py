@@ -36,6 +36,12 @@ SECRETOS = {
 SITIO_URL = 'https://taller-gelatina.pages.dev'
 TODOS = ['sitio-propio', 'indexnow', 'bluesky', 'mastodon', 'telegram-canal', 'discord-webhook', 'youtube-api', 'itch-pagina']
 JUEGO = 'guerreros-gelatina'
+VERSION_JUEGO = json.loads((RAIZ / 'juegos' / JUEGO / 'juego.json').read_text(encoding='utf-8'))['version']   # la versión de la ficha hoy (las pruebas no la suponen)
+
+
+def siguiente_parche(version):
+    *resto, ultimo = version.split('.')
+    return '.'.join(resto + [str(int(ultimo) + 1)])
 PLANTILLA_PROYECTO = None
 
 
@@ -331,7 +337,7 @@ class PruebasPlan(Base):
         self.assertTrue(ok, informe)
         pagina = self.p.raiz / 'salida' / JUEGO / 'index.html'
         pagina.write_text(pagina.read_text(encoding='utf-8') + '\n<!-- parche -->\n', encoding='utf-8')
-        self.p.editar('juegos/%s/juego.json' % JUEGO, lambda s: s.update(version='1.5.0'))
+        self.p.editar('juegos/%s/juego.json' % JUEGO, lambda s: s.update(version=siguiente_parche(s['version'])))
         self.p.regenerar_sitio()
         ctx, plan, problemas = self.p.plan()
         self.assertEqual((ctx.tipo, problemas), ('parche', []))
@@ -761,7 +767,7 @@ class PruebasServicios(Base):
         a = butler[0]['argv']
         self.assertEqual(a[:2], ['butler', 'push'])
         self.assertTrue(a[2].endswith('guerreros-gelatina-web.zip'))
-        self.assertEqual(a[3:], ['taller/guerreros-gelatina:html5', '--userversion', '1.4.0'])
+        self.assertEqual(a[3:], ['taller/guerreros-gelatina:html5', '--userversion', VERSION_JUEGO])
         self.assertEqual(butler[0]['env']['BUTLER_API_KEY'], SECRETOS['BUTLER_API_KEY'])
 
     def test_itch_sin_destino_es_problema_del_plan(self):
@@ -1261,7 +1267,7 @@ class PruebasCiclo(Base):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         texto = (self.p.raiz / 'publicacion' / 'PENDIENTE.md').read_text(encoding='utf-8')
         self.assertIn('Hay envíos en duda', texto)
-        self.assertIn('python3 fabrica.py resolver %s:1.4.0:bluesky:post salio|no-salio' % JUEGO, texto)
+        self.assertIn('python3 fabrica.py resolver %s:%s:bluesky:post salio|no-salio' % (JUEGO, VERSION_JUEGO), texto)
 
 
 class PruebasCoherencia(unittest.TestCase):
