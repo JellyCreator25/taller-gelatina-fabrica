@@ -45,7 +45,7 @@ python3 fabrica.py rumbo [--detalle]      # qué construir después según las m
 python3 fabrica.py publicar ID            # muestra el plan, la huella y las compuertas; NO publica nada
 python3 fabrica.py publicar ID --ejecutar --aprobar HUELLA   # publica exactamente lo que esa huella cubre
 python3 fabrica.py resolver ACCION salio|no-salio            # anota qué pasó con un envío que quedó en duda
-python3 fabrica.py configurar bluesky-bot|mastodon-bot [--ejecutar]   # marca la cuenta como bot (una sola vez)
+python3 fabrica.py configurar bluesky-bot|bluesky-perfil|mastodon-bot [--ejecutar]   # marca la cuenta como bot; bluesky-perfil pone bio, nombre, avatar y banner
 python3 fabrica.py ciclo [--probar]       # el latido semanal: reconstruye, revisa y escribe publicacion/PENDIENTE.md (incluye la recomendación de rumbo)
 python3 -I -m unittest discover -s pruebas   # 162 pruebas de la fábrica (texto, plan, aprobación, compuertas, ritmo, libro, sitio, páginas de difusión, métricas, importador de Cloudflare, rumbo)
 node herramientas/probar.js <id> --rapido # solo las pruebas funcionales (sin portada ni clips)
