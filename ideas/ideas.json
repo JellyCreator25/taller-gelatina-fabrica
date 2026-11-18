@@ -97,6 +97,22 @@
       "costo_estimado": "medio",
       "brief": "Se lanza una gelatina que se aplasta y rebota para llegar a la meta; cada material del nivel la trata distinto.",
       "gancho": "Aprovecha la física blanda que ya tiene el motor, que es lo más propio de la fábrica; el riesgo es parecerse a juegos de lanzamiento conocidos."
+    },
+    {
+      "id": "canales",
+      "titulo": "Canales (trazado de caminos con gelatina)",
+      "mecanica": {
+        "genero": "gestion",
+        "verbo": "conectar",
+        "objetivo": "sobrevivir",
+        "entrada": ["arrastrar"],
+        "progresion": "puntaje-infinito"
+      },
+      "referencias": ["Mini Motorways", "Mini Metro"],
+      "riesgo_estimado": "alto",
+      "costo_estimado": "alto",
+      "brief": "Gelatinas de varios sabores salen de moldes y deben llegar a platos del mismo sabor por canales que dibuja el jugador; con los días aparecen moldes y platos nuevos y se pierde cuando un plato se satura. Cada sabor tiene su forma además de su color, para que se pueda jugar sin distinguir colores.",
+      "gancho": "El giro propio: canales de gelatina que se estiran (su longitud es el recurso), una ciudad que suena (cada entrega toca una nota de la escala y la congestión mete disonancia, con el módulo de música) y un «mapa del día» con semilla por fecha, compartible sin servidor. Sin ese giro es un clon de un juego premiado de un estudio que vigila las copias, y no debe ir a portales. Reglas de diseño (análisis del 18 de noviembre de 2026): nombre sin «Mini», «Motorways» ni «Metro»; estética de mundo gelatina, no cuadros planos sobre un mapa cenital; sin mapas de ciudades reales ni la misma estructura de modos. Max dio su visto bueno al análisis el 18 de noviembre; no se construye hasta que lo pida."
     }
   ]
 }
