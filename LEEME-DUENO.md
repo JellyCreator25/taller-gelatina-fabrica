@@ -126,7 +126,7 @@ Antes de ejecutar, las compuertas se niegan si falta algo: datos de ejemplo en `
 
 El flujo «Ciclo semanal» corre los lunes (o a mano) y deja `publicacion/PENDIENTE.md`: qué juegos están listos para aprobar, cuáles están bloqueados y por qué, y qué construir después. Abre ese archivo y listo. Si GitHub desactiva el flujo por falta de actividad, se reactiva desde *Actions*.
 
-Si quieres que **yo** revise cada semana, dímelo y lo programo como una tarea; en cada corrida solo leería el estado, prepararía lo que toque y te dejaría el plan para aprobar. No aprobaría nada por mí misma.
+Además, **yo** reviso cada lunes (≈13:00, hora de la Ciudad de México) con una tarea programada: leo el estado, compruebo que lo aprobado salió, miro cómo les fue a las publicaciones, preparo el siguiente lote de Bluesky con las tendencias de esa semana, hago un paso de mejora del motor y avanzo el tercer juego (Compás). Te escribo un solo informe con lo que necesita tu decisión. No apruebo nada por mí misma: el lote nuevo queda sin aprobar y tú lo apruebas con su huella. Para pausarla o cambiarla, dímelo.
 
 ## Cómo crece la fábrica (y por qué no son «variantes en serie»)
 
@@ -138,9 +138,15 @@ El camino para crecer es una **plantilla nueva** (otro género), no otra ficha d
 - Un juego solo sale en el sitio cuando su id se agrega a `publicacion/sitio.json → juegos`. Esa línea es la decisión de lanzarlo.
 - Torre Gelatina tiene riesgo alto de parecerse a un juego de fuera: no va a portales, solo a tu sitio (ya está en la lista del sitio, junto a Guerreros).
 
+## El motor que crece solo y la marca
+
+Cada juego nuevo tiene que sentirse mejor que el anterior, y eso lo exige la fábrica, no la buena voluntad: hay una **escalera de calidad** (1 Base, 2 Con sonido, 3 Con jugo y accesible, 4 Con música, 5 Con marca) y un juego nuevo no puede lanzarse si no está al menos un nivel por encima del mejor ya publicado. El motor crece con módulos opcionales (accesibilidad, efectos, música, marca) que se prueban en un navegador real, y una **cola de mejoras** que se calcula sola dice qué sigue. Guerreros y Torre salieron antes de la escalera y no cambian. Detalle: `LEEME.md`, sección «El motor que crece solo».
+
+La **marca** es la Gelatina como insignia (no solo como tema): `marca/guia.md` tiene la idea, los elementos y tres decisiones que te tocan (la promesa, si la Gelatina tiene nombre propio y si sacamos una versión nueva de Guerreros con sello, efectos y música).
+
 ## Publicaciones del calendario
 
-Además de los lanzamientos, preparo publicaciones propias (hoy, una tarjeta por cada Leyenda de Guerreros Gelatina). Tú aprobaste el primer lote viendo cada texto, su imagen y su fecha. Salen solas, una por día como mucho, a las 10:00 de la Ciudad de México, y solo si siguen siendo exactamente lo que aprobaste.
+Además de los lanzamientos, preparo publicaciones propias para Bluesky (hoy, 13: comparaciones, personajes, elige-uno, parodias y más, en la voz de la Gelatina; ver `difusion/voz.md`). Tú aprobaste el lote viendo cada texto, su imagen y su fecha. Cada una se mide a las 24 horas y a los 3 días (likes, reposts, respuestas) para saber qué formatos funcionan. Salen solas, una por día como mucho, a las 10:00 de la Ciudad de México, y solo si siguen siendo exactamente lo que aprobaste.
 
 - **Para frenar una:** dímelo y la quito del calendario, o bórrala desde tu cuenta de Bluesky si ya salió.
 - **Para cambiar una:** cualquier cambio (texto, imagen o fecha) la deja sin aprobar y te la vuelvo a mostrar.
