@@ -29,7 +29,7 @@ Uso:
   python3 fabrica.py publicar ID [--solo canal,canal]     (muestra el plan y las compuertas; no publica nada)
   python3 fabrica.py publicar ID --ejecutar --aprobar HUELLA   (publica EXACTAMENTE lo que esa huella cubre)
   python3 fabrica.py resolver ACCION salio|no-salio       (anota qué pasó con un envío que quedó en duda)
-  python3 fabrica.py calendario [--aprobar HUELLA_DEL_LOTE | --ejecutar]   (publicaciones propias del calendario: se aprueban por lote y salen en su fecha)
+  python3 fabrica.py calendario [--aprobar HUELLA_DEL_LOTE | --ejecutar | --medir]   (publicaciones propias del calendario: se aprueban por lote y salen en su fecha; --medir anota likes, reposts y respuestas)
   python3 fabrica.py configurar bluesky-bot|mastodon-bot [--ejecutar]   (ajuste de una sola vez en la cuenta del bot)
 """
 import base64
@@ -391,12 +391,17 @@ def publicar(juego_id):
 
 
 def calendario_cmd():
-    """calendario | calendario --aprobar HUELLA_DEL_LOTE | calendario --ejecutar"""
+    """calendario | calendario --aprobar HUELLA_DEL_LOTE | calendario --ejecutar | calendario --medir"""
     nucleo, adaptadores = _publicacion()
-    from publicacion import calendario
+    from publicacion import calendario, resultados
     ent = nucleo.Entorno()
     hoy = ent.ahora().date()
     try:
+        if '--medir' in sys.argv:
+            nuevos = resultados.medir(RAIZ, ent.ahora(), ent)
+            print('[resultados] %d medición(es) nueva(s)' % len(nuevos))
+            print('\n'.join(resultados.resumen(RAIZ)))
+            return
         if _opcion('--aprobar'):
             ids = calendario.aprobar(RAIZ, hoy, _opcion('--aprobar'))
             print('[calendario] aprobadas %d publicación(es): %s\nQueda anotado en contenido/aprobaciones.json: súbelo al repositorio para que la tarea diaria lo vea.' % (len(ids), ', '.join(ids)))
@@ -413,6 +418,8 @@ def calendario_cmd():
         print(calendario.mostrar(calendario.estado(RAIZ, hoy)))
     except calendario.ErrorCalendario as e:
         sys.exit('[calendario] ' + str(e))
+    except resultados.ErrorResultados as e:
+        sys.exit('[resultados] ' + str(e))
 
 
 def resolver(accion_id, resultado):
@@ -571,6 +578,13 @@ def ciclo():
     except Exception as e:      # un registro dañado no debe impedir el resto del estado, pero sí quedar a la vista y hacer fallar el ciclo
         errores.append('rumbo: %s' % e)
         L += ['No se pudo calcular el rumbo: %s' % e]
+    L += ['', '## Bluesky: qué ha funcionado', '']
+    try:
+        from publicacion import resultados
+        L += resultados.resumen(RAIZ)
+    except Exception as e:
+        errores.append('resultados: %s' % e)
+        L += ['No se pudieron leer los resultados: %s' % e]
     L += ['', 'Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: %s.' % (', '.join(politica.get('canales', [])) or 'ninguno'), '']
     texto = '\n'.join(L)
     (RAIZ / 'publicacion' / 'PENDIENTE.md').write_text(texto, encoding='utf-8')

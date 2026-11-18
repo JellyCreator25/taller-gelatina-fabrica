@@ -1462,6 +1462,128 @@ class PruebasCalendario(Base):
         entrada = [e for e in self.p.libro() if e['accion'] == 'calendario:hoy:bluesky'][0]
         self.assertEqual((entrada['resultado'], entrada['lanzamiento'], entrada['tipo']), ('ok', False, 'post'))
 
+    # --- resultados: likes, reposts y respuestas de lo ya publicado ---
+
+    API_RES = 'https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts'
+    CREAR = 'https://bsky.social/xrpc/com.atproto.repo.createRecord'
+    URI_LANZAMIENTO = 'at://did:plc:abc123/app.bsky.feed.post/3kpost'
+
+    def preparar_resultados(self):
+        """Cada publicación del calendario recibe su propia dirección, y los contadores públicos salen de self.cont (lo que no esté ahí, «no existe»).
+        El lanzamiento del setUp cumple 24 horas justo hoy: se mide aquí para que las pruebas hablen solo de lo que publican ellas."""
+        from urllib.parse import unquote
+        self.cont = {self.URI_LANZAMIENTO: {'likeCount': 1}}
+        n = [0]
+
+        def crear(url, cab, cuerpo):
+            n[0] += 1
+            return resp(200, {'uri': 'at://did:plc:abc123/app.bsky.feed.post/3kcal%d' % n[0], 'cid': 'bafy'})
+
+        def leer(url, cab, cuerpo):
+            uris = [unquote(x[5:]) for x in url.split('?', 1)[1].split('&')]
+            return resp(200, {'posts': [dict(uri=u, **self.cont[u]) for u in uris if u in self.cont]})
+        self.p.red.al('POST', self.CREAR, crear)
+        self.p.red.al('GET', self.API_RES, leer)
+        self.medir()
+        self.p.red.llamadas.clear()
+
+    def medir(self):
+        from publicacion import resultados
+        return resultados.medir(self.p.raiz, self.p.reloj(), self.p.ent())
+
+    def de_este_post(self, registros, id='uno'):
+        return [r for r in registros if r['accion'] == 'calendario:%s:bluesky' % id]
+
+    def publicar(self, *items):
+        self.escribir(*items)
+        self.aprobar_todo()
+        informe, ok = self.correr()
+        self.assertTrue(ok, informe)
+        return {e['accion']: e['ref'] for e in self.p.libro() if e['accion'].startswith('calendario:')}
+
+    def test_mide_a_las_24_horas_y_a_los_3_dias_y_no_repite(self):
+        from publicacion import resultados
+        self.preparar_resultados()
+        ref = self.publicar(self.item('uno', formato='comparacion'))['calendario:uno:bluesky']
+        self.cont[ref] = {'likeCount': 10, 'repostCount': 2, 'replyCount': 1, 'quoteCount': 1}
+        self.p.reloj.avanzar(hours=23)
+        self.assertEqual(self.de_este_post(self.medir()), [])                      # aún no pasan 24 horas desde que salió
+        self.p.reloj.avanzar(hours=2)
+        (r,) = self.de_este_post(self.medir())
+        self.assertEqual((r['ventana'], r['likes'], r['reposts'], r['respuestas'], r['citas']), (24, 10, 2, 1, 1))
+        self.assertEqual(resultados.puntaje(r), 10 + 3 * 2 + 2 * 1 + 2 * 1)       # el repost pesa más que el like
+        self.assertEqual(self.medir(), [])                                        # no repite la misma ventana
+        self.assertEqual(self.p.red.a('GET', self.API_RES)[-1]['url'].count('uris='), 1)
+        self.cont[ref]['likeCount'] = 30
+        self.p.reloj.avanzar(hours=50)                                            # 75 h desde que salió
+        (r,) = self.de_este_post(self.medir())
+        self.assertEqual((r['ventana'], r['likes']), (72, 30))
+        self.assertEqual([x['ventana'] for x in self.de_este_post(resultados.cargar(self.p.raiz))], [24, 72])
+        self.assertEqual(self.medir(), [])
+
+    def test_un_post_ya_vencido_en_las_dos_ventanas_se_mide_solo_en_la_mas_grande(self):
+        from publicacion import resultados
+        self.preparar_resultados()
+        ref = self.publicar(self.item('uno'))['calendario:uno:bluesky']
+        self.cont[ref] = {'likeCount': 4}
+        self.p.reloj.avanzar(days=5)                                              # nadie midió a tiempo: no se inventa un dato de «las 24 horas»
+        (r,) = self.de_este_post(self.medir())
+        self.assertEqual(r['ventana'], 72)
+        self.assertEqual(self.medir(), [])
+
+    def test_una_publicacion_borrada_se_anota_y_no_rompe_ni_cuenta(self):
+        from publicacion import resultados
+        self.preparar_resultados()
+        self.publicar(self.item('uno'))                                           # sin contadores en self.cont: Bluesky ya no la devuelve
+        self.p.reloj.avanzar(hours=25)
+        (r,) = self.de_este_post(self.medir())
+        self.assertTrue(r['ausente'])
+        self.assertEqual(self.medir(), [])
+        self.assertNotIn('calendario:uno:bluesky', [f['accion'] for f in resultados._filas(self.p.raiz)])   # la borrada no cuenta; el lanzamiento, que sí existe, sí
+
+    def test_si_bluesky_falla_no_se_anota_nada(self):
+        from publicacion import resultados
+        self.preparar_resultados()
+        self.publicar(self.item('uno'))
+        antes = resultados.cargar(self.p.raiz)
+        self.p.reloj.avanzar(hours=25)
+        self.p.red.al('GET', self.API_RES, resp(500, {'error': 'x'}))
+        with self.assertRaises(resultados.ErrorResultados):
+            self.medir()
+        self.p.red.al('GET', self.API_RES, red.ErrorRed('sin conexión'))
+        with self.assertRaises(resultados.ErrorResultados):
+            self.medir()
+        self.assertEqual(resultados.cargar(self.p.raiz), antes)
+
+    def test_el_resumen_no_concluye_con_pocas_publicaciones_y_agrupa_con_suficientes(self):
+        from publicacion import resultados
+        formatos = ['comparacion', 'comparacion', 'personaje', 'personaje', 'dato', 'dato', 'parodia', 'parodia']
+        self.escribir(*[self.item('p%d' % i, formato=f) for i, f in enumerate(formatos)])
+        ruta = self.p.raiz / 'contenido' / 'resultados.jsonl'
+
+        def anotar(n):
+            with open(ruta, 'w', encoding='utf-8') as f:
+                for i in range(n):
+                    f.write(json.dumps({'accion': 'calendario:p%d:bluesky' % i, 'ventana': 24, 'likes': 5 * (i % 2), 'reposts': 4 if formatos[i] == 'comparacion' else 0,
+                                        'respuestas': 0, 'citas': 0, 'ref': 'at://x/y/%d' % i, 'ts': '2026-11-25T00:00:00Z', 'horas': 24.0}) + '\n')
+        self.assertIn('Todavía no hay publicaciones medidas', resultados.resumen(self.p.raiz)[0])
+        anotar(3)
+        texto = '\n'.join(resultados.resumen(self.p.raiz))
+        self.assertIn('Todavía son pocas (3 de 8)', texto)
+        self.assertNotIn('Por formato', texto)
+        anotar(8)
+        texto = '\n'.join(resultados.resumen(self.p.raiz))
+        self.assertIn('Por formato', texto)
+        self.assertLess(texto.index('- comparacion:'), texto.index('- dato:'))     # lo que más movió va primero
+        self.assertIn('no demuestra nada', texto)
+
+    def test_la_tarea_diaria_mide_sin_secretos_y_guarda_los_resultados(self):
+        yml = (RAIZ / '.github' / 'workflows' / 'calendario.yml').read_text(encoding='utf-8')
+        self.assertIn('fabrica.py calendario --medir', yml)
+        self.assertIn('continue-on-error: true', yml)                  # medir nunca debe impedir guardar el libro
+        self.assertIn('contenido/resultados.jsonl', yml)
+        self.assertNotIn('--aprobar', yml)
+
     def test_no_publica_dos_veces_lo_mismo(self):
         self.escribir(self.item('uno'))
         self.aprobar_todo()
