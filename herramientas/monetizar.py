@@ -257,6 +257,7 @@ def ficha_crazygames(raiz, spec, linea_ia_en):
     salida = raiz / 'salida' / spec['id']
     medios = salida / 'medios' / 'crazygames'
     en = spec['ficha'].get('en') or {}
+    notas = spec.get('portales_notas') or {}
     titulo = en.get('titulo') or spec['ficha'][spec['idiomas'][0]]['titulo']
     largo = '\n'.join(l for l in (en.get('larga') or '').rstrip().split('\n') if not SIN_ANUNCIOS.search(l))
     piezas = [('portada-16x9-1920x1080.png', 'portada horizontal 16:9 (1920×1080)'), ('portada-2x3-800x1200.png', 'portada vertical 2:3 (800×1200)'),
@@ -280,16 +281,16 @@ def ficha_crazygames(raiz, spec, linea_ia_en):
           '| Requisito | Estado | Detalle |', '|---|---|---|',
           '| Descarga inicial ≤ 50 MB, total ≤ 250 MB con SDK, ≤ 1 500 archivos | Cumple | Un solo archivo `index.html` de unos %s |' % _kb(salida / 'index.html'),
           '| Inglés obligatorio y tomar el idioma del jugador del SDK | Cumple | El juego trae es, en y zh; con el SDK usa su idioma (`user.systemInfo.locale`) y, si no hay, el del navegador o el inglés. Probado con una simulación del SDK |',
-          '| Legible entre 800×450 y 1920×1080 en un cuadro 16:9 | Probado con reservas | El escenario es vertical (9:16) y se centra en el cuadro; a 800×450 mide unos 240×425 px y el texto se lee, pero queda pequeño. Un revisor puede pedir ajustes |',
+          '| Legible entre 800×450 y 1920×1080 en un cuadro 16:9 | %s | %s |' % (('Probado con reservas', notas['legibilidad']) if notas.get('legibilidad') else ('Sin comprobar', 'Falta revisar el juego en cuadros de 800×450 a 1920×1080')),
           '| Sin botón propio de pantalla completa | Cumple | El juego no tiene uno |',
           '| Sin promoción de otros juegos o plataformas ni enlaces de salida | Cumple, con una duda | La versión para portal no tiene enlaces (se revisa en cada armado). Sí muestra la insignia «Taller Gelatina» al empezar y en la tarjeta de inicio; no enlaza a nada y no promueve otro juego, pero la regla de marca no está en las páginas leídas |',
           '| Contenido apto para PEGI 12 | Cumple | Sin violencia, sin lenguaje fuerte, sin compras |',
           '| Sin datos personales propios | Cumple | Solo guarda el mejor puntaje y los ajustes en el dispositivo; no pide registro |',
-          '| Controles intuitivos | Cumple | Toque o clic en el carril, flechas, A/S/D y barra espaciadora. La lista de teclas restringidas está en sus Quality Guidelines (no leídas) |',
+          '| Controles intuitivos | Cumple | %s. La lista de teclas restringidas está en sus Quality Guidelines (no leídas) |' % notas.get('controles', 'Revisar'),
           '| Si trae anuncios, que funcione con ellos desactivados (Basic Launch) | Cumple | Probado: ante `adError` el juego sigue sin trabarse |',
-          '| Anuncios solo del SDK, entre niveles, nunca desde botones de navegación | Cumple | Un anuncio al pulsar «Otra canción igual» en la pantalla final; nunca durante la partida ni desde menús. El SDK limita a uno cada 3 minutos |',
+          '| Anuncios solo del SDK, entre niveles, nunca desde botones de navegación | Cumple | %s |' % notas.get('momento_de_anuncio', 'Revisar dónde se piden'),
           '| Silencio solo mientras suena el anuncio y pausa del juego | Cumple | Probado con una simulación del SDK |',
-          '| Full Launch: SDK con `gameplayStart`, y entrar al juego en un clic o menos | Cumple | Se llaman al empezar y terminar la partida. Hoy hay una tarjeta de inicio con el ánimo ya elegido: un clic en «Play» |',
+          '| Full Launch: SDK con `gameplayStart`, y entrar al juego en un clic o menos | Cumple | Se llaman al empezar y terminar la partida. %s |' % notas.get('arranque', 'Revisar cuántos clics hay antes de jugar'),
           '| Portadas 1920×1080, 800×1200 y 800×800, sin bordes y sin más texto que el título | Cumple | Generadas por la fábrica con captura real del juego; el único otro texto es el del propio juego dentro de la captura (puntos, «Perfect!») |',
           '| Videos de 15 a 20 s, hasta 50 MB, 1080p horizontal y vertical, sin sonido ni pantallas negras | Cumple | Generados por la fábrica jugando el juego de verdad; se recortan para que no salga la tarjeta de inicio, la insignia ni la cuenta regresiva |', '',
           '## Lo que sigue (lo hace el dueño)', '',

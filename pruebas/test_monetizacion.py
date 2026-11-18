@@ -207,11 +207,12 @@ class FichaDeEnvio(unittest.TestCase):
     def test_es_la_misma_cada_vez(self):
         self.assertEqual(self._ficha(), self._ficha())
 
-    def test_solo_los_juegos_con_ganchos_traen_ficha_en_su_kit(self):
+    def test_solo_los_juegos_con_paquete_de_envio_traen_ficha_en_su_kit(self):
+        for juego in fabrica.ids():
+            tiene = (RAIZ / 'salida' / juego / 'kit' / 'ficha-crazygames.md').exists()
+            paquete = (RAIZ / 'salida' / juego / 'medios' / 'crazygames').is_dir() and 'anuncios' in fabrica.cargar(juego).get('motor', [])
+            self.assertEqual(tiene, paquete, juego)
         self.assertTrue((RAIZ / 'salida' / 'compas-gelatina' / 'kit' / 'ficha-crazygames.md').exists())
-        for juego in ('guerreros-gelatina', 'torre-gelatina'):
-            if 'anuncios' not in fabrica.cargar(juego).get('motor', []):
-                self.assertFalse((RAIZ / 'salida' / juego / 'kit' / 'ficha-crazygames.md').exists(), juego)
 
     def test_las_portadas_tienen_las_medidas_del_portal_y_los_videos_caben(self):
         import struct

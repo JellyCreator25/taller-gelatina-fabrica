@@ -567,7 +567,7 @@ def generar(raiz, spec):
     (kit / 'difusion.md').write_text(texto_difusion, encoding='utf-8')
     (kit / 'registro-creacion.md').write_text(registro_creacion(spec), encoding='utf-8')
     ficha_cg = kit / 'ficha-crazygames.md'
-    if 'anuncios' in (spec.get('motor') or []) and (spec.get('originalidad') or {}).get('riesgo_portales') != 'alto':   # solo los juegos que ya traen ganchos de anuncios y no chocan con la regla de originalidad
+    if 'anuncios' in (spec.get('motor') or []) and (salida / 'medios' / 'crazygames').is_dir() and (spec.get('originalidad') or {}).get('riesgo_portales') != 'alto':   # solo con ganchos de anuncios, paquete de portadas y videos ya hecho y sin choque con la regla de originalidad
         import monetizar
         ficha_cg.write_text(monetizar.ficha_crazygames(raiz, spec, linea_ia(spec, 'en')), encoding='utf-8')
     elif ficha_cg.exists():

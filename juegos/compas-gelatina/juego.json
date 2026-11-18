@@ -288,6 +288,12 @@
       "panel-de-accesibilidad"
     ]
   },
+  "portales_notas": {
+    "legibilidad": "El escenario es vertical (9:16) y se centra en el cuadro; a 800×450 mide unos 240×425 px y el texto se lee, pero queda pequeño. Un revisor puede pedir ajustes",
+    "momento_de_anuncio": "Un anuncio al pulsar «Otra canción igual» en la pantalla final; nunca durante la partida ni desde menús. El SDK limita a uno cada 3 minutos",
+    "arranque": "Hoy hay una tarjeta de inicio con el ánimo ya elegido: un clic en «Play»",
+    "controles": "Toque o clic en el carril, flechas, A/S/D y barra espaciadora"
+  },
   "novedades": [
     {
       "version": "1.0.0",
