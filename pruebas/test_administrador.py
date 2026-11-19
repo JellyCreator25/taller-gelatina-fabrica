@@ -48,6 +48,24 @@ class Chequeo(unittest.TestCase):
         h = self.chequeo([linea('sin aprobar', '2026-11-20')])
         self.assertIn('apruebe el lote pendiente', [x for x in h if x['id'] == 'calendario-detenido'][0]['accion'])
 
+    def test_algo_que_sale_hoy_no_es_un_calendario_detenido(self):
+        h = self.chequeo([linea('lista', '2026-11-18')])
+        self.assertNotIn('calendario-detenido', ids(h))
+        self.assertIn('calendario-por-agotarse', ids(h, 'avisar'))
+
+    def test_la_reserva_perenne_autorizada_pero_vacia_o_baja_se_anota(self):
+        perenne = lambda estado: dict(linea(estado, '2026-01-01'), perenne=True, fecha=None)
+        con_fecha = [linea('aún no es su fecha', '2026-12-30')]
+        h = self.chequeo(con_fecha)
+        self.assertIn('reserva-vacia', ids(h, 'info'))
+        self.assertIn('la rutina de los lunes la prepare', [x for x in h if x['id'] == 'reserva-vacia'][0]['accion'])
+        h = self.chequeo(con_fecha + [perenne('sin aprobar')])
+        self.assertIn('que Max apruebe la reserva', [x for x in h if x['id'] == 'reserva-vacia'][0]['accion'])
+        h = self.chequeo(con_fecha + [perenne('en reserva') for _ in range(2)])
+        self.assertIn('reserva-baja', ids(h, 'info'))
+        h = self.chequeo(con_fecha + [perenne('en reserva') for _ in range(administrador.RESERVA_MINIMA)])
+        self.assertFalse([x for x in ids(h) if x.startswith('reserva-')])
+
     def test_quedar_con_pocos_dias_avisa_y_con_una_semana_solo_informa(self):
         self.assertIn('calendario-por-agotarse', ids(self.chequeo([linea('aún no es su fecha', '2026-11-20')]), 'avisar'))
         h = self.chequeo([linea('aún no es su fecha', '2026-11-24')])

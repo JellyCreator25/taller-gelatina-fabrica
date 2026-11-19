@@ -1554,6 +1554,101 @@ class PruebasCalendario(Base):
         entrada = [e for e in self.p.libro() if e['accion'] == 'calendario:hoy:bluesky'][0]
         self.assertEqual((entrada['resultado'], entrada['lanzamiento'], entrada['tipo']), ('ok', False, 'post'))
 
+    # --- reserva perenne: aprobada una vez, el calendario solo decide el día ---
+
+    def perenne(self, id, orden=100, **extra):
+        d = self.item(id, perenne=True, orden=orden, texto='Dato eterno de la Gelatina (' + id + ').\n\nJuega gratis: {enlace}\n{ia}')
+        del d['no_antes_de']
+        d.update(extra)
+        return d
+
+    def test_una_perenne_espera_en_reserva_y_solo_sale_cuando_no_hay_nada_para_hoy(self):
+        self.escribir(self.item('hoy'), self.perenne('p1'))
+        self.assertEqual(self.estados(), {'hoy': 'sin aprobar', 'p1': 'sin aprobar'})
+        self.assertEqual(sorted(self.aprobar_todo()), ['hoy', 'p1'], 'la reserva se aprueba con el mismo lote y la misma huella')
+        self.assertEqual(self.estados(), {'hoy': 'lista', 'p1': 'en reserva'})
+        informe, ok = self.correr()
+        self.assertTrue(ok)
+        self.assertEqual(len(self.posts()), 1)
+        self.assertIn('Conoce a las Leyendas (hoy)', json.loads(self.posts()[0]['cuerpo'])['record']['text'])
+        self.p.reloj.avanzar(days=1)
+        self.assertEqual(self.estados(), {'hoy': 'hecha', 'p1': 'lista'})
+        informe, ok = self.correr()
+        self.assertTrue(ok)
+        self.assertEqual(len(self.posts()), 2)
+        r = json.loads(self.posts()[1]['cuerpo'])['record']
+        self.assertIn('Dato eterno de la Gelatina (p1)', r['text'])
+        self.assertEqual(r['embed']['images'][0]['alt'], 'Tarjeta con Zeus, una gelatina azul con un rayo dorado.')
+
+    def test_una_perenne_sin_aprobar_no_sale_nunca_y_su_huella_no_depende_del_dia(self):
+        self.escribir(self.perenne('p1'))
+        self.assertEqual(self.estados(), {'p1': 'sin aprobar'})
+        informe, ok = self.correr()
+        self.assertTrue(ok)
+        self.assertEqual(self.posts(), [])
+        huella = self.cal.estado(self.p.raiz, self.hoy)[0]['huella']
+        self.aprobar_todo()
+        self.p.reloj.avanzar(days=9)
+        linea = self.cal.estado(self.p.raiz, self.hoy)[0]
+        self.assertEqual((linea['huella'], linea['estado']), (huella, 'lista'), 'pasan los días y lo aprobado sigue siendo exactamente lo mismo; nunca «vence»')
+
+    def test_sale_una_perenne_por_dia_y_en_su_orden(self):
+        self.escribir(self.perenne('b', orden=2), self.perenne('a', orden=1), self.perenne('c', orden=3))
+        self.aprobar_todo()
+        self.assertEqual(self.estados(), {'a': 'lista', 'b': 'en reserva', 'c': 'en reserva'})
+        self.correr()
+        self.correr()      # la misma jornada otra vez: no sale una segunda
+        self.assertEqual(len(self.posts()), 1)
+        self.assertIn('(a)', json.loads(self.posts()[0]['cuerpo'])['record']['text'])
+        self.assertEqual(self.estados(), {'a': 'hecha', 'b': 'en reserva', 'c': 'en reserva'})
+        self.p.reloj.avanzar(days=1)
+        self.correr()
+        self.assertIn('(b)', json.loads(self.posts()[1]['cuerpo'])['record']['text'])
+
+    def test_una_publicacion_con_fecha_siempre_va_antes_que_la_reserva(self):
+        self.escribir(self.perenne('p1', orden=1), self.item('fechada'))
+        self.aprobar_todo()
+        self.assertEqual(self.estados(), {'fechada': 'lista', 'p1': 'en reserva'})
+        self.correr()
+        self.assertIn('(fechada)', json.loads(self.posts()[0]['cuerpo'])['record']['text'])
+        self.assertEqual(len(self.posts()), 1)
+
+    def test_un_envio_en_duda_frena_a_la_reserva(self):
+        self.escribir(self.item('dudosa'), self.perenne('p1'))
+        self.aprobar_todo()
+        with open(self.p.raiz / 'publicacion' / 'libro.jsonl', 'a', encoding='utf-8') as f:
+            f.write(json.dumps({'accion': 'calendario:dudosa:bluesky', 'canal': 'bluesky', 'tipo': 'post', 'juego': JUEGO, 'resultado': 'incierto', 'ts': '2026-11-21T10:00:00Z'}) + '\n')
+        self.assertEqual(self.estados(), {'dudosa': 'en duda', 'p1': 'en reserva'})
+        self.correr()
+        self.assertEqual(self.posts(), [])
+
+    def test_una_perenne_con_fecha_o_con_un_anio_tiene_problemas_y_no_se_aprueba(self):
+        self.escribir(self.perenne('p1', no_antes_de='2026-12-01'), self.perenne('p2', texto='Desde 2026 con delirios.\n{enlace}\n{ia}'), self.perenne('p3', orden=True))
+        self.assertEqual(self.estados(), {'p1': 'con problemas', 'p2': 'con problemas', 'p3': 'con problemas'})
+        problemas = ' | '.join(' '.join(l['problemas']) for l in self.cal.estado(self.p.raiz, self.hoy))
+        self.assertIn('no lleva «no_antes_de»', problemas)
+        self.assertIn('no menciona años ni fechas', problemas)
+        self.assertIn('«orden» debe ser un número entero', problemas)
+        with self.assertRaises(self.cal.ErrorCalendario):
+            self.cal.aprobar(self.p.raiz, self.hoy, 'a' * 16)
+
+    def test_cambiar_una_perenne_ya_aprobada_la_devuelve_a_aprobacion(self):
+        self.escribir(self.perenne('p1'))
+        self.aprobar_todo()
+        self.assertEqual(self.estados(), {'p1': 'lista'})
+        self.escribir(self.perenne('p1', alt='Otro texto alternativo.'))
+        self.assertEqual(self.estados(), {'p1': 'cambió tras aprobar'})
+        self.correr()
+        self.assertEqual(self.posts(), [])
+
+    def test_la_huella_de_una_publicacion_con_fecha_no_cambia_por_existir_la_reserva(self):
+        self.escribir(self.item('uno'))
+        ctx, accion, problemas = self.cal.armar(self.p.raiz, self.item('uno'))
+        self.assertEqual(problemas, [])
+        self.assertEqual(sorted(accion['datos']), ['alt', 'idioma', 'imagen', 'no_antes_de', 'texto'], 'solo las perennes llevan la marca «perenne»')
+        ctx, accion, _ = self.cal.armar(self.p.raiz, self.perenne('p'))
+        self.assertEqual((accion['datos']['no_antes_de'], accion['datos']['perenne']), ('perenne', True))
+
     # --- resultados: likes, reposts y respuestas de lo ya publicado ---
 
     API_RES = 'https://public.api.bsky.app/xrpc/app.bsky.feed.getPosts'

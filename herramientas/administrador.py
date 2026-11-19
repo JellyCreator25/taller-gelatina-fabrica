@@ -23,6 +23,7 @@ import motor
 NIVELES = ('resolver', 'avisar', 'info')
 FALLAS_DE_LA_RED = ('fallo', 'error')
 UMBRAL_AVISAR = 3        # días de contenido aprobado por salir por debajo de los cuales Max tiene que enterarse
+RESERVA_MINIMA = 5       # publicaciones perennes aprobadas por debajo de las cuales conviene reponer la reserva
 UMBRAL_LOTE = 7          # por debajo de esto la rutina de los lunes debe preparar el siguiente lote
 MAX_TEXTO = 400
 IDENTIDAD = 'administrador-del-motor'
@@ -96,7 +97,7 @@ def chequeo(raiz, hoy, lineas_calendario=None, entradas_libro=None, juegos=None)
         for l in lineas_calendario:
             if l['estado'] in ('vencida', 'con problemas', 'en duda'):
                 H.append(_h('avisar', 'calendario-' + l['estado'].replace(' ', '-'), 'La publicación «%s» del calendario está %s.' % (l['id'], l['estado']), 'ver `python3 fabrica.py calendario`'))
-        if dias == 0:
+        if hasta is None:
             H.append(_h('avisar', 'calendario-detenido', 'No queda contenido aprobado por salir: el calendario está detenido%s.' % (' (hay %d sin aprobar)' % len(pend) if pend else ''),
                         'que Max apruebe el lote pendiente' if pend else 'preparar un lote nuevo para que Max lo apruebe'))
         elif dias < UMBRAL_AVISAR:
@@ -106,6 +107,15 @@ def chequeo(raiz, hoy, lineas_calendario=None, entradas_libro=None, juegos=None)
             H.append(_h('info', 'lote-por-preparar', 'Quedan %d días de contenido aprobado: la rutina de los lunes debe preparar el siguiente lote.' % dias))
         elif pend:
             H.append(_h('info', 'lote-esperando', 'Hay %d publicación(es) esperando la aprobación de Max; quedan %d días de contenido aprobado.' % (len(pend), dias)))
+    if lineas_calendario is not None and cat is not None:
+        autorizada = any(x.get('id') == 'reserva-de-contenido-perenne' and x.get('estado') == 'autorizada' for x in cat.get('propuestas', []))
+        en_reserva = len([l for l in lineas_calendario if l.get('perenne') and l['estado'] in ('en reserva', 'lista')])
+        sin_aprobar = len([l for l in lineas_calendario if l.get('perenne') and l['estado'] in ('sin aprobar', 'cambió tras aprobar')])
+        if autorizada and en_reserva == 0:
+            H.append(_h('info', 'reserva-vacia', 'La reserva perenne está autorizada pero no hay ninguna aprobada%s.' % (' (%d esperan la aprobación de Max)' % sin_aprobar if sin_aprobar else ''),
+                        'que la rutina de los lunes la prepare y se la lleve a Max con la huella del lote' if not sin_aprobar else 'que Max apruebe la reserva'))
+        elif autorizada and en_reserva < RESERVA_MINIMA:
+            H.append(_h('info', 'reserva-baja', 'Quedan %d publicaciones en la reserva perenne (mínimo deseable: %d).' % (en_reserva, RESERVA_MINIMA), 'que la rutina de los lunes reponga la reserva'))
     hist = autonomia.historial(raiz)
     if hist:
         ultima = _semana_a_fecha(hist[-1]['semana'])

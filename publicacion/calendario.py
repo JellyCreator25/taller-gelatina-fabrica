@@ -5,6 +5,9 @@ La aprobación es de CADA publicación, con su huella (un hash de todo lo que sa
 El dueño aprueba un lote con la huella del lote; eso anota en contenido/aprobaciones.json la huella de cada publicación. Después, una tarea diaria
 publica solo lo que cumple las tres condiciones: está aprobada con su huella actual, ya llegó su fecha y no se pasó de la ventana.
 Si alguien cambia el texto, la imagen o la fecha después de aprobar, la huella cambia y esa publicación vuelve a pedir aprobación.
+Reserva perenne (autorizada por el dueño el 18 de noviembre de 2026): publicaciones con «perenne»: true, sin fecha ni años en el texto, que el dueño aprueba
+UNA vez con la misma huella de lote. Su texto, su imagen y su texto alternativo siguen siendo exactamente lo aprobado; lo único automático es el día: salen
+solo cuando el calendario no tiene nada para hoy (una publicación del calendario por día como máximo, nunca en un día con algo en duda).
 Pasa por las mismas barreras que un lanzamiento (nucleo.ejecutar): compuertas, ritmo del canal, libro de registro y «incierto» sin reintentos."""
 import datetime
 import json
@@ -106,11 +109,20 @@ def armar(raiz, item, libro=None):
         problemas.append('falta la imagen')
     if not str(item.get('alt', '')).strip():
         problemas.append('falta el texto alternativo de la imagen')
-    fecha = _fecha(item.get('no_antes_de'))
-    if not fecha:
+    perenne = bool(item.get('perenne'))
+    if perenne:
+        if item.get('no_antes_de'):
+            problemas.append('una publicación perenne no lleva «no_antes_de»: su día lo decide el calendario')
+        if re.search(r'\b(19|20)\d\d\b', texto):
+            problemas.append('una publicación perenne no menciona años ni fechas: tiene que valer cualquier día')
+        if not isinstance(item.get('orden', 100), int) or isinstance(item.get('orden', 100), bool):
+            problemas.append('«orden» debe ser un número entero')
+    elif not _fecha(item.get('no_antes_de')):
         problemas.append('«no_antes_de» debe ser una fecha AAAA-MM-DD')
-    accion = {'id': 'calendario:%s:%s' % (item['id'], canal), 'tipo': 'post', 'canal': canal, 'categoria': 'redes',
-              'datos': {'texto': texto, 'idioma': idioma, 'imagen': imagen, 'alt': str(item.get('alt', '')).strip(), 'no_antes_de': str(item.get('no_antes_de', ''))}}
+    datos = {'texto': texto, 'idioma': idioma, 'imagen': imagen, 'alt': str(item.get('alt', '')).strip(), 'no_antes_de': 'perenne' if perenne else str(item.get('no_antes_de', ''))}
+    if perenne:
+        datos['perenne'] = True        # solo las perennes llevan esta marca: la huella de una publicación con fecha no cambia
+    accion = {'id': 'calendario:%s:%s' % (item['id'], canal), 'tipo': 'post', 'canal': canal, 'categoria': 'redes', 'datos': datos}
     return ctx, accion, problemas
 
 
@@ -124,15 +136,29 @@ def _plan_de(ctx, accion):
     return plan
 
 
+def _orden(item):
+    perenne = bool(item.get('perenne'))
+    orden = item.get('orden', 100) if isinstance(item.get('orden', 100), int) and not isinstance(item.get('orden', 100), bool) else 100
+    return (1 if perenne else 0, '' if perenne else str(item.get('no_antes_de')), orden if perenne else 0, item['id'])
+
+
+def _publico_hoy(entradas, hoy):
+    """¿Ya salió hoy (fecha UTC del libro) alguna publicación del calendario?"""
+    return any(str(e.get('accion', '')).startswith('calendario:') and e.get('resultado') == 'ok' and e.get('tipo') == 'post' and str(e.get('ts', ''))[:10] == hoy.isoformat() for e in entradas)
+
+
 def estado(raiz, hoy, libro=None):
-    """Una línea por publicación: dict(id, fecha, estado, huella, problemas, accion, ctx).
-    estados: hecha · en duda · sin aprobar · cambió tras aprobar · aún no es su fecha · lista · vencida · con problemas"""
+    """Una línea por publicación: dict(id, fecha, perenne, estado, huella, problemas, accion, ctx).
+    estados: hecha · en duda · sin aprobar · cambió tras aprobar · aún no es su fecha · lista · vencida · con problemas · en reserva (solo perennes)
+    Una perenne aprobada espera «en reserva» y pasa a «lista» solo si hoy el calendario no tiene nada: ninguna publicación con fecha lista, ninguna en duda
+    y ninguna del calendario salió ya hoy. Solo una perenne está «lista» a la vez (la de menor «orden»)."""
     aprobadas = aprobaciones(raiz)
     lineas = []
-    for it in sorted(cargar(raiz), key=lambda i: (str(i.get('no_antes_de')), i['id'])):
+    for it in sorted(cargar(raiz), key=_orden):
         ctx, accion, problemas = armar(raiz, it, libro)
         h = huella_de(accion)
-        fecha = _fecha(it.get('no_antes_de'))
+        perenne = bool(it.get('perenne'))
+        fecha = None if perenne else _fecha(it.get('no_antes_de'))
         if ctx.libro.hecho(accion['id']):
             est = 'hecha'
         elif ctx.libro.incierto(accion['id']):
@@ -143,13 +169,20 @@ def estado(raiz, hoy, libro=None):
             est = 'sin aprobar'
         elif aprobadas[it['id']] != h:
             est = 'cambió tras aprobar'
+        elif perenne:
+            est = 'en reserva'
         elif hoy < fecha:
             est = 'aún no es su fecha'
         elif hoy > fecha + datetime.timedelta(days=VENTANA_DIAS):
             est = 'vencida'
         else:
             est = 'lista'
-        lineas.append({'id': it['id'], 'fecha': it.get('no_antes_de'), 'estado': est, 'huella': h, 'problemas': problemas, 'accion': accion, 'ctx': ctx})
+        lineas.append({'id': it['id'], 'fecha': it.get('no_antes_de') if not perenne else None, 'perenne': perenne, 'estado': est, 'huella': h, 'problemas': problemas, 'accion': accion, 'ctx': ctx})
+    reserva = [l for l in lineas if l['estado'] == 'en reserva']
+    if reserva:
+        entradas = reserva[0]['ctx'].libro.entradas()
+        if not any(l['estado'] in ('lista', 'en duda') for l in lineas if not l['perenne']) and not any(l['estado'] == 'en duda' for l in lineas) and not _publico_hoy(entradas, hoy):
+            reserva[0]['estado'] = 'lista'
     return lineas
 
 
@@ -167,7 +200,7 @@ def mostrar(lineas):
     L = ['Calendario de contenido', '']
     for l in lineas:
         a = l['accion']
-        L.append('%s · %s · %s · huella %s' % (l['fecha'], l['id'], l['estado'].upper(), l['huella'][:12]))
+        L.append('%s · %s · %s · huella %s' % (l['fecha'] or 'perenne', l['id'], l['estado'].upper(), l['huella'][:12]))
         L += ['     texto:'] + ['       | ' + x for x in a['datos']['texto'].split('\n')]
         L.append('     imagen: %s' % ((a['datos']['imagen'] or {}).get('archivo')))
         L.append('     alt: %s' % a['datos']['alt'])

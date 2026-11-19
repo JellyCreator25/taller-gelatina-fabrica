@@ -101,9 +101,10 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 
 - **Contenido aprobado por salir:** hasta el 2026-11-30 (11 días). Cuando se acabe, el calendario se detiene hasta que Max apruebe un lote nuevo.
 - Espera su aprobación el plan de «guerreros-gelatina» (huella 392b7acd88e5a855).
-- Pasos del ciclo que corren sin Max: 13 de 21 (62 %).
-- Toques de Max por mes (estimado del inventario, no medido): 5.1; de ellos evitables: 3.3. Si Max autorizara las reglas propuestas bajarían a 2.05; si solo se construye lo automatizable, a 4.8.
+- Pasos del ciclo que corren sin Max: 15 de 23 (65 %).
+- Toques de Max por mes (estimado del inventario, no medido): 4.1; de ellos evitables: 2.3. Con todas las reglas (las autorizadas y las propuestas) bajarían a 2.05; si solo se construye lo automatizable, a 3.8.
 - «f-metricas-cloudflare» no corre solo todavía: falta «u-token-analitica», «u-desplegar-sitio».
+- «f-reserva-perenne» no corre solo todavía: falta «u-aprobar-reserva».
 - Lo que la fábrica puede automatizar sin pedirle nada a Max (entra a la cola del motor): Revisar la cuenta y anotar si un envío en duda salió o no; Reactivar un flujo programado que GitHub apagó por falta de actividad.
 - Detalle, reglas que Max podría autorizar y lo que solo él puede hacer: `python3 fabrica.py autonomia`.
 

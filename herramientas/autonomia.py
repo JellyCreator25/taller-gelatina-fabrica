@@ -50,20 +50,25 @@ def problemas_de_catalogo(cat):
         p.append('los pasos necesitan un «id» único')
     propuestas = {x.get('id'): x for x in cat.get('propuestas') or []}
     limites = cat.get('limites') or {}
+    autorizaciones = cat.get('autorizaciones_vigentes') or []
+    por_propuesta = {a.get('propuesta'): a for a in autorizaciones if a.get('propuesta')}
+    for a in autorizaciones:
+        if not (a.get('id') and a.get('fecha') and a.get('texto') and a.get('origen')):
+            p.append('la autorización «%s» necesita id, fecha, texto y origen (de dónde salió, en palabras de Max)' % a.get('id'))
+        if a.get('propuesta') and a['propuesta'] not in propuestas:
+            p.append('la autorización «%s» dice autorizar la propuesta «%s», que no existe' % (a.get('id'), a['propuesta']))
     for n, x in propuestas.items():
-        if x.get('estado') != 'propuesta':
-            p.append('la propuesta «%s» debe seguir en estado «propuesta»: una regla solo pasa a ser autorización cuando Max la autoriza y queda en «autorizaciones_vigentes»' % n)
+        if x.get('estado') not in ('propuesta', 'autorizada'):
+            p.append('la propuesta «%s» debe estar en estado «propuesta» o «autorizada»' % n)
+        if x.get('estado') == 'autorizada' and n not in por_propuesta:
+            p.append('la propuesta «%s» figura como autorizada pero no hay una autorización suya en «autorizaciones_vigentes» (campo «propuesta»): una regla solo es de Max cuando él la autoriza y queda su origen' % n)
+        if x.get('estado') == 'propuesta' and n in por_propuesta:
+            p.append('la propuesta «%s» ya tiene una autorización pero sigue como «propuesta»' % n)
         if x.get('cambia_la_politica') not in (True, False):
             p.append('la propuesta «%s» debe decir si cambia la política (true o false)' % n)
         for campo in ('titulo', 'como_funciona', 'ahorra', 'riesgo', 'requiere'):
             if not x.get(campo):
                 p.append('la propuesta «%s» no explica «%s»' % (n, campo))
-    autorizadas = {a.get('id') for a in cat.get('autorizaciones_vigentes') or []}
-    if autorizadas & set(propuestas):
-        p.append('una propuesta no puede estar también en las autorizaciones vigentes: %s' % ', '.join(sorted(autorizadas & set(propuestas))))
-    for a in cat.get('autorizaciones_vigentes') or []:
-        if not (a.get('id') and a.get('fecha') and a.get('texto') and a.get('origen')):
-            p.append('la autorización «%s» necesita id, fecha, texto y origen (de dónde salió, en palabras de Max)' % a.get('id'))
     for x in pasos:
         i = x.get('id')
         if x.get('quien') not in QUIENES:
@@ -105,6 +110,8 @@ def problemas_de_catalogo(cat):
             reglas = x.get('regla') or []
             if not reglas or any(r not in propuestas for r in reglas):
                 p.append('%s: «regla» debe nombrar propuestas que existan (hoy %r)' % (i, reglas))
+            elif x.get('estado') == 'resuelta' and not any(propuestas[r].get('estado') == 'autorizada' for r in reglas):
+                p.append('%s: un paso reducible solo queda «resuelta» si Max autorizó alguna de sus reglas' % i)
         if clase == 'automatizable' and x.get('construible') not in (True, False):
             p.append('%s: «construible» debe ser true o false' % i)
         if clase == 'automatizable' and x.get('regla'):
@@ -147,16 +154,30 @@ def medir(cat):
 
 
 def dias_aprobados(lineas, hoy):
-    """(días, fecha) que la fábrica corre sola con el contenido ya aprobado del calendario. `lineas` = calendario.estado(...).
-    Solo cuenta lo aprobado y vigente (listo o con fecha por llegar); lo sin aprobar o cambiado no cuenta: ahí la fábrica se detiene."""
-    fechas = []
+    """(días, fecha del último día con publicación) que la fábrica corre sola con lo ya aprobado. `lineas` = calendario.estado(...).
+    Cuenta lo aprobado y vigente: las publicaciones con fecha (listas o por llegar) y la reserva perenne aprobada, que llena los días en que no hay nada con fecha
+    (una publicación del calendario por día). Lo sin aprobar o cambiado no cuenta: ahí la fábrica se detiene. (0, None) = nada por salir."""
+    pendientes, reserva = [], 0
     for l in lineas:
-        if l['estado'] in ESTADOS_CON_CONTENIDO and l.get('fecha'):
-            f = l['fecha'] if isinstance(l['fecha'], datetime.date) else datetime.date.fromisoformat(str(l['fecha']))
-            fechas.append(f)
-    if not fechas or max(fechas) < hoy:
+        if l.get('perenne'):
+            if l['estado'] in ('en reserva', 'lista'):
+                reserva += 1
+        elif l['estado'] in ESTADOS_CON_CONTENIDO and l.get('fecha'):
+            pendientes.append(l['fecha'] if isinstance(l['fecha'], datetime.date) else datetime.date.fromisoformat(str(l['fecha'])))
+    pendientes.sort()
+    dia, ultimo, vueltas = hoy, None, 0
+    while (pendientes or reserva > 0) and vueltas < 1000:
+        if pendientes and pendientes[0] <= dia:
+            pendientes.pop(0)
+            ultimo = dia
+        elif reserva > 0:
+            reserva -= 1
+            ultimo = dia
+        dia += datetime.timedelta(days=1)
+        vueltas += 1
+    if ultimo is None:
         return 0, None
-    return (max(fechas) - hoy).days, max(fechas)
+    return (ultimo - hoy).days, ultimo
 
 
 def cola_items(raiz):
@@ -244,6 +265,9 @@ def informe(raiz, hoy, lineas_calendario=None, listos=None, completo=True):
         else:
             L.append('- **Contenido aprobado por salir:** nada. El calendario está detenido hasta que Max apruebe un lote.')
         pend = [l for l in lineas_calendario if l['estado'] in ('sin aprobar', 'cambió tras aprobar')]
+        reserva = len([l for l in lineas_calendario if l.get('perenne') and l['estado'] in ('en reserva', 'lista')])
+        if reserva:
+            L.append('- La reserva perenne aprobada tiene %d publicación(es); ya cuentan en los días de arriba.' % reserva)
         if pend:
             L.append('- Esperan su aprobación %d publicación(es) del calendario (`python3 fabrica.py calendario` muestra la huella del lote).' % len(pend))
     else:
@@ -251,7 +275,7 @@ def informe(raiz, hoy, lineas_calendario=None, listos=None, completo=True):
     for juego, huella in listos or []:
         L.append('- Espera su aprobación el plan de «%s» (huella %s).' % (juego, huella))
     L.append('- Pasos del ciclo que corren sin Max: %d de %d (%d %%).' % (m['pasos_autonomos'], m['pasos_totales'], round(100 * m['pasos_autonomos'] / m['pasos_totales'])))
-    L.append('- Toques de Max por mes (estimado del inventario, no medido): %s; de ellos evitables: %s. Si Max autorizara las reglas propuestas bajarían a %s; si solo se construye lo automatizable, a %s.'
+    L.append('- Toques de Max por mes (estimado del inventario, no medido): %s; de ellos evitables: %s. Con todas las reglas (las autorizadas y las propuestas) bajarían a %s; si solo se construye lo automatizable, a %s.'
              % (_num(m['toques_mes']), _num(m['toques_evitables_mes']), _num(m['toques_con_reglas_mes']), _num(m['toques_sin_automatizables_mes'])))
     for n, bloqueos in sorted(m['detenidos_por_dueno'].items()):
         L.append('- «%s» no corre solo todavía: falta %s.' % (n, ', '.join('«%s»' % b for b in bloqueos)))
@@ -263,8 +287,10 @@ def informe(raiz, hoy, lineas_calendario=None, listos=None, completo=True):
     if not completo:
         L.append('- Detalle, reglas que Max podría autorizar y lo que solo él puede hacer: `python3 fabrica.py autonomia`.')
         return L
-    L += ['', '## Reglas que Max podría autorizar (hoy NO están autorizadas)', '']
-    for x in cat.get('propuestas', []):
+    por_autorizar = [x for x in cat.get('propuestas', []) if x.get('estado') == 'propuesta']
+    if por_autorizar:
+        L += ['', '## Reglas que Max podría autorizar (hoy NO están autorizadas)', '']
+    for x in por_autorizar:
         L += ['**%s** (`%s`)' % (x['titulo'], x['id']), '- Cómo funciona: ' + x['como_funciona'], '- Qué ahorra: ' + x['ahorra'], '- Riesgo: ' + x['riesgo'],
               '- Cambia la política: %s. Hace falta: %s' % ('sí' if x['cambia_la_politica'] else 'no', x['requiere']), '']
     L += ['## Lo que Max ya autorizó', '']

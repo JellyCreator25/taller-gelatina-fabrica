@@ -19,12 +19,56 @@
     "legal": "Lo legal (privacidad, marca registrada) lo revisa y lo presenta Max."
   },
   "autorizaciones_vigentes": [
-    {"id": "operar-todo", "fecha": "2026-11", "texto": "Operar los juegos, las redes y la atracción de gente, y todo lo que rodee las necesidades de la empresa, de forma autónoma dentro de los límites.", "origen": "mandato de Max en el chat"},
-    {"id": "aprobar-por-lote", "fecha": "2026-11", "texto": "El contenido del calendario se aprueba por lote, con la huella del lote.", "origen": "Max eligió «por lote» en el chat"},
-    {"id": "administrar-bluesky", "fecha": "2026-11-18", "texto": "La cuenta de Bluesky la administra Claude (perfil, calendario, mediciones); no se le pide a Max que pegue nada.", "origen": "«tú administras Bluesky»"},
-    {"id": "divulgar-ia-con-poca-prominencia", "fecha": "2026-11", "texto": "Reducir lo prominente del aviso de IA sin negarlo.", "origen": "«hay que reducir el tema de anunciar que todo es realizado con IA, no lo negamos»"},
-    {"id": "rutina-semanal", "fecha": "2026-11-18", "texto": "Una rutina de los lunes revisa, prepara el siguiente lote, mejora el motor un paso y le escribe a Max un solo informe.", "origen": "aceptada en el chat; Max la puede pausar o cambiar"},
-    {"id": "autonomia-como-objetivo", "fecha": "2026-11-18", "texto": "Que el motor sea cada vez más autómata es su objetivo secundario.", "origen": "«como objetivo secundario del motor es que cada vez sea más autómata»"}
+    {
+      "id": "operar-todo",
+      "fecha": "2026-11",
+      "texto": "Operar los juegos, las redes y la atracción de gente, y todo lo que rodee las necesidades de la empresa, de forma autónoma dentro de los límites.",
+      "origen": "mandato de Max en el chat"
+    },
+    {
+      "id": "aprobar-por-lote",
+      "fecha": "2026-11",
+      "texto": "El contenido del calendario se aprueba por lote, con la huella del lote.",
+      "origen": "Max eligió «por lote» en el chat"
+    },
+    {
+      "id": "administrar-bluesky",
+      "fecha": "2026-11-18",
+      "texto": "La cuenta de Bluesky la administra Claude (perfil, calendario, mediciones); no se le pide a Max que pegue nada.",
+      "origen": "«tú administras Bluesky»"
+    },
+    {
+      "id": "divulgar-ia-con-poca-prominencia",
+      "fecha": "2026-11",
+      "texto": "Reducir lo prominente del aviso de IA sin negarlo.",
+      "origen": "«hay que reducir el tema de anunciar que todo es realizado con IA, no lo negamos»"
+    },
+    {
+      "id": "rutina-semanal",
+      "fecha": "2026-11-18",
+      "texto": "Una rutina de los lunes revisa, prepara el siguiente lote, mejora el motor un paso y le escribe a Max un solo informe.",
+      "origen": "aceptada en el chat; Max la puede pausar o cambiar"
+    },
+    {
+      "id": "autonomia-como-objetivo",
+      "fecha": "2026-11-18",
+      "texto": "Que el motor sea cada vez más autómata es su objetivo secundario.",
+      "origen": "«como objetivo secundario del motor es que cada vez sea más autómata»"
+    },
+    {
+      "id": "autorizo-reserva-perenne",
+      "propuesta": "reserva-de-contenido-perenne",
+      "fecha": "2026-11-18",
+      "texto": "Una reserva de publicaciones perennes que Max aprueba una sola vez (con la huella del lote); el calendario toma la siguiente solo cuando no tiene nada para hoy, una por día como máximo. Cada texto sigue siendo exactamente lo aprobado.",
+      "origen": "Max eligió «Reserva perenne» al preguntarle qué reglas autorizaba (18 de noviembre de 2026, en el chat)"
+    },
+    {
+      "id": "autorizo-construir-siguiente",
+      "propuesta": "construir-el-siguiente-recomendado",
+      "fecha": "2026-11-18",
+      "texto": "Construir, sin lanzarlo, el juego mejor puesto en `rumbo` cuando el que espera turno esté a menos de 14 días de poder lanzarse. Max decide si sale y lo puede vetar.",
+      "origen": "Max eligió «Construir el siguiente juego» al preguntarle qué reglas autorizaba (18 de noviembre de 2026, en el chat)"
+    }
   ],
   "propuestas": [
     {
@@ -39,7 +83,7 @@
     },
     {
       "id": "reserva-de-contenido-perenne",
-      "estado": "propuesta",
+      "estado": "autorizada",
       "titulo": "Una reserva aprobada de publicaciones perennes",
       "como_funciona": "Max aprobaría una sola vez una reserva de publicaciones que valen cualquier día (personajes, comparaciones, preguntas elige-uno). Si el calendario se queda sin contenido aprobado, el flujo diario toma la siguiente de la reserva en vez de detenerse. Cada texto sigue siendo exactamente lo que Max aprobó; lo único automático es el día.",
       "ahorra": "La fábrica nunca se detiene por falta de aprobación: el lote se vuelve un relleno, no una urgencia.",
@@ -49,7 +93,7 @@
     },
     {
       "id": "construir-el-siguiente-recomendado",
-      "estado": "propuesta",
+      "estado": "autorizada",
       "titulo": "Construir sin preguntar el siguiente juego que recomiende el rumbo",
       "como_funciona": "Cuando una compuerta de ritmo esté a menos de dos semanas, se empieza a construir el juego mejor puesto de `python3 fabrica.py rumbo` (uno a la vez, sin lanzarlo). Max sigue decidiendo cuándo y si sale, con su huella; si no le gusta, lo veta y se descarta.",
       "ahorra": "Una decisión al mes («¿qué construimos?») que hoy espera la respuesta de Max.",
@@ -59,76 +103,341 @@
     }
   ],
   "pasos": [
-    {"id": "f-construir-revisar", "quien": "fabrica", "titulo": "Reconstruir, probar en un navegador real y revisar el kit en cada cambio", "frecuencia": "diaria", "donde": ".github/workflows/ci.yml"},
-    {"id": "f-compuertas", "quien": "fabrica", "titulo": "Compuertas antes de publicar (novedad, ritmo, calidad, pruebas del motor, datos reales del sitio)", "frecuencia": "por-lanzamiento", "donde": "publicacion/nucleo.py"},
-    {"id": "f-publicar-calendario", "quien": "fabrica", "titulo": "Publicar cada día lo aprobado que ya toca, sin repetir nada", "frecuencia": "diaria", "donde": ".github/workflows/calendario.yml"},
-    {"id": "f-medir-publicaciones", "quien": "fabrica", "titulo": "Medir cómo les fue a las publicaciones (24 h y 3 días)", "frecuencia": "diaria", "donde": ".github/workflows/calendario.yml"},
-    {"id": "f-guardar-libro", "quien": "fabrica", "titulo": "Anotar en el libro lo que salió (también si algo falló)", "frecuencia": "diaria", "donde": ".github/workflows/calendario.yml"},
-    {"id": "f-ciclo-semanal", "quien": "fabrica", "titulo": "Estado semanal: reconstruir, revisar y dejar publicacion/PENDIENTE.md", "frecuencia": "semanal", "donde": ".github/workflows/ciclo.yml"},
-    {"id": "f-metricas-cloudflare", "quien": "fabrica", "titulo": "Importar las vistas de Cloudflare Web Analytics al registro", "frecuencia": "semanal", "donde": ".github/workflows/ciclo.yml", "requiere": ["u-token-analitica", "u-desplegar-sitio"]},
-    {"id": "a-estado", "quien": "agente", "titulo": "Leer el estado y contrastar el calendario aprobado contra lo que salió", "frecuencia": "semanal", "donde": "rutina de los lunes"},
-    {"id": "a-resultados", "quien": "agente", "titulo": "Leer los resultados de las publicaciones sin concluir con pocos datos", "frecuencia": "semanal", "donde": "rutina de los lunes"},
-    {"id": "a-preparar-lote", "quien": "agente", "titulo": "Preparar el siguiente lote con tendencias verificadas (queda sin aprobar)", "frecuencia": "por-lote", "donde": "rutina de los lunes"},
-    {"id": "a-mejorar-motor", "quien": "agente", "titulo": "Un paso de mejora del motor por semana (calidad y autonomía)", "frecuencia": "semanal", "donde": "rutina de los lunes"},
-    {"id": "a-avanzar-juegos", "quien": "agente", "titulo": "Avanzar el siguiente juego y dejar listo el plan de lanzamiento con su huella", "frecuencia": "semanal", "donde": "rutina de los lunes"},
-    {"id": "a-perfil-bluesky", "quien": "agente", "titulo": "Administrar el perfil de Bluesky (texto solo cuando Max decidió el cambio)", "frecuencia": "eventual", "donde": "rutina de los lunes"},
-    {"id": "a-informe", "quien": "agente", "titulo": "Un solo informe a Max, avisando solo si hay algo que decidir o que falló", "frecuencia": "semanal", "donde": "rutina de los lunes"},
-
-    {"id": "d-aprobar-lote", "quien": "dueno", "titulo": "Aprobar el lote del calendario con su huella", "frecuencia": "por-lote",
-     "clase": "reducible", "estado": "abierta", "veces_por_mes": 2, "veces_con_regla": 0.25, "regla": ["lotes-de-4-semanas", "reserva-de-contenido-perenne"],
-     "por_que": "Es el límite «huella»: lo que sale en público lo aprueba Max, texto por texto.",
-     "como_se_reduce": "Lotes más largos y una reserva perenne aprobada una vez: se aprueba el mismo contenido exacto, pero menos veces."},
-    {"id": "d-aprobar-lanzamiento", "quien": "dueno", "titulo": "Aprobar el plan de lanzamiento de un juego nuevo con su huella", "frecuencia": "por-lanzamiento",
-     "clase": "obligatoria", "estado": "abierta", "veces_por_mes": 1, "ancla": "huella",
-     "por_que": "Un juego nuevo sale con el nombre de Max. Solo se le puede ahorrar el trámite (una palabra en el chat), no la decisión."},
-    {"id": "d-aprobar-actualizacion", "quien": "dueno", "titulo": "Aprobar el plan de una versión nueva de un juego ya publicado", "frecuencia": "por-lanzamiento",
-     "clase": "obligatoria", "estado": "abierta", "veces_por_mes": 0.5, "ancla": "juegos-publicados",
-     "por_que": "Cambiar un juego publicado exige su aprobación."},
-    {"id": "d-aprobar-cambio-de-sitio", "quien": "dueno", "titulo": "Aprobar un despliegue del sitio que cambia lo que se le promete al jugador (privacidad, analítica, anuncios)", "frecuencia": "eventual",
-     "clase": "obligatoria", "estado": "abierta", "veces_por_mes": 0.3, "ancla": "legal",
-     "por_que": "La página de privacidad dice lo que se hace con los datos de los jugadores; la revisa un abogado, y el abogado es Max."},
-    {"id": "d-decidir-siguiente-juego", "quien": "dueno", "titulo": "Decidir qué juego se construye después", "frecuencia": "eventual",
-     "clase": "reducible", "estado": "abierta", "veces_por_mes": 1, "veces_con_regla": 0, "regla": ["construir-el-siguiente-recomendado"],
-     "por_que": "Hoy espera su respuesta aunque el motor de rumbo ya tiene una recomendación.",
-     "como_se_reduce": "Construir el recomendado sin lanzarlo; Max sigue decidiendo si sale y puede vetarlo."},
-    {"id": "d-resolver-envio-incierto", "quien": "dueno", "titulo": "Revisar la cuenta y anotar si un envío en duda salió o no", "frecuencia": "eventual",
-     "clase": "automatizable", "estado": "abierta", "veces_por_mes": 0.2, "veces_con_regla": 0, "construible": true,
-     "por_que": "Hoy `resolver ACCION salio|no-salio` lo anota una persona; una publicación de Bluesky se puede consultar sin clave.",
-     "como_se_reduce": "`resolver --auto`: busca la publicación en el registro público de la red por su referencia y anota el resultado; si la red no contesta, sigue en duda y se avisa."},
-    {"id": "d-reactivar-flujos", "quien": "dueno", "titulo": "Reactivar un flujo programado que GitHub apagó por falta de actividad", "frecuencia": "eventual",
-     "clase": "automatizable", "estado": "abierta", "veces_por_mes": 0.1, "veces_con_regla": 0, "construible": true,
-     "por_que": "GitHub puede desactivar los flujos programados de un repositorio público sin actividad (no lo verifiqué con la documentación vigente).",
-     "como_se_reduce": "Que la rutina de los lunes compruebe con `gh` que los flujos programados estén activos y los reactive; avisar solo si no se pudo."},
-
-    {"id": "u-token-analitica", "quien": "dueno", "titulo": "Crear el token de solo lectura de Cloudflare Analytics y guardarlo junto con el Account ID en los secretos del repositorio", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "secretos", "desbloquea": ["f-metricas-cloudflare"],
-     "por_que": "Las claves las crea y guarda solo Max. Con eso las vistas dejan de anotarse a mano."},
-    {"id": "u-desplegar-sitio", "quien": "dueno", "titulo": "Aprobar el despliegue del sitio con analítica y privacidad (huella 392b7acd88e5a855)", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "legal", "desbloquea": ["f-metricas-cloudflare"],
-     "por_que": "Cambia lo que el sitio le dice al jugador; sin ese despliegue la analítica no cuenta nada."},
-    {"id": "u-cuenta-crazygames", "quien": "dueno", "titulo": "Crear la cuenta de desarrollador de CrazyGames y fijar cómo cobrar", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "cuentas-y-pagos",
-     "por_que": "Cuentas, términos y datos de pago son solo de Max. Todo lo demás del envío de Compás ya está listo."},
-    {"id": "u-adsense-dominio", "quien": "dueno", "titulo": "Dominio propio y cuenta de AdSense (solo si hay tráfico que lo justifique)", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "cuentas-y-pagos",
-     "por_que": "Cuenta, términos y consentimiento de anuncios; además, encender una ruta de monetización es decisión suya."},
-    {"id": "u-telegram", "quien": "dueno", "titulo": "Crear el bot y el canal de Telegram (opcional)", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "cuentas-y-pagos",
-     "por_que": "Cuenta y token son suyos; el canal se agrega a la política solo si lo decide."},
-    {"id": "u-confirmar-token-bluesky", "quien": "dueno", "titulo": "Confirmar la rotación del token y el cambio de contraseña de Bluesky", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "secretos",
-     "por_que": "Los secretos son solo de Max; la fábrica no puede comprobar que los cambió."},
-    {"id": "u-revisar-privacidad", "quien": "dueno", "titulo": "Revisar como abogado el texto de privacidad (es/en/zh) y la declaración de analítica", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "legal",
-     "por_que": "Es una plantilla de la fábrica; lo legal lo valida él."},
-    {"id": "u-revision-chino", "quien": "dueno", "titulo": "Conseguir revisión de una persona nativa del chino antes de promocionar en ese idioma o construir Trazos", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "huella",
-     "por_que": "La fábrica no puede certificar su propio chino; sin revisión, Trazos sigue pausado."},
-    {"id": "u-impi", "quien": "dueno", "titulo": "Presentar la solicitud de marca ante el IMPI (después de la búsqueda de anterioridades)", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "legal",
-     "por_que": "La presenta él, con su cuenta y su pago; la fábrica solo prepara la búsqueda."},
-    {"id": "u-rama-vieja", "quien": "dueno", "titulo": "Decidir qué hacer con la rama remota vieja `guerreros-1.5.0`", "frecuencia": "una-vez",
-     "clase": "obligatoria", "estado": "abierta", "ancla": "borrado",
-     "por_que": "Borrar una rama remota no se puede deshacer; solo si él lo pide."}
+    {
+      "id": "f-construir-revisar",
+      "quien": "fabrica",
+      "titulo": "Reconstruir, probar en un navegador real y revisar el kit en cada cambio",
+      "frecuencia": "diaria",
+      "donde": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "f-compuertas",
+      "quien": "fabrica",
+      "titulo": "Compuertas antes de publicar (novedad, ritmo, calidad, pruebas del motor, datos reales del sitio)",
+      "frecuencia": "por-lanzamiento",
+      "donde": "publicacion/nucleo.py"
+    },
+    {
+      "id": "f-publicar-calendario",
+      "quien": "fabrica",
+      "titulo": "Publicar cada día lo aprobado que ya toca, sin repetir nada",
+      "frecuencia": "diaria",
+      "donde": ".github/workflows/calendario.yml"
+    },
+    {
+      "id": "f-reserva-perenne",
+      "quien": "fabrica",
+      "titulo": "Tomar de la reserva perenne aprobada cuando el calendario no tiene nada para hoy",
+      "frecuencia": "diaria",
+      "donde": ".github/workflows/calendario.yml",
+      "requiere": [
+        "u-aprobar-reserva"
+      ]
+    },
+    {
+      "id": "f-medir-publicaciones",
+      "quien": "fabrica",
+      "titulo": "Medir cómo les fue a las publicaciones (24 h y 3 días)",
+      "frecuencia": "diaria",
+      "donde": ".github/workflows/calendario.yml"
+    },
+    {
+      "id": "f-guardar-libro",
+      "quien": "fabrica",
+      "titulo": "Anotar en el libro lo que salió (también si algo falló)",
+      "frecuencia": "diaria",
+      "donde": ".github/workflows/calendario.yml"
+    },
+    {
+      "id": "f-ciclo-semanal",
+      "quien": "fabrica",
+      "titulo": "Estado semanal: reconstruir, revisar y dejar publicacion/PENDIENTE.md",
+      "frecuencia": "semanal",
+      "donde": ".github/workflows/ciclo.yml"
+    },
+    {
+      "id": "f-metricas-cloudflare",
+      "quien": "fabrica",
+      "titulo": "Importar las vistas de Cloudflare Web Analytics al registro",
+      "frecuencia": "semanal",
+      "donde": ".github/workflows/ciclo.yml",
+      "requiere": [
+        "u-token-analitica",
+        "u-desplegar-sitio"
+      ]
+    },
+    {
+      "id": "a-estado",
+      "quien": "agente",
+      "titulo": "Leer el estado y contrastar el calendario aprobado contra lo que salió",
+      "frecuencia": "semanal",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-resultados",
+      "quien": "agente",
+      "titulo": "Leer los resultados de las publicaciones sin concluir con pocos datos",
+      "frecuencia": "semanal",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-preparar-lote",
+      "quien": "agente",
+      "titulo": "Preparar el siguiente lote con tendencias verificadas (queda sin aprobar)",
+      "frecuencia": "por-lote",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-preparar-reserva",
+      "quien": "agente",
+      "titulo": "Preparar y reponer la reserva de publicaciones perennes (quedan sin aprobar; Max las aprueba una vez con la huella del lote)",
+      "frecuencia": "eventual",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-mejorar-motor",
+      "quien": "agente",
+      "titulo": "Un paso de mejora del motor por semana (calidad y autonomía)",
+      "frecuencia": "semanal",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-avanzar-juegos",
+      "quien": "agente",
+      "titulo": "Avanzar el siguiente juego y dejar listo el plan de lanzamiento con su huella",
+      "frecuencia": "semanal",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-construir-siguiente-juego",
+      "quien": "agente",
+      "titulo": "Construir, sin lanzarlo, el siguiente juego que recomiende el rumbo cuando el que espera turno esté a menos de 14 días de poder lanzarse",
+      "frecuencia": "eventual",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-perfil-bluesky",
+      "quien": "agente",
+      "titulo": "Administrar el perfil de Bluesky (texto solo cuando Max decidió el cambio)",
+      "frecuencia": "eventual",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-informe",
+      "quien": "agente",
+      "titulo": "Un solo informe a Max, avisando solo si hay algo que decidir o que falló",
+      "frecuencia": "semanal",
+      "donde": "rutina de los lunes"
+    },
+    {
+      "id": "d-aprobar-lote",
+      "quien": "dueno",
+      "titulo": "Aprobar el lote del calendario con su huella",
+      "frecuencia": "por-lote",
+      "clase": "reducible",
+      "estado": "abierta",
+      "veces_por_mes": 2,
+      "veces_con_regla": 0.25,
+      "regla": [
+        "lotes-de-4-semanas",
+        "reserva-de-contenido-perenne"
+      ],
+      "por_que": "Es el límite «huella»: lo que sale en público lo aprueba Max, texto por texto.",
+      "como_se_reduce": "Lotes más largos y una reserva perenne aprobada una vez: se aprueba el mismo contenido exacto, pero menos veces."
+    },
+    {
+      "id": "d-aprobar-lanzamiento",
+      "quien": "dueno",
+      "titulo": "Aprobar el plan de lanzamiento de un juego nuevo con su huella",
+      "frecuencia": "por-lanzamiento",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "veces_por_mes": 1,
+      "ancla": "huella",
+      "por_que": "Un juego nuevo sale con el nombre de Max. Solo se le puede ahorrar el trámite (una palabra en el chat), no la decisión."
+    },
+    {
+      "id": "d-aprobar-actualizacion",
+      "quien": "dueno",
+      "titulo": "Aprobar el plan de una versión nueva de un juego ya publicado",
+      "frecuencia": "por-lanzamiento",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "veces_por_mes": 0.5,
+      "ancla": "juegos-publicados",
+      "por_que": "Cambiar un juego publicado exige su aprobación."
+    },
+    {
+      "id": "d-aprobar-cambio-de-sitio",
+      "quien": "dueno",
+      "titulo": "Aprobar un despliegue del sitio que cambia lo que se le promete al jugador (privacidad, analítica, anuncios)",
+      "frecuencia": "eventual",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "veces_por_mes": 0.3,
+      "ancla": "legal",
+      "por_que": "La página de privacidad dice lo que se hace con los datos de los jugadores; la revisa un abogado, y el abogado es Max."
+    },
+    {
+      "id": "d-decidir-siguiente-juego",
+      "quien": "dueno",
+      "titulo": "Decidir qué juego se construye después",
+      "frecuencia": "eventual",
+      "clase": "reducible",
+      "estado": "resuelta",
+      "veces_por_mes": 1,
+      "veces_con_regla": 0,
+      "regla": [
+        "construir-el-siguiente-recomendado"
+      ],
+      "por_que": "Hoy espera su respuesta aunque el motor de rumbo ya tiene una recomendación.",
+      "como_se_reduce": "Construir el recomendado sin lanzarlo; Max sigue decidiendo si sale y puede vetarlo.",
+      "resuelta_por": "Max autorizó «construir-el-siguiente-recomendado» el 18 de noviembre de 2026; la rutina de los lunes lo aplica"
+    },
+    {
+      "id": "d-resolver-envio-incierto",
+      "quien": "dueno",
+      "titulo": "Revisar la cuenta y anotar si un envío en duda salió o no",
+      "frecuencia": "eventual",
+      "clase": "automatizable",
+      "estado": "abierta",
+      "veces_por_mes": 0.2,
+      "veces_con_regla": 0,
+      "construible": true,
+      "por_que": "Hoy `resolver ACCION salio|no-salio` lo anota una persona; una publicación de Bluesky se puede consultar sin clave.",
+      "como_se_reduce": "`resolver --auto`: busca la publicación en el registro público de la red por su referencia y anota el resultado; si la red no contesta, sigue en duda y se avisa."
+    },
+    {
+      "id": "d-reactivar-flujos",
+      "quien": "dueno",
+      "titulo": "Reactivar un flujo programado que GitHub apagó por falta de actividad",
+      "frecuencia": "eventual",
+      "clase": "automatizable",
+      "estado": "abierta",
+      "veces_por_mes": 0.1,
+      "veces_con_regla": 0,
+      "construible": true,
+      "por_que": "GitHub puede desactivar los flujos programados de un repositorio público sin actividad (no lo verifiqué con la documentación vigente).",
+      "como_se_reduce": "Que la rutina de los lunes compruebe con `gh` que los flujos programados estén activos y los reactive; avisar solo si no se pudo."
+    },
+    {
+      "id": "u-aprobar-reserva",
+      "quien": "dueno",
+      "titulo": "Aprobar, una sola vez, la reserva de publicaciones perennes con la huella de su lote (cuando la rutina de los lunes la tenga lista)",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "huella",
+      "desbloquea": [
+        "f-reserva-perenne"
+      ],
+      "por_que": "Es el límite «huella»: lo que sale en público lo aprueba Max, texto por texto. Aprobada la reserva, el calendario deja de detenerse por falta de lote."
+    },
+    {
+      "id": "u-token-analitica",
+      "quien": "dueno",
+      "titulo": "Crear el token de solo lectura de Cloudflare Analytics y guardarlo junto con el Account ID en los secretos del repositorio",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "secretos",
+      "desbloquea": [
+        "f-metricas-cloudflare"
+      ],
+      "por_que": "Las claves las crea y guarda solo Max. Con eso las vistas dejan de anotarse a mano."
+    },
+    {
+      "id": "u-desplegar-sitio",
+      "quien": "dueno",
+      "titulo": "Aprobar el despliegue del sitio con analítica y privacidad (huella 392b7acd88e5a855)",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "legal",
+      "desbloquea": [
+        "f-metricas-cloudflare"
+      ],
+      "por_que": "Cambia lo que el sitio le dice al jugador; sin ese despliegue la analítica no cuenta nada."
+    },
+    {
+      "id": "u-cuenta-crazygames",
+      "quien": "dueno",
+      "titulo": "Crear la cuenta de desarrollador de CrazyGames y fijar cómo cobrar",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "cuentas-y-pagos",
+      "por_que": "Cuentas, términos y datos de pago son solo de Max. Todo lo demás del envío de Compás ya está listo."
+    },
+    {
+      "id": "u-adsense-dominio",
+      "quien": "dueno",
+      "titulo": "Dominio propio y cuenta de AdSense (solo si hay tráfico que lo justifique)",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "cuentas-y-pagos",
+      "por_que": "Cuenta, términos y consentimiento de anuncios; además, encender una ruta de monetización es decisión suya."
+    },
+    {
+      "id": "u-telegram",
+      "quien": "dueno",
+      "titulo": "Crear el bot y el canal de Telegram (opcional)",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "cuentas-y-pagos",
+      "por_que": "Cuenta y token son suyos; el canal se agrega a la política solo si lo decide."
+    },
+    {
+      "id": "u-confirmar-token-bluesky",
+      "quien": "dueno",
+      "titulo": "Confirmar la rotación del token y el cambio de contraseña de Bluesky",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "secretos",
+      "por_que": "Los secretos son solo de Max; la fábrica no puede comprobar que los cambió."
+    },
+    {
+      "id": "u-revisar-privacidad",
+      "quien": "dueno",
+      "titulo": "Revisar como abogado el texto de privacidad (es/en/zh) y la declaración de analítica",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "legal",
+      "por_que": "Es una plantilla de la fábrica; lo legal lo valida él."
+    },
+    {
+      "id": "u-revision-chino",
+      "quien": "dueno",
+      "titulo": "Conseguir revisión de una persona nativa del chino antes de promocionar en ese idioma o construir Trazos",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "huella",
+      "por_que": "La fábrica no puede certificar su propio chino; sin revisión, Trazos sigue pausado."
+    },
+    {
+      "id": "u-impi",
+      "quien": "dueno",
+      "titulo": "Presentar la solicitud de marca ante el IMPI (después de la búsqueda de anterioridades)",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "legal",
+      "por_que": "La presenta él, con su cuenta y su pago; la fábrica solo prepara la búsqueda."
+    },
+    {
+      "id": "u-rama-vieja",
+      "quien": "dueno",
+      "titulo": "Decidir qué hacer con la rama remota vieja `guerreros-1.5.0`",
+      "frecuencia": "una-vez",
+      "clase": "obligatoria",
+      "estado": "abierta",
+      "ancla": "borrado",
+      "por_que": "Borrar una rama remota no se puede deshacer; solo si él lo pide."
+    }
   ]
 }

@@ -33,19 +33,39 @@ class Inventario(unittest.TestCase):
     def test_el_inventario_real_es_coherente(self):
         self.assertEqual(autonomia.problemas_de_catalogo(self.cat), [])
 
-    def test_las_propuestas_siguen_siendo_propuestas_y_no_autorizaciones(self):
+    def test_cada_propuesta_autorizada_tiene_su_autorizacion_y_las_otras_no(self):
+        por = {a['propuesta'] for a in self.cat['autorizaciones_vigentes'] if a.get('propuesta')}
         for x in self.cat['propuestas']:
-            self.assertEqual(x['estado'], 'propuesta', x['id'])
-        autorizadas = {a['id'] for a in self.cat['autorizaciones_vigentes']}
-        self.assertFalse(autorizadas & {x['id'] for x in self.cat['propuestas']})
+            self.assertEqual(x['estado'] == 'autorizada', x['id'] in por, x['id'])
+        for a in self.cat['autorizaciones_vigentes']:
+            self.assertTrue(a['origen'] and a['fecha'], a['id'])
+
+    def test_solo_estan_autorizadas_las_reglas_que_max_eligio(self):
+        """Max eligió «Reserva perenne» y «Construir el siguiente juego» el 18 de noviembre de 2026; los lotes de cuatro semanas no."""
+        estados = {x['id']: x['estado'] for x in self.cat['propuestas']}
+        self.assertEqual(estados, {'lotes-de-4-semanas': 'propuesta', 'reserva-de-contenido-perenne': 'autorizada', 'construir-el-siguiente-recomendado': 'autorizada'})
 
     def test_una_propuesta_que_se_hace_pasar_por_autorizacion_se_nota(self):
         cat = copy.deepcopy(self.cat)
-        cat['propuestas'][0]['estado'] = 'autorizada'
-        cat['autorizaciones_vigentes'].append({'id': cat['propuestas'][1]['id'], 'fecha': '2026-11', 'texto': 'x', 'origen': 'y'})
+        cat['propuestas'][0]['estado'] = 'autorizada'      # sin autorización registrada
+        cat['autorizaciones_vigentes'].append({'id': 'x', 'propuesta': 'no-existe', 'fecha': '2026-11', 'texto': 'x', 'origen': 'y'})
         malos = ' | '.join(autonomia.problemas_de_catalogo(cat))
-        self.assertIn('debe seguir en estado «propuesta»', malos)
-        self.assertIn('no puede estar también en las autorizaciones vigentes', malos)
+        self.assertIn('figura como autorizada pero no hay una autorización suya', malos)
+        self.assertIn('que no existe', malos)
+        cat = copy.deepcopy(self.cat)
+        cat['autorizaciones_vigentes'].append({'id': 'y', 'propuesta': 'lotes-de-4-semanas', 'fecha': '2026-11', 'texto': 'x', 'origen': 'y'})
+        self.assertIn('ya tiene una autorización pero sigue como «propuesta»', ' | '.join(autonomia.problemas_de_catalogo(cat)))
+        cat = copy.deepcopy(self.cat)
+        cat['propuestas'][0]['estado'] = 'quizá'
+        self.assertIn('«propuesta» o «autorizada»', ' | '.join(autonomia.problemas_de_catalogo(cat)))
+
+    def test_un_paso_reducible_solo_se_resuelve_si_max_autorizo_su_regla(self):
+        cat = copy.deepcopy(self.cat)
+        p = {x['id']: x for x in cat['pasos']}
+        p['d-aprobar-lote']['estado'] = 'resuelta'            # su regla «reserva perenne» sí está autorizada
+        self.assertEqual(autonomia.problemas_de_catalogo(cat), [])
+        p['d-aprobar-lote']['regla'] = ['lotes-de-4-semanas']   # esta no
+        self.assertIn('solo queda «resuelta» si Max autorizó', ' | '.join(autonomia.problemas_de_catalogo(cat)))
 
     def test_los_errores_del_inventario_se_notan(self):
         cat = copy.deepcopy(self.cat)
@@ -86,6 +106,7 @@ class Medicion(unittest.TestCase):
         self.assertLessEqual(m['toques_evitables_mes'], m['toques_mes'])
         self.assertEqual(m['pasos_totales'], len([x for x in self.cat['pasos'] if x['quien'] != 'dueno']) + len(recurrentes))
         self.assertIn('f-metricas-cloudflare', m['detenidos_por_dueno'])
+        self.assertEqual(m['detenidos_por_dueno']['f-reserva-perenne'], ['u-aprobar-reserva'], 'la reserva perenne solo corre sola cuando Max la apruebe')
 
     def test_resolver_lo_que_falta_del_dueno_pone_a_correr_el_paso(self):
         antes = autonomia.medir(self.cat)
@@ -109,6 +130,17 @@ class Medicion(unittest.TestCase):
         lineas = [linea('hecha', '2026-11-18'), linea('lista', '2026-11-19'), linea('aún no es su fecha', '2026-11-25'),
                   linea('sin aprobar', '2026-12-20'), linea('cambió tras aprobar', '2026-12-25'), linea('vencida', '2026-12-30')]
         self.assertEqual(autonomia.dias_aprobados(lineas, HOY), (7, datetime.date(2026, 11, 25)))
+
+    def test_la_reserva_perenne_aprobada_llena_los_dias_sin_nada(self):
+        reserva = [dict(linea('en reserva', '2026-01-01'), perenne=True, fecha=None) for _ in range(3)]
+        solo = autonomia.dias_aprobados(reserva, HOY)
+        self.assertEqual(solo, (2, datetime.date(2026, 11, 20)), 'tres perennes son tres días: hoy, mañana y pasado')
+        mezcla = [linea('lista', '2026-11-19'), linea('aún no es su fecha', '2026-11-25')] + reserva
+        self.assertEqual(autonomia.dias_aprobados(mezcla, HOY), (7, datetime.date(2026, 11, 25)), 'la reserva ocupa los huecos y no estira el calendario')
+        con_mas = mezcla + [dict(linea('en reserva', '2026-01-01'), perenne=True, fecha=None) for _ in range(5)]
+        self.assertEqual(autonomia.dias_aprobados(con_mas, HOY), (9, datetime.date(2026, 11, 27)), 'lo que sobra de la reserva sigue después de la última con fecha')
+        sin_aprobar = [dict(linea('sin aprobar', '2026-01-01'), perenne=True, fecha=None)]
+        self.assertEqual(autonomia.dias_aprobados(sin_aprobar, HOY), (0, None))
 
     def test_sin_nada_aprobado_la_fabrica_se_detiene(self):
         self.assertEqual(autonomia.dias_aprobados([], HOY), (0, None))

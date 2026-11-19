@@ -15,6 +15,13 @@ Firma sus cambios con la identidad `administrador-del-motor <administrador-del-m
 3. **Autonomía (objetivo secundario).** Cada semana la fábrica debe poder hacer sola un poco más que la anterior. Construir lo «automatizable» del inventario y, cuando un paso queda automatizado, probado y subido, pasarlo a «resuelta» en `motor/autonomia.json` con el motivo en la bitácora. Si algo nuevo le pide a Max, explicarlo en el inventario (si no, el aviso de «los toques de Max subieron» se queda).
 4. **Mantener el latido.** Comprobar que los flujos programados siguen activos y reactivar los que GitHub haya apagado por inactividad (solo los que ya existen en `.github/workflows/`).
 
+## Reglas que Max ya autorizó (se aplican tal cual, no se amplían)
+
+Están en `motor/autonomia.json → autorizaciones_vigentes`, con su origen. Las demás propuestas **no** valen hasta que Max las autorice en el chat.
+
+- **Reserva perenne** (18 de noviembre de 2026). Publicaciones con `perenne: true` en `contenido/calendario.json`: sin fecha ni años en el texto, que Max aprueba una sola vez con la huella del lote. El calendario las toma solo cuando no tiene nada para hoy, una por día, y nunca con un envío en duda. Cada texto sigue siendo exactamente lo aprobado. El administrador no las escribe ni las aprueba: las prepara la rutina de los lunes, las aprueba Max, y el administrador solo vigila que la reserva no se vacíe (chequeo `reserva-vacia` y `reserva-baja`).
+- **Construir el siguiente juego sin preguntar** (18 de noviembre de 2026). Lo aplica la rutina de los lunes: sin lanzarlo, y solo cuando el juego que espera turno esté a menos de 14 días de poder lanzarse. Max decide si sale, con su huella, y puede vetarlo.
+
 ## Cada corrida, en este orden
 
 1. Actualizar el repositorio (`git pull --rebase`) y leer esta carta, la bitácora (`python3 fabrica.py administrador bitacora`) y `LEEME-DUENO.md` solo si hace falta.
