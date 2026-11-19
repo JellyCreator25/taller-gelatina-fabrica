@@ -118,10 +118,22 @@ class QueFalta(unittest.TestCase):
         for ruta in ('portales', 'adsense-sitio'):
             self.assertTrue(any('módulo «anuncios»' in x and 'pruebas del motor vigentes' in x for x in self.est[ruta]['listo']), self.est[ruta])
 
-    def test_adsense_dice_que_falta_dominio_cuenta_consentimiento_y_analitica(self):
+    def test_adsense_dice_que_falta_dominio_cuenta_y_consentimiento(self):
         faltan = ' | '.join(self.est['adsense-sitio']['falta_dueno'])
-        for esperado in ('dominio propio', 'cuenta de AdSense', 'consentimiento', 'analítica'):
+        for esperado in ('dominio propio', 'cuenta de AdSense', 'consentimiento'):
             self.assertIn(esperado, faltan)
+
+    def test_la_analitica_se_reporta_segun_lo_que_diga_el_sitio(self):
+        """Activa → aparece como lista y ya no se pide; sin activar → se pide. Sigue lo que diga publicacion/sitio.json."""
+        sitio = json.loads((RAIZ / 'publicacion' / 'sitio.json').read_text(encoding='utf-8'))
+        faltan = ' | '.join(self.est['adsense-sitio']['falta_dueno'])
+        listo = ' | '.join(self.est['adsense-sitio']['listo'])
+        if sitio.get('analitica') == 'cloudflare':
+            self.assertIn('analítica de visitas activa', listo)
+            self.assertNotIn('analítica', faltan)
+        else:
+            self.assertIn('analítica', faltan)
+            self.assertNotIn('analítica de visitas activa', listo)
 
     def test_donaciones_pide_solo_el_enlace(self):
         self.assertEqual(len(self.est['donaciones']['falta_dueno']), 1)

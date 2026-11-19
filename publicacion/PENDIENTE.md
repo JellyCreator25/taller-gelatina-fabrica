@@ -11,7 +11,7 @@ Lo escribe `python3 fabrica.py ciclo`. No contiene claves ni fechas; lo que sale
 
 - Novedad: distinto
 - **Listo para aprobar** (1 acciones pendientes: sitio-propio).
-  Lee el plan con `python3 fabrica.py publicar guerreros-gelatina` y, si está bien: `python3 fabrica.py publicar guerreros-gelatina --ejecutar --aprobar ef8a8864d76e24c2`
+  Lee el plan con `python3 fabrica.py publicar guerreros-gelatina` y, si está bien: `python3 fabrica.py publicar guerreros-gelatina --ejecutar --aprobar 392b7acd88e5a855`
 
 ## torre-gelatina (v1.1.0)
 
@@ -73,11 +73,11 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 ### AdSense en el sitio propio (apagada)
 - Listo: módulo «anuncios» v1.0.0 con 25 pruebas del motor vigentes
 - Listo: juegos con anuncios en cortes naturales: compas-gelatina
+- Listo: analítica de visitas activa (Cloudflare Web Analytics)
 - Falta (fábrica): el sitio muestra 2 juego(s); con pocos juegos AdSense puede rechazarlo por contenido escaso
 - Falta (dueño): un dominio propio: hoy el sitio vive en taller-gelatina.pages.dev, y los reportes de editores indican que AdSense no aprueba subdominios gratuitos
 - Falta (dueño): cuenta de AdSense aprobada para ese dominio, la solicitud aparte de «H5 Games Ads» y el identificador pub-… en publicacion/sitio.json
 - Falta (dueño): configurar en la cuenta de AdSense el mensaje de consentimiento (obligatorio para tráfico del EEE, el Reino Unido y Suiza) y marcar consentimiento_listo en la política
-- Falta (dueño): decidir la analítica de visitas (Cloudflare Web Analytics): sin ella no hay forma de saber cuántas sesiones hay ni de medir ingresos por visita
 
 ### Donaciones y pago libre (apagada)
 - Listo: el botón de apoyo ya existe en el motor y se muestra solo cuando hay enlace

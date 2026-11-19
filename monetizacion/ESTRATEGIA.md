@@ -4,7 +4,7 @@ Escrita el 18 de noviembre de 2026. Las reglas de las plataformas cambian: antes
 
 ## En tres líneas
 
-1. Meter anuncios es lo fácil: el motor ya lo sabe hacer, apagado, y se enciende con una línea. Lo difícil y lo lento es **que alguien los vea**: sin visitas no hay ingresos, y hoy el sitio no tiene analítica.
+1. Meter anuncios es lo fácil: el motor ya lo sabe hacer, apagado, y se enciende con una línea. Lo difícil y lo lento es **que alguien los vea**: sin visitas no hay ingresos. La analítica de visitas (Cloudflare Web Analytics, sin cookies) ya está activada en el panel y declarada en `sitio.json` desde el 18 de noviembre de 2026; empieza a contar cuando se despliegue el sitio.
 2. Hay tres rutas. La que puede dar los primeros pesos antes es **un portal con revenue share** (CrazyGames primero), porque aporta sus propios jugadores; **AdSense en el sitio propio** exige dominio propio y aprobaciones que tardan; **las donaciones** son inmediatas pero pequeñas.
 3. Los primeros ingresos reales, en el mejor caso, llegan en semanas, y el primer *cobro* en meses, porque los portales pagan al juntar un mínimo (ver las cuentas abajo). Ninguna cifra de aquí es una promesa.
 
@@ -58,7 +58,7 @@ Con 100 sesiones por día, llegar a un mínimo de pago de 50 tarda de 2 a 6 mese
 
 1. **Ya hecho**: módulo, política, estado, versión para CrazyGames, ganchos en Compás (aún no publicado: sale con anuncios apagados en el sitio propio, y la versión de portal los usa) y su **paquete de envío a CrazyGames** (`python3 fabrica.py monetizar envio compas-gelatina`: tres portadas, dos videos de vista previa y la ficha `kit/ficha-crazygames.md`, con cada requisito del portal contra el estado real del juego). Con CrazyGames, el módulo toma el idioma del jugador de su SDK, como exige el portal.
 2. **Compás primero** como ejemplo de portal. Los ganchos de **Guerreros** (anuncio al pasar a otra batalla desde el cartel de resultado) ya están en la rama `guerreros-1.5.0-anuncios`, junto a su actualización de calidad: apagados por defecto y sin publicar; el paquete de envío de Guerreros se hace después, si se decide mandarlo a un portal. Torre, solo si se decide mandarlo a portales distinto de Stack.
-3. **Medición**: decidir la analítica (Cloudflare Web Analytics) para saber cuántas sesiones hay. Sin eso, no hay cuentas reales.
+3. **Medición**: la analítica (Cloudflare Web Analytics) quedó activada el 18 de noviembre de 2026 y `sitio.json` ya lo dice; cuenta desde el siguiente despliegue del sitio. Falta, si se quiere el informe semanal automático, el token de solo lectura (`CLOUDFLARE_ANALITICA_TOKEN`) y el `CLOUDFLARE_ACCOUNT_ID`, que crea el dueño.
 4. **AdSense** solo cuando haya dominio y tráfico que justifique la espera de aprobación.
 5. **Datos de ingresos**: hoy no se leen solos (los reportes de cada portal y de AdSense necesitan una clave tuya); se anotan con `python3 fabrica.py metricas anotar`. Leerlos solos sería la siguiente mejora del motor y requiere esas claves.
 
