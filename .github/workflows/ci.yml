@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0     # la guardia del administrador lee el historial
       - name: Preparar Python con Pillow (la imagen que se sube a las redes)
         run: |
           python3 -m venv .venv
@@ -26,6 +28,8 @@ jobs:
           .venv/bin/python -I fabrica.py revisar todos
           .venv/bin/python -I fabrica.py novedad todos
           .venv/bin/python -I fabrica.py sitio
+      - name: Guardia del administrador del motor (ninguno de sus cambios toca lo que su carta le prohíbe)
+        run: .venv/bin/python -I fabrica.py administrador guardia
       - name: Lo guardado en salida/ coincide con lo que se reconstruye
         # Si falla: corre «python3 fabrica.py todo todos» en tu computadora y guarda los cambios.
         run: git diff --exit-code -- salida
