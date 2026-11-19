@@ -1,6 +1,6 @@
 # Estado de la fábrica
 
-Lo escribe `python3 fabrica.py ciclo`. No contiene claves ni fechas; lo que sale en el libro está en `publicacion/libro.jsonl`.
+Lo escribe `python3 fabrica.py ciclo`. No contiene claves; las únicas fechas son las del calendario aprobado (sección «Autonomía»). Lo que sale en el libro está en `publicacion/libro.jsonl`.
 
 ## compas-gelatina (v1.0.0)
 
@@ -56,7 +56,9 @@ Niveles: 1 Base · 2 Con sonido · 3 Con jugo y accesible · 4 Con música · 5 
 - torre-gelatina: nivel 2 (Con sonido) — falta: Módulo «accesible»: menos movimiento, alto contraste y anuncios para lector de pantalla (declarado en «motor» y llamado por el código del juego).
 
 Lo que sigue para el motor:
-1. Actualizar «guerreros-gelatina» del nivel 2 al 5 — Una versión nueva con lo que le falta (accesible, efectos, musica, marca) mejora el juego y da una novedad que anunciar.
+1. Automatizar: Reactivar un flujo programado que GitHub apagó por falta de actividad — Hoy lo hace Max (~0.1 veces al mes, estimado). Que la rutina de los lunes compruebe con `gh` que los flujos programados estén activos y los reactive; avisar solo si no se pudo.
+2. Automatizar: Revisar la cuenta y anotar si un envío en duda salió o no — Hoy lo hace Max (~0.2 veces al mes, estimado). `resolver --auto`: busca la publicación en el registro público de la red por su referencia y anota el resultado; si la red no contesta, sigue en duda y se avisa.
+3. Actualizar «guerreros-gelatina» del nivel 2 al 5 — Una versión nueva con lo que le falta (accesible, efectos, musica, marca) mejora el juego y da una novedad que anunciar.
 
 ## Monetización: qué falta para cobrar
 
@@ -94,6 +96,16 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 | 10,000 | US$2 | 840.00 | 2 |
 | 10,000 | US$5 | 2,100.00 | 1 |
 
+
+## Autonomía: cuánto corre la fábrica sin Max
+
+- **Contenido aprobado por salir:** hasta el 2026-11-30 (11 días). Cuando se acabe, el calendario se detiene hasta que Max apruebe un lote nuevo.
+- Espera su aprobación el plan de «guerreros-gelatina» (huella 392b7acd88e5a855).
+- Pasos del ciclo que corren sin Max: 13 de 21 (62 %).
+- Toques de Max por mes (estimado del inventario, no medido): 5.1; de ellos evitables: 3.3. Si Max autorizara las reglas propuestas bajarían a 2.05; si solo se construye lo automatizable, a 4.8.
+- «f-metricas-cloudflare» no corre solo todavía: falta «u-token-analitica», «u-desplegar-sitio».
+- Lo que la fábrica puede automatizar sin pedirle nada a Max (entra a la cola del motor): Revisar la cuenta y anotar si un envío en duda salió o no; Reactivar un flujo programado que GitHub apagó por falta de actividad.
+- Detalle, reglas que Max podría autorizar y lo que solo él puede hacer: `python3 fabrica.py autonomia`.
 
 ## Bluesky: qué ha funcionado
 

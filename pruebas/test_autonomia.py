@@ -1,0 +1,210 @@
+"""Pruebas del objetivo secundario del motor, la autonomía: el inventario es coherente, lo «reducible» nunca se hace pasar por autorización,
+solo lo construible sin Max entra a la cola del motor, los días aprobados se cuentan solo con lo vigente y el registro semanal no se duplica.
+Ninguna toca la red ni abre un navegador.
+Correr: python3 -I -m unittest discover -s pruebas   (desde la carpeta de la fábrica)"""
+import copy
+import datetime
+import json
+import pathlib
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+
+RAIZ = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(RAIZ))
+sys.path.insert(0, str(RAIZ / 'herramientas'))
+
+import autonomia  # noqa: E402
+import motor  # noqa: E402
+
+HOY = datetime.date(2026, 11, 18)
+
+
+def linea(estado, fecha):
+    return {'id': 'x-' + fecha, 'estado': estado, 'fecha': fecha}
+
+
+class Inventario(unittest.TestCase):
+    def setUp(self):
+        self.cat = autonomia.catalogo(RAIZ)
+
+    def test_el_inventario_real_es_coherente(self):
+        self.assertEqual(autonomia.problemas_de_catalogo(self.cat), [])
+
+    def test_las_propuestas_siguen_siendo_propuestas_y_no_autorizaciones(self):
+        for x in self.cat['propuestas']:
+            self.assertEqual(x['estado'], 'propuesta', x['id'])
+        autorizadas = {a['id'] for a in self.cat['autorizaciones_vigentes']}
+        self.assertFalse(autorizadas & {x['id'] for x in self.cat['propuestas']})
+
+    def test_una_propuesta_que_se_hace_pasar_por_autorizacion_se_nota(self):
+        cat = copy.deepcopy(self.cat)
+        cat['propuestas'][0]['estado'] = 'autorizada'
+        cat['autorizaciones_vigentes'].append({'id': cat['propuestas'][1]['id'], 'fecha': '2026-11', 'texto': 'x', 'origen': 'y'})
+        malos = ' | '.join(autonomia.problemas_de_catalogo(cat))
+        self.assertIn('debe seguir en estado «propuesta»', malos)
+        self.assertIn('no puede estar también en las autorizaciones vigentes', malos)
+
+    def test_los_errores_del_inventario_se_notan(self):
+        cat = copy.deepcopy(self.cat)
+        p = {x['id']: x for x in cat['pasos']}
+        p['d-aprobar-lote']['regla'] = ['no-existe']
+        p['d-aprobar-lanzamiento']['ancla'] = 'inventado'
+        p['d-resolver-envio-incierto']['veces_con_regla'] = 9
+        del p['d-reactivar-flujos']['construible']
+        p['f-ciclo-semanal']['requiere'] = ['a-estado']
+        p['u-impi']['por_que'] = ''
+        del p['a-informe']['donde']
+        cat['pasos'].append(dict(p['a-informe'], id='d-aprobar-lote'))
+        malos = ' | '.join(autonomia.problemas_de_catalogo(cat))
+        for esperado in ('«regla» debe nombrar propuestas que existan', 'se ancla en uno de los límites', 'no puede ser mayor', '«construible»',
+                         'solo se puede requerir un paso del dueño', 'dice por qué es suyo', 'falta «donde»', 'id» único'):
+            self.assertIn(esperado, malos)
+
+    def test_lo_obligatorio_no_se_puede_volver_automatizable_sin_decirlo(self):
+        """Los límites de la política están anclados: ninguna obligación queda sin un límite que la respalde."""
+        for x in self.cat['pasos']:
+            if x['quien'] == 'dueno' and x['clase'] == 'obligatoria':
+                self.assertIn(x['ancla'], self.cat['limites'], x['id'])
+
+    def test_los_limites_que_no_cambian_estan_todos(self):
+        for clave in ('cuentas-y-pagos', 'secretos', 'huella', 'juegos-publicados', 'politica', 'sin-interaccion', 'ia', 'borrado', 'monetizacion', 'legal'):
+            self.assertIn(clave, self.cat['limites'])
+
+
+class Medicion(unittest.TestCase):
+    def setUp(self):
+        self.cat = autonomia.catalogo(RAIZ)
+
+    def test_los_numeros_salen_del_inventario(self):
+        m = autonomia.medir(self.cat)
+        recurrentes = [x for x in self.cat['pasos'] if x['quien'] == 'dueno' and x['estado'] == 'abierta' and x['frecuencia'] != 'una-vez']
+        self.assertAlmostEqual(m['toques_mes'], sum(x['veces_por_mes'] for x in recurrentes), places=2)
+        self.assertLess(m['toques_con_reglas_mes'], m['toques_mes'])
+        self.assertLessEqual(m['toques_evitables_mes'], m['toques_mes'])
+        self.assertEqual(m['pasos_totales'], len([x for x in self.cat['pasos'] if x['quien'] != 'dueno']) + len(recurrentes))
+        self.assertIn('f-metricas-cloudflare', m['detenidos_por_dueno'])
+
+    def test_resolver_lo_que_falta_del_dueno_pone_a_correr_el_paso(self):
+        antes = autonomia.medir(self.cat)
+        cat = copy.deepcopy(self.cat)
+        for x in cat['pasos']:
+            if x['id'] in ('u-token-analitica', 'u-desplegar-sitio'):
+                x['estado'] = 'resuelta'
+        despues = autonomia.medir(cat)
+        self.assertEqual(despues['pasos_autonomos'], antes['pasos_autonomos'] + 1)
+        self.assertNotIn('f-metricas-cloudflare', despues['detenidos_por_dueno'])
+
+    def test_automatizar_un_paso_baja_los_toques(self):
+        antes = autonomia.medir(self.cat)
+        cat = copy.deepcopy(self.cat)
+        for x in cat['pasos']:
+            if x['id'] == 'd-resolver-envio-incierto':
+                x['estado'] = 'resuelta'
+        self.assertLess(autonomia.medir(cat)['toques_mes'], antes['toques_mes'])
+
+    def test_dias_aprobados_solo_cuenta_lo_vigente(self):
+        lineas = [linea('hecha', '2026-11-18'), linea('lista', '2026-11-19'), linea('aún no es su fecha', '2026-11-25'),
+                  linea('sin aprobar', '2026-12-20'), linea('cambió tras aprobar', '2026-12-25'), linea('vencida', '2026-12-30')]
+        self.assertEqual(autonomia.dias_aprobados(lineas, HOY), (7, datetime.date(2026, 11, 25)))
+
+    def test_sin_nada_aprobado_la_fabrica_se_detiene(self):
+        self.assertEqual(autonomia.dias_aprobados([], HOY), (0, None))
+        self.assertEqual(autonomia.dias_aprobados([linea('sin aprobar', '2026-12-01')], HOY), (0, None))
+        self.assertEqual(autonomia.dias_aprobados([linea('hecha', '2026-11-10')], HOY), (0, None))
+
+
+class ColaDelMotor(unittest.TestCase):
+    def test_solo_entra_lo_que_se_puede_construir_sin_max(self):
+        cat = autonomia.catalogo(RAIZ)
+        titulos = [i['titulo'] for i in autonomia.cola_items(RAIZ)]
+        self.assertTrue(titulos, 'mientras haya algo automatizable por construir, la cola lo trae')
+        for x in cat['pasos']:
+            if x['quien'] != 'dueno':
+                continue
+            en_cola = ('Automatizar: ' + x['titulo']) in titulos
+            esperado = x['clase'] == 'automatizable' and x['estado'] == 'abierta' and bool(x.get('construible'))
+            self.assertEqual(en_cola, esperado, x['id'])
+
+    def test_lo_reducible_nunca_entra_a_la_cola(self):
+        for x in autonomia.catalogo(RAIZ)['pasos']:
+            if x['quien'] == 'dueno' and x['clase'] == 'reducible':
+                self.assertNotIn('Automatizar: ' + x['titulo'], [i['titulo'] for i in autonomia.cola_items(RAIZ)])
+
+    def test_la_cola_del_motor_la_incluye_despues_de_la_calidad(self):
+        piso = json.loads((RAIZ / 'motor' / 'piso.json').read_text(encoding='utf-8'))
+        entradas = [{'juego': j, 'lanzamiento': True, 'resultado': 'ok'} for j in piso.get('lanzados', [])] or []
+        juegos = [json.loads((RAIZ / 'juegos' / d.name / 'juego.json').read_text(encoding='utf-8')) for d in sorted((RAIZ / 'juegos').iterdir()) if (d / 'juego.json').exists()]
+        sola = motor.cola(RAIZ, entradas, juegos)
+        con = motor.cola_con_autonomia(RAIZ, entradas, juegos)
+        self.assertFalse([i for i in sola if i['tipo'] == 'autonomia'], 'la cola de calidad no cambia')
+        extra = [i for i in con if i['tipo'] == 'autonomia']
+        self.assertTrue(extra)
+        indices = [con.index(i) for i in extra]
+        for i in sola:
+            if i['prioridad'] < 3:
+                self.assertLess(con.index(i), min(indices), 'la calidad va antes que la autonomía: es el objetivo secundario')
+
+    def test_sin_inventario_la_cola_es_la_de_siempre(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for carpeta in ('motor', 'juegos', 'plantillas', 'herramientas', 'catalogo'):
+                shutil.copytree(RAIZ / carpeta, pathlib.Path(tmp) / carpeta, ignore=shutil.ignore_patterns('__pycache__'))
+            (pathlib.Path(tmp) / 'motor' / 'autonomia.json').unlink()
+            self.assertFalse([i for i in motor.cola_con_autonomia(tmp, [], []) if i['tipo'] == 'autonomia'])
+
+
+class RegistroSemanal(unittest.TestCase):
+    def setUp(self):
+        self.tmp = pathlib.Path(tempfile.mkdtemp(prefix='autonomia-test-'))
+        self.addCleanup(shutil.rmtree, self.tmp, ignore_errors=True)
+        self.m = autonomia.medir(autonomia.catalogo(RAIZ))
+
+    def test_correr_dos_veces_en_la_misma_semana_no_duplica(self):
+        autonomia.registrar(self.tmp, HOY, self.m, 12)
+        autonomia.registrar(self.tmp, HOY + datetime.timedelta(days=1), self.m, 11)
+        filas = autonomia.historial(self.tmp)
+        self.assertEqual(len(filas), 1)
+        self.assertEqual(filas[0]['semana'], '2026-W47')
+        self.assertEqual(filas[0]['dias_aprobados'], '11')
+
+    def test_las_semanas_quedan_en_orden(self):
+        autonomia.registrar(self.tmp, HOY + datetime.timedelta(days=7), self.m, 5)
+        autonomia.registrar(self.tmp, HOY, self.m, 12)
+        self.assertEqual([r['semana'] for r in autonomia.historial(self.tmp)], ['2026-W47', '2026-W48'])
+
+    def test_avisa_si_la_fabrica_empieza_a_pedir_mas(self):
+        autonomia.registrar(self.tmp, HOY, self.m, 12)
+        peor = dict(self.m, toques_mes=self.m['toques_mes'] + 1, pasos_autonomos=self.m['pasos_autonomos'] - 1)
+        avisos = ' | '.join(autonomia.avisos(self.tmp, HOY + datetime.timedelta(days=7), peor))
+        self.assertIn('subieron', avisos)
+        self.assertIn('Bajaron los pasos', avisos)
+        self.assertEqual(autonomia.avisos(self.tmp, HOY + datetime.timedelta(days=7), self.m), [])
+
+    def test_sin_historial_no_hay_avisos(self):
+        self.assertEqual(autonomia.avisos(self.tmp, HOY, self.m), [])
+
+
+class Informe(unittest.TestCase):
+    def test_el_informe_dice_lo_esencial(self):
+        lineas = [linea('lista', '2026-11-19'), linea('aún no es su fecha', '2026-11-30'), linea('sin aprobar', '2026-12-05')]
+        texto = '\n'.join(autonomia.informe(RAIZ, HOY, lineas, [('guerreros-gelatina', 'abc123')]))
+        for esperado in ('hasta el 2026-11-30 (12 días)', 'Esperan su aprobación 1 publicación', '«guerreros-gelatina» (huella abc123)', 'no están autorizadas'.replace('no están', 'NO están'),
+                         'Lo que solo Max puede hacer', 'Límites que no cambian', 'estimado del inventario, no medido'):
+            self.assertIn(esperado, texto)
+
+    def test_la_version_corta_remite_al_detalle(self):
+        texto = '\n'.join(autonomia.informe(RAIZ, HOY, [], [], completo=False))
+        self.assertIn('python3 fabrica.py autonomia', texto)
+        self.assertNotIn('Límites que no cambian', texto)
+        self.assertIn('nada. El calendario está detenido', texto)
+
+    def test_el_comando_revisa_el_inventario_real(self):
+        r = subprocess.run([sys.executable, '-I', str(RAIZ / 'fabrica.py'), 'autonomia', 'revisar'], capture_output=True, text=True, cwd=str(RAIZ))
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn('inventario en orden', r.stdout)
+
+
+if __name__ == '__main__':
+    unittest.main()

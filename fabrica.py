@@ -34,6 +34,8 @@ Uso:
   python3 fabrica.py motor [probar]           (el motor que crece solo: techo, juegos por nivel y cola de mejoras; «probar» corre las pruebas del motor y guarda motor/informe.json)
   python3 fabrica.py calidad [id|todos]       (en qué nivel de la escalera de calidad está cada juego, qué le falta y qué nivel se le exige para lanzarse)
   python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]|envio ID]   (qué falta para cobrar por ruta, cuentas con supuestos, versiones para portales y paquete de envío a CrazyGames; el estado también entra a publicacion/PENDIENTE.md)
+  python3 fabrica.py administrador [chequeo|guardia|anotar "TEXTO" --resultado R [--commit C]|bitacora [N]]   (el administrador del motor, carta en motor/ADMINISTRADOR.md: mira la salud y la autonomía, y deja constancia en motor/bitacora.jsonl; no aprueba ni publica)
+  python3 fabrica.py autonomia [estado|registrar|revisar]   (objetivo secundario del motor: cuánto corre la fábrica sin Max, qué le toca a él y qué reglas podría autorizar; «registrar» anota la fila de la semana en metricas/autonomia.csv)
 """
 import base64
 import json
@@ -573,7 +575,7 @@ def ciclo():
     ent = nucleo.Entorno()
     sitio = nucleo.cargar_json(RAIZ / 'publicacion' / 'sitio.json', {})
     politica = nucleo.cargar_json(RAIZ / 'publicacion' / 'politica.json', {})
-    L = ['# Estado de la fábrica', '', 'Lo escribe `python3 fabrica.py ciclo`. No contiene claves ni fechas; lo que sale en el libro está en `publicacion/libro.jsonl`.', '']
+    L = ['# Estado de la fábrica', '', 'Lo escribe `python3 fabrica.py ciclo`. No contiene claves; las únicas fechas son las del calendario aprobado (sección «Autonomía»). Lo que sale en el libro está en `publicacion/libro.jsonl`.', '']
     if errores:
         L += ['## Pasos que fallaron', ''] + ['- ' + x for x in errores] + ['']
     for i in ids():
@@ -624,6 +626,16 @@ def ciclo():
     except Exception as e:
         errores.append('monetizacion: %s' % e)
         L += ['No se pudo calcular el estado de la monetización: %s' % e]
+    L += ['', '## Autonomía: cuánto corre la fábrica sin Max', '']
+    try:
+        sys.path.insert(0, str(RAIZ / 'herramientas'))
+        import autonomia as aut
+        hoy, lineas, listos = _estado_para_autonomia()
+        L += aut.informe(RAIZ, hoy, lineas, listos, completo=False)
+        aut.registrar(RAIZ, hoy, aut.medir(aut.catalogo(RAIZ)), aut.dias_aprobados(lineas, hoy)[0])
+    except Exception as e:
+        errores.append('autonomia: %s' % e)
+        L += ['No se pudo calcular la autonomía: %s' % e]
     L += ['', '## Bluesky: qué ha funcionado', '']
     try:
         from publicacion import resultados
@@ -718,6 +730,102 @@ def monetizar_cmd(args):
     sys.exit('Uso: python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]|envio ID]')
 
 
+def _estado_para_autonomia():
+    """(líneas del calendario, [(juego, huella corta) listos para aprobar]) leídos del estado real, para el informe de autonomía."""
+    nucleo, adaptadores = _publicacion()
+    from publicacion import calendario
+    ent = nucleo.Entorno()
+    lineas = calendario.estado(RAIZ, ent.ahora().date())
+    sitio = nucleo.cargar_json(RAIZ / 'publicacion' / 'sitio.json', {})
+    listos = []
+    for i in ids():
+        if i not in (sitio.get('juegos') or []):
+            continue
+        ctx = nucleo.Contexto(RAIZ, i)
+        plan, problemas = nucleo.construir_plan(ctx, adaptadores)
+        if problemas or nucleo.compuertas(ctx, plan, problemas, ent.ahora()):
+            continue
+        if any(not ctx.libro.hecho(a['id']) for a in plan['acciones']) and not any(ctx.libro.incierto(a['id']) for a in plan['acciones']):
+            listos.append((i, plan['huella'][:16]))
+    return ent.ahora().date(), lineas, listos
+
+
+def autonomia_cmd(args):
+    """autonomia [estado] | registrar | revisar   — el objetivo secundario del motor: que la fábrica necesite cada vez menos de Max (herramientas/autonomia.py)"""
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import autonomia as aut
+    accion = args[0] if args else 'estado'
+    if accion not in ('estado', 'registrar', 'revisar'):
+        sys.exit('Uso: python3 fabrica.py autonomia [estado|registrar|revisar]')
+    try:
+        if accion == 'revisar':
+            malos = aut.problemas_de_catalogo(aut.catalogo(RAIZ))
+            for x in malos:
+                print('  PROBLEMA · ' + x)
+            if malos:
+                sys.exit('[autonomia] el inventario tiene %d problema(s)' % len(malos))
+            print('[autonomia] inventario en orden')
+            return
+        hoy, lineas, listos = _estado_para_autonomia()
+        if accion == 'registrar':
+            cat = aut.catalogo(RAIZ)
+            m = aut.medir(cat)
+            dias, _ = aut.dias_aprobados(lineas, hoy)
+            fila = aut.registrar(RAIZ, hoy, m, dias)
+            print('[autonomia] semana %s: %s de %s pasos sin Max, %s toques al mes (estimado), %s días aprobados por salir' % (fila['semana'], fila['pasos_autonomos'], fila['pasos_totales'], fila['toques_mes'], fila['dias_aprobados']))
+            return
+        print('\n'.join(['# Autonomía: cuánto corre la fábrica sin Max', ''] + aut.informe(RAIZ, hoy, lineas, listos)))
+    except aut.ErrorAutonomia as e:
+        sys.exit('[autonomia] ' + str(e))
+
+
+def administrador_cmd(args):
+    """administrador [chequeo] | guardia | anotar "TEXTO" --resultado hecho|no-se-pudo|avisado|nada-que-hacer [--commit C] | bitacora [N]
+    El administrador del motor (carta: motor/ADMINISTRADOR.md): mira la salud y la autonomía, y deja constancia en motor/bitacora.jsonl. No aprueba ni publica nada."""
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import administrador as adm
+    accion = args[0] if args else 'chequeo'
+    try:
+        if accion == 'anotar' and len(args) > 1:
+            nucleo, _ = _publicacion()
+            linea = adm.anotar(RAIZ, nucleo.Entorno().ahora().date(), args[1], _opcion('--resultado'), _opcion('--commit') or '')
+            print('[administrador] anotado: %s · %s · %s' % (linea['fecha'], linea['resultado'], linea['que']))
+            return
+        if accion == 'bitacora':
+            try:
+                n = int(args[1]) if len(args) > 1 else 10
+            except ValueError:
+                sys.exit('Uso: python3 fabrica.py administrador bitacora [N]')
+            for l in adm.ultimas(RAIZ, n):
+                print('%s · %-14s · %s%s' % (l['fecha'], l['resultado'], l['que'], (' (%s)' % l['commit']) if l.get('commit') else ''))
+            return
+        if accion == 'guardia':
+            nucleo, _ = _publicacion()
+            entradas = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl').entradas()
+            cambios = adm.cambios_del_administrador(RAIZ)
+            malas = adm.violaciones(cambios, entradas)
+            for commit, ruta, motivo in malas:
+                print('  VIOLACIÓN · %s tocó %s (%s)' % (commit[:10], ruta, motivo))
+            if malas:
+                sys.exit('[administrador] %d cambio(s) del administrador tocan algo que su carta le prohíbe' % len(malas))
+            print('[administrador] guardia en orden: %d cambio(s) firmados como el administrador, ninguno en una ruta protegida' % len(cambios))
+            return
+        if accion != 'chequeo':
+            sys.exit('Uso: python3 fabrica.py administrador [chequeo|guardia|anotar "TEXTO" --resultado R [--commit C]|bitacora [N]]')
+        hoy, lineas, _ = _estado_para_autonomia()
+        nucleo, _ = _publicacion()
+        entradas = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl').entradas()
+        hallazgos = adm.chequeo(RAIZ, hoy, lineas, entradas)
+        print('\n'.join(['# Chequeo del administrador · %s' % hoy.isoformat(), ''] + adm.resumen(hallazgos)))
+        recientes = adm.ultimas(RAIZ, 5)
+        if recientes:
+            print('Últimas anotaciones de la bitácora:')
+            for l in recientes:
+                print('  %s · %-14s · %s' % (l['fecha'], l['resultado'], l['que']))
+    except (adm.ErrorAdministrador, adm.autonomia.ErrorAutonomia) as e:
+        sys.exit('[administrador] ' + str(e))
+
+
 def calidad_cmd(objetivo):
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import motor as motor_mod
@@ -770,6 +878,10 @@ if __name__ == '__main__':
         motor_cmd(sys.argv[2:])
     elif orden == 'monetizar':
         monetizar_cmd(sys.argv[2:])
+    elif orden == 'autonomia':
+        autonomia_cmd(sys.argv[2:])
+    elif orden == 'administrador':
+        administrador_cmd(sys.argv[2:])
     elif orden == 'calidad':
         calidad_cmd(objetivo)
     elif orden == 'huella':

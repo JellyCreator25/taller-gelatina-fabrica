@@ -126,7 +126,7 @@ Antes de ejecutar, las compuertas se niegan si falta algo: datos de ejemplo en `
 
 El flujo «Ciclo semanal» corre los lunes (o a mano) y deja `publicacion/PENDIENTE.md`: qué juegos están listos para aprobar, cuáles están bloqueados y por qué, y qué construir después. Abre ese archivo y listo. Si GitHub desactiva el flujo por falta de actividad, se reactiva desde *Actions*.
 
-Además, **yo** reviso cada lunes (≈13:00, hora de la Ciudad de México) con una tarea programada: leo el estado, compruebo que lo aprobado salió, miro cómo les fue a las publicaciones, preparo el siguiente lote de Bluesky con las tendencias de esa semana, hago un paso de mejora del motor y avanzo el tercer juego (Compás). Te escribo un solo informe con lo que necesita tu decisión. No apruebo nada por mí misma: el lote nuevo queda sin aprobar y tú lo apruebas con su huella. Para pausarla o cambiarla, dímelo.
+Además, **yo** reviso cada lunes (≈13:00, hora de la Ciudad de México) con una tarea programada: leo el estado, compruebo que lo aprobado salió, miro cómo les fue a las publicaciones, preparo el siguiente lote de Bluesky con las tendencias de esa semana, avanzo el siguiente juego y dejo listo su plan de lanzamiento (el motor ya lo lleva el administrador, ver la sección siguiente). Te escribo un solo informe con lo que necesita tu decisión. No apruebo nada por mí misma: el lote nuevo queda sin aprobar y tú lo apruebas con su huella. Para pausarla o cambiarla, dímelo.
 
 ## Cómo crece la fábrica (y por qué no son «variantes en serie»)
 
@@ -143,6 +143,18 @@ El camino para crecer es una **plantilla nueva** (otro género), no otra ficha d
 Cada juego nuevo tiene que sentirse mejor que el anterior, y eso lo exige la fábrica, no la buena voluntad: hay una **escalera de calidad** (1 Base, 2 Con sonido, 3 Con jugo y accesible, 4 Con música, 5 Con marca) y un juego nuevo no puede lanzarse si no está al menos un nivel por encima del mejor ya publicado. El motor crece con módulos opcionales (accesibilidad, efectos, música, marca) que se prueban en un navegador real, y una **cola de mejoras** que se calcula sola dice qué sigue. Guerreros y Torre salieron antes de la escalera y no cambian. Detalle: `LEEME.md`, sección «El motor que crece solo».
 
 La **marca** es la Gelatina como insignia (no solo como tema): `marca/guia.md` tiene la idea, los elementos y lo que ya decidiste: la promesa «Juegos chiquitos, gratis y con delirios de grandeza.», que la Gelatina siga sin nombre propio por ahora y que Guerreros reciba una versión nueva con sello, efectos y música después de Compás.
+
+## Autonomía y el administrador del motor
+
+**El objetivo.** Además de la calidad, el motor tiene un objetivo secundario que pediste el 18 de noviembre de 2026: que necesite cada vez menos de ti. No es quitarte decisiones: es pedírtelas menos veces y que nada te llegue escondido. Lo que la política reserva para ti (cuentas, claves, términos, pagos, aprobar lo que se publica) no se automatiza nunca.
+
+**Dónde lo ves.** `python3 fabrica.py autonomia` (o la sección «Autonomía» de `publicacion/PENDIENTE.md`) muestra tres números: cuántos pasos del ciclo corren sin ti, cuántas veces al mes te tocan (es un estimado mío, no una medición) y **cuántos días corre la fábrica sola** con lo que ya aprobaste. Este último sí se mide: hoy es lo que queda del lote aprobado (hasta el 30 de noviembre); cuando se acaba, el calendario se detiene hasta que apruebes otro. El inventario completo, con el motivo de cada cosa que te toca, está en `motor/autonomia.json`.
+
+**Las reglas que podrías autorizar.** Están como propuestas y **no valen nada hasta que tú lo digas**: lotes de cuatro semanas en vez de dos; una reserva de publicaciones perennes aprobadas una sola vez, que el calendario usa para no detenerse; y construir sin preguntar el siguiente juego que recomiende el rumbo (sin lanzarlo). Ninguna cambia la política ni te quita la aprobación del contenido exacto.
+
+**El administrador del motor.** Es una tarea programada mía que corre **cada día** (a las 19:43, hora de la Ciudad de México), sin nadie delante, con una carta de funciones y límites (`motor/ADMINISTRADOR.md`). Revisa la salud (calendario por agotarse, envíos en duda, publicaciones que fallaron, pruebas del motor vencidas, ciclo semanal parado), da un paso de mejora del motor o de autonomía, deja constancia en su bitácora (`motor/bitacora.jsonl`) y **solo te escribe si hay algo que decidir o algo falló**; una corrida tranquila no manda nada. Firma como `administrador-del-motor`, y `python3 fabrica.py administrador guardia` (que también corre en cada cambio) falla si alguno de sus commits toca algo prohibido: aprobaciones, política, libro de publicación, el sitio, los flujos que publican, el núcleo del motor, su propia carta o un juego ya publicado.
+
+No es un proceso encendido todo el tiempo: cada corrida empieza de cero y lo que le da continuidad es lo escrito en el repositorio. Si quieres pausarlo o cambiarlo, dímelo; también se puede disparar a mano.
 
 ## Publicaciones del calendario
 

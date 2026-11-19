@@ -340,6 +340,22 @@ def cola(raiz, entradas, juegos):
     return sorted(items, key=lambda i: (i['prioridad'], i['titulo']))
 
 
+def cola_con_autonomia(raiz, entradas, juegos):
+    """La cola del motor más lo que baja las intervenciones de Max (objetivo secundario: herramientas/autonomia.py). Va después de lo de calidad
+    y de los pedidos, y solo trae lo que se puede construir sin que Max decida: lo que depende de una regla suya no entra."""
+    items = cola(raiz, entradas, juegos)
+    try:
+        import autonomia
+    except ImportError:
+        autonomia = None                            # una copia mínima del proyecto, sin la herramienta: la cola es la de siempre
+    if autonomia is not None:
+        try:
+            items += autonomia.cola_items(raiz)
+        except autonomia.ErrorAutonomia:
+            pass                                    # sin inventario no hay nada que sumar (el ciclo sí avisa de un inventario dañado)
+    return sorted(items, key=lambda i: (i['prioridad'], i['titulo']))
+
+
 def informe_de_estado(raiz, entradas, juegos):
     """Líneas de texto para PENDIENTE.md y para `fabrica.py motor`."""
     raiz = pathlib.Path(raiz)
@@ -353,6 +369,6 @@ def informe_de_estado(raiz, entradas, juegos):
         n = nivel_de(raiz, spec)
         L.append('- %s: nivel %d (%s)%s' % (spec['id'], n['nivel'], n['nombre'], (' — falta: ' + n['faltan'][0][2]) if n['faltan'] else ''))
     L += ['', 'Lo que sigue para el motor:']
-    items = cola(raiz, entradas, juegos)
+    items = cola_con_autonomia(raiz, entradas, juegos)
     L += ['%d. %s — %s' % (i + 1, it['titulo'], it['por_que']) for i, it in enumerate(items[:5])] or ['(nada pendiente)']
     return L

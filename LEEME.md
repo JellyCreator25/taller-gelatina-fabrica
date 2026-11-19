@@ -103,6 +103,15 @@ Cada juego nuevo debe sentirse con más presupuesto que el anterior, y el motor 
 
 Un juego nuevo (`nuevo ID PLANTILLA`) parte con todos los módulos declarados; declararlos no basta para subir de nivel.
 
+## Autonomía y el administrador del motor
+
+Objetivo secundario del motor (después de la calidad): que la fábrica necesite cada vez menos de Max sin cruzar sus límites.
+
+- **Inventario** (`motor/autonomia.json`): cada paso del ciclo de vida, quién lo hace (fábrica, agente o dueño) y, si es del dueño, por qué y de qué clase es: *obligatoria* (la política o la ley lo reservan a Max: cuentas, claves, términos, pagos, aprobar lo que se publica), *reducible* (sigue siendo suya, pero una regla que él autorice permite pedírsela menos veces) o *automatizable* (no necesita su decisión: falta construirlo). Trae también las autorizaciones que Max ya dio, los límites que no cambian y las **propuestas** de reglas, que no valen nada hasta que él las autorice (una prueba lo vigila: una propuesta no puede pasar por autorización).
+- **Medición** (`python3 fabrica.py autonomia`, y sección «Autonomía» de `PENDIENTE.md`): tres números, sin mezclarlos en un puntaje inventado. Pasos del ciclo que corren sin Max; toques de Max por mes (estimado del inventario, no medido); y los **días que la fábrica corre sola** con el contenido ya aprobado (este sí se mide, con el calendario). `ciclo` anota una fila por semana en `metricas/autonomia.csv` y avisa si los toques de Max suben o los pasos autónomos bajan.
+- **Cola del motor**: lo *automatizable* y construible entra a la cola (`motor.cola_con_autonomia`), después de lo de calidad. Lo *reducible* nunca entra: depende de que Max autorice una regla.
+- **Administrador del motor** (`motor/ADMINISTRADOR.md`): una tarea programada de Claude que corre cada día, sin nadie delante, con una carta de funciones y límites. No es un proceso encendido: lo que le da continuidad es lo escrito en el repositorio, sobre todo la **bitácora** (`motor/bitacora.jsonl`, solo se agrega). `python3 fabrica.py administrador` hace el chequeo (calendario por agotarse, envíos en duda, publicaciones fallidas, pruebas del motor vencidas, ciclo semanal parado, siguiente paso de autonomía) con tres niveles: *avisar* a Max, *resolver* sin él, *info*. `administrador anotar` escribe la bitácora y `administrador guardia` falla si algún commit firmado como `administrador-del-motor` tocó una ruta protegida (aprobaciones, política, libro, sitio, flujos que publican, núcleo del motor, la carta o un juego ya publicado); corre en cada cambio (`ci.yml`) y es red de seguridad, no un candado contra quien pueda escribir en el repositorio.
+
 ## La marca
 
 La gelatina es la insignia del Taller, no solo el tema de un juego: `marca/guia.md` explica la idea, los elementos (emblema en cuatro versiones, sello, «blup», distintivo, firma y voz) y las reglas de uso. El emblema se dibuja una sola vez en `herramientas/marca.py` (`python3 herramientas/marca.py` regenera `marca/*.svg`); el módulo `marca` del motor y el ícono del sitio llevan el mismo dibujo, y una prueba lo verifica.
