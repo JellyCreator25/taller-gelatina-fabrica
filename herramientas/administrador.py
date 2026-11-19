@@ -11,10 +11,14 @@ siempre encendido: cada corrida empieza de cero, y lo que le da continuidad es l
   bitacora      motor/bitacora.jsonl: una línea por cosa hecha o decidida, solo se agrega (nunca se reescribe). Es lo primero que lee la corrida
                 siguiente y lo que Max puede leer para ver qué hizo el administrador.
 
+  flujos        GitHub apaga los flujos programados de un repositorio sin actividad («disabled_inactivity») y sin ellos el calendario no corre.
+                `revisar_flujos` los lista y, si se pide, vuelve a encender solo esos; uno apagado a mano se respeta y se avisa.
+
 Lo que este módulo no hace: aprobar, publicar, cambiar la política ni tocar un juego publicado. Mira y anota."""
 import datetime
 import json
 import pathlib
+import re
 import subprocess
 
 import autonomia
@@ -88,7 +92,7 @@ def chequeo(raiz, hoy, lineas_calendario=None, entradas_libro=None, juegos=None)
         H.append(_h('resolver', 'pruebas-vencidas', 'Las pruebas del motor están vencidas (%s): ningún juego que use el motor puede salir.' % motivo, 'python3 fabrica.py motor probar'))
     entradas = entradas_libro or []
     for a in en_duda(entradas):
-        H.append(_h('avisar', 'envio-en-duda', 'El envío «%s» quedó en duda: pudo salir o no. No se reintenta solo.' % a, 'revisar la cuenta y `python3 fabrica.py resolver %s salio|no-salio`' % a))
+        H.append(_h('avisar', 'envio-en-duda', 'El envío «%s» quedó en duda: pudo salir o no. No se reintenta solo.' % a, 'correr `python3 fabrica.py resolver --auto` (lee la cuenta pública, sin claves; también corre solo cada día); si sigue en duda, mirar la cuenta y `python3 fabrica.py resolver %s salio|no-salio`' % a))
     for a in fallas_recientes(entradas, hoy):
         H.append(_h('avisar', 'publicacion-fallida', 'La publicación «%s» falló en los últimos 3 días.' % a, 'mirar el motivo en publicacion/libro.jsonl y en la corrida del flujo'))
     if lineas_calendario is not None:
@@ -121,7 +125,7 @@ def chequeo(raiz, hoy, lineas_calendario=None, entradas_libro=None, juegos=None)
         ultima = _semana_a_fecha(hist[-1]['semana'])
         if (hoy - ultima).days > 13:
             H.append(_h('avisar', 'ciclo-semanal-parado', 'El ciclo semanal no ha dejado su registro desde la semana %s.' % hist[-1]['semana'],
-                        'revisar que el flujo «Ciclo semanal» siga activo (`gh workflow list --all`) y reactivarlo; correr `python3 fabrica.py ciclo`'))
+                        'correr `python3 fabrica.py administrador flujos --reactivar` (enciende solo los que GitHub apagó por inactividad y confirma que quedaron activos); luego `python3 fabrica.py ciclo`'))
     if cat is not None:
         items = autonomia.cola_items(raiz)
         if items:
@@ -221,3 +225,90 @@ def cambios_del_administrador(raiz, identidad=IDENTIDAD):
         elif linea.strip() and commit:
             cambios.append((commit, linea.strip()))
     return cambios
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Flujos programados: que el calendario y el ciclo sigan corriendo
+# ---------------------------------------------------------------------------------------------------------------------
+
+REACTIVABLE = 'disabled_inactivity'    # GitHub apaga los flujos programados de un repositorio sin actividad; es lo único que se reactiva solo
+APAGADO_A_MANO = 'disabled_manually'   # alguien lo apagó a propósito: no se toca
+
+
+def _gh(argv, tiempo=60):
+    """Corre `gh` y devuelve (código, salida, error). Todo pasa por la API REST (`gh api`), que es la que está disponible en las sesiones de la fábrica."""
+    try:
+        r = subprocess.run(['gh'] + list(argv), capture_output=True, text=True, timeout=tiempo)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        return 127, '', str(e)[:200]
+    return r.returncode, r.stdout, r.stderr
+
+
+def repo_de_remoto(url):
+    """«dueño/repositorio» a partir de la dirección del remoto (https o ssh, con o sin .git)."""
+    m = re.search(r'github\.com[:/]+([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git)?/?\s*$', str(url or ''))
+    if not m:
+        raise ErrorAdministrador('no pude saber el repositorio de GitHub a partir del remoto «%s»' % str(url or '').strip()[:80])
+    return '%s/%s' % m.groups()
+
+
+def repo_actual(raiz, entorno=None):
+    """El repositorio: GITHUB_REPOSITORY si existe (en los flujos) y, si no, el remoto «origin» de la carpeta."""
+    import os
+    env = os.environ if entorno is None else entorno
+    if env.get('GITHUB_REPOSITORY'):
+        return repo_de_remoto('github.com/' + env['GITHUB_REPOSITORY'])
+    try:
+        r = subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True, text=True, cwd=str(raiz), timeout=30)
+    except (OSError, subprocess.TimeoutExpired) as e:
+        raise ErrorAdministrador('no pude leer el remoto de git: %s' % e)
+    return repo_de_remoto(r.stdout)
+
+
+def listar_flujos(gh, repo):
+    """[{'id', 'nombre', 'ruta', 'estado'}] de los flujos del repositorio (sin los borrados)."""
+    codigo, salida, error = gh(['api', 'repos/%s/actions/workflows?per_page=100' % repo])
+    if codigo != 0:
+        raise ErrorAdministrador('no pude listar los flujos de %s: %s' % (repo, (error or salida or 'sin respuesta').strip()[:200]))
+    try:
+        flujos = json.loads(salida).get('workflows')
+    except (ValueError, AttributeError):
+        flujos = None
+    if not isinstance(flujos, list):
+        raise ErrorAdministrador('la lista de flujos de %s no tiene la forma esperada' % repo)
+    return [{'id': w.get('id'), 'nombre': w.get('name') or w.get('path') or str(w.get('id')), 'ruta': w.get('path') or '', 'estado': w.get('state') or '?'}
+            for w in flujos if isinstance(w, dict) and w.get('state') != 'deleted']
+
+
+def revisar_flujos(gh, repo, reactivar=False):
+    """Revisa los flujos y, con reactivar=True, vuelve a encender los que GitHub apagó por inactividad (y solo esos).
+    → [{'nombre', 'ruta', 'estado', 'resultado'}]; resultado: activo · apagado-por-inactividad · reactivado · no-se-pudo · apagado-a-mano · otro-estado."""
+    informe = []
+    for f in listar_flujos(gh, repo):
+        r = dict(f)
+        if f['estado'] == 'active':
+            r['resultado'] = 'activo'
+        elif f['estado'] == REACTIVABLE:
+            r['resultado'] = 'apagado-por-inactividad'
+            if reactivar:
+                codigo, salida, error = gh(['api', '-X', 'PUT', 'repos/%s/actions/workflows/%s/enable' % (repo, f['id'])])
+                r['resultado'] = 'reactivado' if codigo == 0 else 'no-se-pudo'
+                if codigo != 0:
+                    r['detalle'] = (error or salida or 'sin respuesta').strip()[:160]
+        elif f['estado'] == APAGADO_A_MANO:
+            r['resultado'] = 'apagado-a-mano'
+        else:
+            r['resultado'] = 'otro-estado'
+        informe.append(r)
+    if reactivar and any(r['resultado'] == 'reactivado' for r in informe):
+        despues = {f['id']: f['estado'] for f in listar_flujos(gh, repo)}        # se confirma: «reactivado» solo si GitHub lo muestra activo
+        for r in informe:
+            if r['resultado'] == 'reactivado' and despues.get(r['id']) != 'active':
+                r['resultado'], r['detalle'] = 'no-se-pudo', 'GitHub aceptó la orden pero el flujo no figura activo'
+    return informe
+
+
+def flujos_sin_resolver(informe):
+    """Los que siguen apagados después de revisar: lo que el administrador no pudo o no debe arreglar solo."""
+    return [r for r in informe if r['resultado'] not in ('activo', 'reactivado')]
+

@@ -1,0 +1,60 @@
+name: Comprobar envíos en duda
+# Si un envío a Bluesky queda «en duda» (la red no contestó: pudo salir o no), el calendario se detiene hasta que alguien lo aclare.
+# Este flujo lo intenta aclarar solo, media hora antes del calendario de cada día: lee la cuenta pública (no usa claves, no publica nada)
+# y anota en el libro únicamente lo que pueda demostrar (ver publicacion/comprobar.py). Si no puede asegurarlo, la duda sigue y el chequeo del administrador avisa.
+# Ejecución manual: modo «verificar» solo lee y comprueba que la lectura pública funciona; no anota nada.
+on:
+  schedule:
+    - cron: '30 15 * * *'   # 15:30 UTC = 09:30 en Ciudad de México, antes del calendario (16:00 UTC)
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'auto = comprueba y anota lo que pueda aclarar · verificar = solo lectura, no anota nada'
+        type: choice
+        options: [auto, verificar]
+        default: auto
+
+# el mismo grupo que «Publicar» y «Calendario de contenido»: dos trabajos nunca escriben el libro de registro a la vez
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  comprobar:
+    runs-on: ubuntu-latest      # sin «environment»: no recibe ninguna clave
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - name: Preparar Python con Pillow
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet pillow
+      - name: Comprobar (lee la cuenta pública)
+        env:
+          MODO: ${{ inputs.modo || 'auto' }}
+        shell: bash
+        run: |
+          if [ "$MODO" = "verificar" ]; then
+            .venv/bin/python -I fabrica.py resolver --verificar | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            .venv/bin/python -I fabrica.py resolver --auto | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Guardar lo que se aclaró en el libro de registro
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          git config user.name "fabrica-de-juegos"
+          git config user.email "fabrica-de-juegos@users.noreply.github.com"
+          git add publicacion/libro.jsonl
+          if ! git diff --cached --quiet; then
+            git commit -m "Libro de publicación: envío en duda aclarado por la comprobación automática"
+            for intento in 1 2 3 4 5; do
+              git pull --rebase origin main && git push && exit 0
+              sleep 6
+            done
+            echo "No se pudo guardar el libro tras 5 intentos"; exit 1
+          fi

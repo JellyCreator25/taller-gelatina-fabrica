@@ -29,12 +29,14 @@ Uso:
   python3 fabrica.py publicar ID [--solo canal,canal]     (muestra el plan y las compuertas; no publica nada)
   python3 fabrica.py publicar ID --ejecutar --aprobar HUELLA   (publica EXACTAMENTE lo que esa huella cubre)
   python3 fabrica.py resolver ACCION salio|no-salio       (anota qué pasó con un envío que quedó en duda)
+  python3 fabrica.py resolver --auto [ACCION]             (lo comprueba solo: lee la cuenta pública, sin claves, y anota lo que se pueda aclarar; corre cada día antes del calendario)
+  python3 fabrica.py resolver --verificar                 (solo lectura: comprueba que esa lectura pública funciona con el último post que sí salió)
   python3 fabrica.py calendario [--aprobar HUELLA_DEL_LOTE | --ejecutar | --medir]   (publicaciones propias del calendario: se aprueban por lote y salen en su fecha; --medir anota likes, reposts y respuestas)
   python3 fabrica.py configurar bluesky-bot|bluesky-perfil|mastodon-bot [--ejecutar]   (ajustes en la cuenta del bot; bluesky-perfil pone bio, nombre, avatar y banner)
   python3 fabrica.py motor [probar]           (el motor que crece solo: techo, juegos por nivel y cola de mejoras; «probar» corre las pruebas del motor y guarda motor/informe.json)
   python3 fabrica.py calidad [id|todos]       (en qué nivel de la escalera de calidad está cada juego, qué le falta y qué nivel se le exige para lanzarse)
   python3 fabrica.py monetizar [estado|escenarios [N…]|variantes ID [portal]|envio ID]   (qué falta para cobrar por ruta, cuentas con supuestos, versiones para portales y paquete de envío a CrazyGames; el estado también entra a publicacion/PENDIENTE.md)
-  python3 fabrica.py administrador [chequeo|guardia|anotar "TEXTO" --resultado R [--commit C]|bitacora [N]]   (el administrador del motor, carta en motor/ADMINISTRADOR.md: mira la salud y la autonomía, y deja constancia en motor/bitacora.jsonl; no aprueba ni publica)
+  python3 fabrica.py administrador [chequeo|guardia|flujos [--reactivar]|anotar "TEXTO" --resultado R [--commit C]|bitacora [N]]   (el administrador del motor, carta en motor/ADMINISTRADOR.md: mira la salud y la autonomía, y deja constancia en motor/bitacora.jsonl; «flujos --reactivar» vuelve a encender los flujos que GitHub apague por inactividad; no aprueba ni publica)
   python3 fabrica.py autonomia [estado|registrar|revisar]   (objetivo secundario del motor: cuánto corre la fábrica sin Max, qué le toca a él y qué reglas podría autorizar; «registrar» anota la fila de la semana en metricas/autonomia.csv)
 """
 import base64
@@ -459,6 +461,33 @@ def resolver(accion_id, resultado):
     print('[resolver] %s anotado como «%s»' % (accion_id, 'salió' if resultado == 'salio' else 'no salió (podrá reintentarse)'))
 
 
+def resolver_auto(modo, accion=None):
+    """resolver --auto [ACCION] | --verificar. Lee la cuenta pública (sin claves) y, con --auto, anota en el libro lo que logre aclarar; lo que no, sigue en duda."""
+    nucleo, _ = _publicacion()
+    from publicacion import comprobar
+    libro = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl')
+    ent = nucleo.Entorno()
+    if modo == '--verificar':
+        estado, texto = comprobar.verificar(ent.http, libro.entradas())
+        print('[resolver] lectura pública: %s · %s' % (estado, texto))
+        if estado == 'falla':
+            sys.exit(1)
+        return
+    if not comprobar.en_duda(libro.entradas()) and not accion:
+        print('[resolver] nada en duda: no hay envíos por comprobar')
+        return
+    try:
+        informe = comprobar.resolver_en_duda(libro, ent.http, ent.ahora(), accion)
+    except nucleo.ErrorPublicacion as e:
+        sys.exit('[resolver] ' + str(e))
+    nombres = {'salio': 'SALIÓ (anotado como hecho)', 'no-salio': 'NO SALIÓ (anotado como descartado; podrá reintentarse)', 'sigue-en-duda': 'SIGUE EN DUDA'}
+    for r in informe:
+        print('[resolver] %s · %s — %s' % (r['accion'], nombres[r['estado']], r['motivo']))
+    quedan = [r for r in informe if r['estado'] == 'sigue-en-duda']
+    if quedan:
+        print('[resolver] %d envío(s) siguen en duda: mira la cuenta y anota con `python3 fabrica.py resolver ACCION salio|no-salio`' % len(quedan))
+
+
 def configurar(que):
     nucleo, _ = _publicacion()
     from publicacion import red
@@ -593,7 +622,7 @@ def ciclo():
         pendientes = [a for a in plan['acciones'] if not ctx.libro.hecho(a['id'])]
         if dudosos:
             L.append('- **Hay envíos en duda** (pudieron salir o no). Mira la cuenta y anota qué pasó:')
-            L += ['  - `python3 fabrica.py resolver %s salio|no-salio`' % a['id'] for a in dudosos]
+            L += ['  - `python3 fabrica.py resolver --auto` (o, si sigue en duda, `python3 fabrica.py resolver %s salio|no-salio`)' % a['id'] for a in dudosos]
         if problemas or razones:
             L.append('- **Bloqueado:**')
             L += ['  - ' + x for x in problemas + [x for x in razones if x not in problemas]]
@@ -780,7 +809,7 @@ def autonomia_cmd(args):
 
 
 def administrador_cmd(args):
-    """administrador [chequeo] | guardia | anotar "TEXTO" --resultado hecho|no-se-pudo|avisado|nada-que-hacer [--commit C] | bitacora [N]
+    """administrador [chequeo] | guardia | flujos [--reactivar] | anotar "TEXTO" --resultado hecho|no-se-pudo|avisado|nada-que-hacer [--commit C] | bitacora [N]
     El administrador del motor (carta: motor/ADMINISTRADOR.md): mira la salud y la autonomía, y deja constancia en motor/bitacora.jsonl. No aprueba ni publica nada."""
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import administrador as adm
@@ -799,6 +828,18 @@ def administrador_cmd(args):
             for l in adm.ultimas(RAIZ, n):
                 print('%s · %-14s · %s%s' % (l['fecha'], l['resultado'], l['que'], (' (%s)' % l['commit']) if l.get('commit') else ''))
             return
+        if accion == 'flujos':
+            repo = adm.repo_actual(RAIZ)
+            informe = adm.revisar_flujos(adm._gh, repo, '--reactivar' in args)
+            nombres = {'activo': 'activo', 'reactivado': 'REACTIVADO (GitHub lo había apagado por inactividad)', 'apagado-por-inactividad': 'APAGADO por inactividad (usa --reactivar)',
+                       'no-se-pudo': 'NO SE PUDO REACTIVAR', 'apagado-a-mano': 'APAGADO A MANO (no se toca: avisar a Max)', 'otro-estado': 'EN OTRO ESTADO'}
+            for r in informe:
+                print('  %-34s %-28s %s%s' % (r['nombre'], r['ruta'].rsplit('/', 1)[-1], nombres[r['resultado']], (' · ' + r['detalle']) if r.get('detalle') else ''))
+            malos = adm.flujos_sin_resolver(informe)
+            if malos:
+                sys.exit('[administrador] %d flujo(s) siguen sin correr: %s' % (len(malos), ', '.join(r['nombre'] for r in malos)))
+            print('[administrador] los %d flujos del repositorio están activos' % len(informe))
+            return
         if accion == 'guardia':
             nucleo, _ = _publicacion()
             entradas = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl').entradas()
@@ -811,7 +852,7 @@ def administrador_cmd(args):
             print('[administrador] guardia en orden: %d cambio(s) firmados como el administrador, ninguno en una ruta protegida' % len(cambios))
             return
         if accion != 'chequeo':
-            sys.exit('Uso: python3 fabrica.py administrador [chequeo|guardia|anotar "TEXTO" --resultado R [--commit C]|bitacora [N]]')
+            sys.exit('Uso: python3 fabrica.py administrador [chequeo|guardia|flujos [--reactivar]|anotar "TEXTO" --resultado R [--commit C]|bitacora [N]]')
         hoy, lineas, _ = _estado_para_autonomia()
         nucleo, _ = _publicacion()
         entradas = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl').entradas()
@@ -888,6 +929,8 @@ if __name__ == '__main__':
         huella(objetivo)
     elif orden == 'publicar':
         publicar(objetivo)
+    elif orden == 'resolver' and len(sys.argv) > 2 and sys.argv[2] in ('--auto', '--verificar'):
+        resolver_auto(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
     elif orden == 'resolver' and len(sys.argv) > 3:
         resolver(sys.argv[2], sys.argv[3])
     elif orden == 'calendario':

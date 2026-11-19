@@ -32,9 +32,10 @@ ORDEN_TIPO = {'desplegar': 0, 'avisar': 1, 'post': 2, 'video': 3, 'empujar': 4}
 class ErrorPublicacion(Exception):
     """Una acción falló. incierto=True cuando pudo haberse hecho aunque no haya respuesta (no se reintenta sola)."""
 
-    def __init__(self, mensaje, incierto=False):
+    def __init__(self, mensaje, incierto=False, extra=None):
         super().__init__(mensaje)
         self.incierto = incierto
+        self.extra = dict(extra or {})   # datos sin secretos que sirven para comprobar después qué pasó (por ejemplo la cuenta, «did»)
 
 
 class ErrorPlan(Exception):
@@ -325,10 +326,14 @@ def ejecutar(ctx, plan, plan_problemas, aprobar, ent, adaptadores):
         ad = por_canal[acc['canal']]
         base = {'accion': acc['id'], 'canal': acc['canal'], 'tipo': acc['tipo'], 'juego': ctx.id, 'version': ctx.version, 'huella': plan['huella'],
                 'lanzamiento': ctx.tipo == 'lanzamiento'}
+        texto_post = (acc.get('datos') or {}).get('texto')
+        if acc['tipo'] == 'post' and isinstance(texto_post, str):
+            base['texto_sha256'] = sha256_texto(texto_post)   # con esto se puede comprobar después, sin las claves, si ese texto llegó a salir
 
-        def anotar(resultado, detalle='', ref=None, url=None):
+        def anotar(resultado, detalle='', ref=None, url=None, mas=None):
             informe.append({'accion': acc['id'], 'canal': acc['canal'], 'resultado': resultado, 'detalle': detalle})
             extra = {k: v for k, v in (('ref', ref), ('url', url)) if v}
+            extra.update({k: v for k, v in (mas or {}).items() if isinstance(v, (str, int)) and v != ''})
             ctx.libro.agregar(ent.ahora(), resultado=resultado, detalle=detalle, **dict(base, **extra))
         if ctx.libro.hecho(acc['id']):
             informe.append({'accion': acc['id'], 'canal': acc['canal'], 'resultado': 'ya hecho', 'detalle': 'esta misma acción ya salió (libro)'})
@@ -356,7 +361,7 @@ def ejecutar(ctx, plan, plan_problemas, aprobar, ent, adaptadores):
             r = ad.ejecutar(acc, ent, ctx) or {}
             anotar('ok', red.redactar(r.get('detalle', ''), valores), r.get('ref'), r.get('url'))
         except ErrorPublicacion as e:
-            anotar('incierto' if e.incierto else 'error', red.redactar(str(e), valores))
+            anotar('incierto' if e.incierto else 'error', red.redactar(str(e), valores), mas=e.extra if e.incierto else None)
             todo_ok = False
             if acc['categoria'] == 'sitio':
                 break
@@ -368,12 +373,14 @@ def ejecutar(ctx, plan, plan_problemas, aprobar, ent, adaptadores):
     return informe, todo_ok
 
 
-def resolver(libro, accion_id, salio, ahora, quien='persona'):
-    """Una persona dice qué pasó con una acción dudosa. salio=True → se da por hecha; False → se descarta y podrá reintentarse."""
+def resolver(libro, accion_id, salio, ahora, quien='persona', extra=None):
+    """Una persona (o la comprobación automática, publicacion/comprobar.py) dice qué pasó con una acción dudosa.
+    salio=True → se da por hecha; False → se descarta y podrá reintentarse. `extra`: datos que se anotan (por ejemplo ref y url del post hallado)."""
     u = libro.ultima(accion_id)
     if not u or u.get('resultado') != 'incierto':
         raise ErrorPublicacion('«%s» no tiene un resultado dudoso en el libro; nada que resolver' % accion_id)
-    campos = {k: u[k] for k in ('accion', 'canal', 'tipo', 'juego', 'version', 'huella', 'lanzamiento') if k in u}
+    campos = {k: u[k] for k in ('accion', 'canal', 'tipo', 'juego', 'version', 'huella', 'lanzamiento', 'texto_sha256') if k in u}
+    campos.update({k: v for k, v in (extra or {}).items() if v})
     libro.agregar(ahora, resultado='ok' if salio else 'descartado', detalle='resuelto por %s: %s' % (quien, 'sí salió' if salio else 'no salió'), **campos)
 
 

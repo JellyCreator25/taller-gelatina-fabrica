@@ -91,6 +91,8 @@ def problemas_de_catalogo(cat):
             continue
         if x.get('estado') not in ('abierta', 'resuelta'):
             p.append('%s: «estado» debe ser abierta o resuelta' % i)
+        if x.get('estado') == 'resuelta' and not str(x.get('resuelta_por') or '').strip():
+            p.append('%s: un paso «resuelta» dice cómo y cuándo («resuelta_por»)' % i)
         if not x.get('por_que'):
             p.append('%s: todo paso del dueño dice por qué es suyo' % i)
         recurrente = x.get('frecuencia') != 'una-vez'

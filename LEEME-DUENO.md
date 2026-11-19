@@ -118,7 +118,7 @@ Antes de ejecutar, las compuertas se niegan si falta algo: datos de ejemplo en `
 ## Si algo sale mal
 
 - Cada resultado queda en `publicacion/libro.jsonl`. Lo ya hecho se salta; nunca se publica dos veces lo mismo.
-- Si una red no contestó y no se sabe si el envío salió, queda como **incierto** y **no se reintenta solo** (se evitan los duplicados). Revisa la cuenta y anota qué pasó: `python3 fabrica.py resolver ACCION salio` o `no-salio`.
+- Si una red no contestó y no se sabe si el envío salió, queda como **incierto** y **no se reintenta solo** (se evitan los duplicados). Cada día, media hora antes del calendario, el flujo «Comprobar envíos en duda» lo intenta aclarar solo: lee la cuenta pública (sin claves, sin publicar nada) y anota únicamente lo que puede demostrar (el texto exacto aparece en la cuenta, o se comprueba con certeza que no salió); si no puede asegurarlo, la duda sigue y el administrador te avisa. En ese caso revisa la cuenta y anota qué pasó: `python3 fabrica.py resolver ACCION salio` o `no-salio`.
 - Un fallo en una red no frena a las demás. Un fallo del sitio sí detiene la ejecución.
 - Los secretos se toman solo del entorno y se tachan en los mensajes de error.
 

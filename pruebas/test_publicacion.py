@@ -2417,5 +2417,264 @@ class PruebasAnaliticaEnElSitio(BaseMetricas):
         self.assertEqual(sorted(k for k in antes if antes[k] != despues.get(k)), ['en/privacidad/index.html', 'es/privacidad/index.html', 'zh/privacidad/index.html'])
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Comprobar solo qué pasó con un envío en duda (publicacion/comprobar.py)
+# ---------------------------------------------------------------------------------------------------------------------
+
+DID = 'did:plc:abc123'
+TEXTO_DUDOSO = 'Un post que quedó en duda https://taller-gelatina.pages.dev/es/'
+ACCION_DUDOSA = 'demo:1.0.0:bluesky:post'
+FEED = 'https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed'
+
+
+class PruebasComprobarEnvios(Base):
+    """El comprobador solo lee la cuenta pública. Concluye «salió» con pruebas y «no salió» con muchas más; si no puede, la duda sigue."""
+
+    def setUp(self):
+        super().setUp()
+        self.t0 = datetime.datetime(2026, 11, 20, 15, 0, tzinfo=datetime.timezone.utc)
+        self.libro = nucleo.Libro(self.p.raiz / 'publicacion' / 'libro.jsonl')
+        self.red = Red()
+
+    def iso(self, t):
+        return t.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+
+    def post(self, rkey, texto, creado, autor=DID):
+        return {'post': {'uri': 'at://%s/app.bsky.feed.post/%s' % (autor, rkey), 'author': {'did': autor}, 'record': {'text': texto, 'createdAt': self.iso(creado)}}}
+
+    def feed(self, *posts, cursor=None):
+        cuerpo = {'feed': list(posts)}
+        if cursor:
+            cuerpo['cursor'] = cursor
+        self.red.al('GET', FEED, resp(200, cuerpo))
+
+    def ancla(self, dias=1):
+        """Un post anterior que sí salió: fila «ok» con su referencia."""
+        self.libro.agregar(self.t0 - datetime.timedelta(days=dias), accion='viejo:1:bluesky:post', canal='bluesky', tipo='post', juego='x', version='1', huella='h',
+                           lanzamiento=False, resultado='ok', detalle='post creado', ref='at://%s/app.bsky.feed.post/3kviejo' % DID)
+        return self.post('3kviejo', 'Un post de antes', self.t0 - datetime.timedelta(days=dias))
+
+    def duda(self, canal='bluesky', accion=ACCION_DUDOSA, con_cuenta=True, ts=None, texto=TEXTO_DUDOSO):
+        campos = dict(accion=accion, canal=canal, tipo='post', juego='demo', version='1.0.0', huella='h', lanzamiento=False, resultado='incierto', detalle='sin respuesta')
+        if con_cuenta:
+            campos.update(did=DID, texto_sha256=nucleo.sha256_texto(texto))
+        self.libro.agregar(ts or self.t0, **campos)
+
+    def resolver(self, despues=datetime.timedelta(hours=1), accion=None):
+        from publicacion import comprobar
+        return comprobar.resolver_en_duda(self.libro, self.red, self.t0 + despues, accion)
+
+    def estado(self, informe):
+        return [r['estado'] for r in informe]
+
+    def filas(self):
+        return self.libro.entradas()
+
+    # --- qué anota el libro cuando un post queda en duda --------------------------------------------------------------
+
+    def test_un_post_en_duda_anota_la_cuenta_y_el_hash_del_texto(self):
+        self.p.red.al('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord', red.ErrorRed('timeout'))
+        self.p.ejecutar()
+        ctx, plan, _ = self.p.plan()
+        texto = [a for a in plan['acciones'] if a['canal'] == 'bluesky'][0]['datos']['texto']
+        fila = [e for e in self.p.libro() if e['resultado'] == 'incierto'][0]
+        self.assertEqual(fila['did'], 'did:plc:abc123')
+        self.assertEqual(fila['texto_sha256'], nucleo.sha256_texto(texto))
+        ok = [e for e in self.p.libro() if e['canal'] == 'bluesky' and e['resultado'] == 'ok']
+        self.assertEqual(ok, [])
+
+    def test_los_posts_que_salen_tambien_anotan_el_hash_y_nunca_un_secreto(self):
+        self.p.ejecutar()
+        fila = [e for e in self.p.libro() if e['canal'] == 'bluesky'][0]
+        self.assertEqual(fila['resultado'], 'ok')
+        self.assertEqual(len(fila['texto_sha256']), 64)
+        for secreto in (v for v in SECRETOS.values() if 'SECRETO' in v):     # las direcciones públicas (como la instancia de Mastodon) sí pueden aparecer
+            self.assertNotIn(secreto, self.p.texto_libro())
+
+    # --- «salió» ------------------------------------------------------------------------------------------------------
+
+    def test_si_el_post_esta_en_la_cuenta_se_da_por_hecho_con_su_referencia(self):
+        self.ancla()
+        self.duda()
+        self.feed(self.post('3knuevo', TEXTO_DUDOSO, self.t0 - datetime.timedelta(seconds=40)), self.post('3kviejo', 'Un post de antes', self.t0 - datetime.timedelta(days=1)))
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['salio'])
+        ultima = self.libro.ultima(ACCION_DUDOSA)
+        self.assertEqual((ultima['resultado'], ultima['ref']), ('ok', 'at://%s/app.bsky.feed.post/3knuevo' % DID))
+        self.assertEqual(ultima['url'], 'https://bsky.app/profile/%s/post/3knuevo' % DID)
+        self.assertIn('comprobación automática', ultima['detalle'])
+        self.assertTrue(self.libro.hecho(ACCION_DUDOSA) and not self.libro.incierto(ACCION_DUDOSA))
+
+    def test_si_aparece_se_da_por_hecho_aunque_el_intento_sea_reciente(self):
+        self.duda()
+        self.feed(self.post('3knuevo', TEXTO_DUDOSO, self.t0 - datetime.timedelta(seconds=30)))
+        inf = self.resolver(despues=datetime.timedelta(minutes=2))
+        self.assertEqual(self.estado(inf), ['salio'])
+
+    def test_solo_lee_la_cuenta_publica_sin_claves_ni_escrituras(self):
+        self.duda()
+        self.feed(self.post('3knuevo', TEXTO_DUDOSO, self.t0 - datetime.timedelta(seconds=30)))
+        self.resolver()
+        self.assertEqual(len(self.red.llamadas), 1)
+        c = self.red.llamadas[0]
+        self.assertEqual(c['metodo'], 'GET')
+        self.assertTrue(c['url'].startswith(FEED + '?actor=' + DID))
+        self.assertNotIn('Authorization', c['cab'])
+        self.assertIsNone(c['cuerpo'])
+
+    def test_lo_resuelto_a_mano_o_solo_deja_el_mismo_efecto_en_el_calendario(self):
+        self.p.red.al('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord', red.ErrorRed('timeout'))
+        self.p.ejecutar()
+        _, plan, _ = self.p.plan()
+        texto = [a for a in plan['acciones'] if a['canal'] == 'bluesky'][0]['datos']['texto']
+        self.red.al('GET', FEED, resp(200, {'feed': [self.post('3kauto', texto, self.p.reloj() - datetime.timedelta(seconds=20))]}))
+        from publicacion import comprobar
+        inf = comprobar.resolver_en_duda(self.libro, self.red, self.p.reloj() + datetime.timedelta(hours=1))
+        self.assertEqual(self.estado(inf), ['salio'])
+        self.p.red = Red.todo_bien()
+        informe, ok = self.p.ejecutar()
+        self.assertTrue(ok, informe)
+        self.assertEqual(self.p.red.a('POST', 'https://bsky.social/xrpc/com.atproto.repo.createRecord'), [])   # no se repite el post
+
+    def test_un_repost_o_un_texto_igual_de_otro_momento_no_cuenta(self):
+        ancla = self.ancla()
+        self.duda()
+        self.feed(self.post('3kajeno', TEXTO_DUDOSO, self.t0 - datetime.timedelta(seconds=30), autor='did:plc:otra'),
+                  self.post('3kantes', TEXTO_DUDOSO, self.t0 - datetime.timedelta(hours=3)), ancla)
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['no-salio'])
+
+    # --- «no salió» ---------------------------------------------------------------------------------------------------
+
+    def test_no_salio_solo_con_lectura_completa_y_un_post_anterior_visible(self):
+        ancla = self.ancla()
+        self.duda()
+        self.feed(ancla)
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['no-salio'])
+        ultima = self.libro.ultima(ACCION_DUDOSA)
+        self.assertEqual(ultima['resultado'], 'descartado')
+        self.assertFalse(self.libro.incierto(ACCION_DUDOSA) or self.libro.hecho(ACCION_DUDOSA))
+
+    def test_un_intento_de_menos_de_30_minutos_sigue_en_duda(self):
+        ancla = self.ancla()
+        self.duda()
+        self.feed(ancla)
+        inf = self.resolver(despues=datetime.timedelta(minutes=10))
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertTrue(self.libro.incierto(ACCION_DUDOSA))
+
+    def test_sin_un_post_anterior_que_pruebe_la_lectura_no_se_concluye_que_no_salio(self):
+        self.duda()
+        self.feed()                                   # cuenta «vacía»: ¿no salió, o la lectura no es de esta cuenta?
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertIn('mirar la cuenta', inf[0]['motivo'])
+
+    def test_si_la_lectura_no_muestra_un_post_que_si_salio_no_se_fia_de_ella(self):
+        self.ancla()
+        self.duda()
+        self.feed(self.post('3kotro', 'Otro post', self.t0 - datetime.timedelta(days=2)))
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertIn('no me fío', inf[0]['motivo'])
+
+    def test_una_lectura_que_no_llega_hasta_antes_del_intento_no_concluye(self):
+        ancla = self.ancla()
+        self.duda()
+        recientes = [self.post('3k%d' % i, 'post %d' % i, self.t0 - datetime.timedelta(minutes=10 + i)) for i in range(3)]
+        self.feed(*recientes, cursor='sigue')        # hay más páginas y todo lo leído es posterior a la ventana
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertEqual(len(self.red.a('GET', FEED)), 3)    # se detiene en el tope de páginas
+        self.assertIn('no llegó hasta antes del intento', inf[0]['motivo'])
+        self.assertIsNotNone(ancla)
+
+    def test_un_envio_descartado_una_vez_no_se_descarta_otra_vez_solo(self):
+        ancla = self.ancla()
+        self.duda()
+        self.libro.agregar(self.t0 + datetime.timedelta(minutes=1), accion=ACCION_DUDOSA, canal='bluesky', tipo='post', resultado='descartado', detalle='resuelto por la comprobación automática: no salió')
+        self.duda(ts=self.t0 + datetime.timedelta(hours=2))
+        self.feed(ancla)
+        inf = self.resolver(despues=datetime.timedelta(hours=5))
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertIn('ya se descartó una vez', inf[0]['motivo'])
+
+    # --- cuando no se puede, la duda sigue y no se anota nada -----------------------------------------------------------
+
+    def test_sin_red_o_con_error_del_servicio_la_duda_sigue_sin_anotar_nada(self):
+        self.ancla()
+        self.duda()
+        antes = self.libro.ruta.read_text(encoding='utf-8')
+        for respuesta in (red.ErrorRed('timeout'), resp(500), resp(200, {'otra': 'cosa'})):
+            self.red = Red()
+            self.red.al('GET', FEED, respuesta)
+            inf = self.resolver()
+            self.assertEqual(self.estado(inf), ['sigue-en-duda'], respuesta)
+        self.assertEqual(self.libro.ruta.read_text(encoding='utf-8'), antes)
+
+    def test_un_envio_anterior_a_este_comprobador_no_se_adivina(self):
+        self.duda(con_cuenta=False)
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertEqual(self.red.llamadas, [])
+        self.assertIn('anterior a este comprobador', inf[0]['motivo'])
+
+    def test_un_canal_sin_comprobador_sigue_en_duda_sin_tocar_la_red(self):
+        self.duda(canal='mastodon', accion='demo:1:mastodon:post')
+        inf = self.resolver()
+        self.assertEqual(self.estado(inf), ['sigue-en-duda'])
+        self.assertEqual(self.red.llamadas, [])
+
+    def test_pedir_una_accion_que_no_esta_en_duda_es_un_error(self):
+        with self.assertRaises(nucleo.ErrorPublicacion):
+            self.resolver(accion='no-existe')
+
+    def test_varios_envios_en_duda_se_resuelven_cada_uno(self):
+        ancla = self.ancla()
+        self.duda()
+        self.duda(accion='demo2:1:bluesky:post', texto='Otro texto', ts=self.t0 + datetime.timedelta(minutes=5))
+        self.feed(self.post('3kdos', 'Otro texto', self.t0 + datetime.timedelta(minutes=5, seconds=-30)), ancla)
+        inf = {r['accion']: r['estado'] for r in self.resolver(despues=datetime.timedelta(hours=2))}
+        self.assertEqual(inf, {ACCION_DUDOSA: 'no-salio', 'demo2:1:bluesky:post': 'salio'})
+
+    # --- verificar la lectura (solo lectura) -----------------------------------------------------------------------------
+
+    def test_verificar_lee_el_ultimo_post_que_si_salio(self):
+        from publicacion import comprobar
+        ancla = self.ancla()
+        self.feed(ancla)
+        estado, texto = comprobar.verificar(self.red, self.libro.entradas())
+        self.assertEqual(estado, 'ok', texto)
+        self.red = Red()
+        self.feed(self.post('3kotro', 'Otro post', self.t0))
+        self.assertEqual(comprobar.verificar(self.red, self.libro.entradas())[0], 'falla')
+        self.red = Red()
+        self.red.al('GET', FEED, red.ErrorRed('sin conexión'))
+        self.assertEqual(comprobar.verificar(self.red, self.libro.entradas())[0], 'falla')
+        self.assertEqual(comprobar.verificar(self.red, [])[0], 'inconcluso')
+
+    # --- la línea de comandos ---------------------------------------------------------------------------------------------
+
+    def fabrica(self, *args):
+        return subprocess.run([sys.executable, '-I', str(self.p.raiz / 'fabrica.py'), *args], capture_output=True, text=True,
+                              env={'PYTHONHASHSEED': '3', 'PATH': '/usr/bin:/bin'}, cwd=str(self.p.raiz))
+
+    def test_la_linea_de_comandos_sin_nada_en_duda_no_toca_la_red(self):
+        r = self.fabrica('resolver', '--auto')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('nada en duda', r.stdout)
+
+    def test_la_linea_de_comandos_pide_un_envio_que_no_esta_en_duda(self):
+        r = self.fabrica('resolver', '--auto', 'no-existe')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('nada que resolver', r.stderr)
+
+    def test_resolver_a_mano_sigue_funcionando(self):
+        r = self.fabrica('resolver', 'x:1:y:z', 'salio')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('nada que resolver', r.stderr)
+
+
 if __name__ == '__main__':
     unittest.main()

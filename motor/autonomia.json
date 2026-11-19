@@ -149,6 +149,13 @@
       "donde": ".github/workflows/calendario.yml"
     },
     {
+      "id": "f-resolver-envio-incierto",
+      "quien": "fabrica",
+      "titulo": "Aclarar solos los envíos en duda leyendo la cuenta pública (sin claves)",
+      "frecuencia": "diaria",
+      "donde": ".github/workflows/comprobar.yml (resolver --auto)"
+    },
+    {
       "id": "f-ciclo-semanal",
       "quien": "fabrica",
       "titulo": "Estado semanal: reconstruir, revisar y dejar publicacion/PENDIENTE.md",
@@ -172,6 +179,13 @@
       "titulo": "Leer el estado y contrastar el calendario aprobado contra lo que salió",
       "frecuencia": "semanal",
       "donde": "rutina de los lunes"
+    },
+    {
+      "id": "a-reactivar-flujos",
+      "quien": "agente",
+      "titulo": "Volver a encender los flujos programados que GitHub apague por inactividad",
+      "frecuencia": "diaria",
+      "donde": "tarea diaria del administrador, paso «Latido» (administrador flujos --reactivar es la herramienta comprobada)"
     },
     {
       "id": "a-resultados",
@@ -300,12 +314,13 @@
       "titulo": "Revisar la cuenta y anotar si un envío en duda salió o no",
       "frecuencia": "eventual",
       "clase": "automatizable",
-      "estado": "abierta",
+      "estado": "resuelta",
       "veces_por_mes": 0.2,
       "veces_con_regla": 0,
       "construible": true,
       "por_que": "Hoy `resolver ACCION salio|no-salio` lo anota una persona; una publicación de Bluesky se puede consultar sin clave.",
-      "como_se_reduce": "`resolver --auto`: busca la publicación en el registro público de la red por su referencia y anota el resultado; si la red no contesta, sigue en duda y se avisa."
+      "como_se_reduce": "`resolver --auto`: busca la publicación en el registro público de la red por su referencia y anota el resultado; si la red no contesta, sigue en duda y se avisa.",
+      "resuelta_por": "Construido el 19 de noviembre de 2026: `resolver --auto` (publicacion/comprobar.py) lee la cuenta pública y aclara solo los envíos en duda; corre cada día media hora antes del calendario (.github/workflows/comprobar.yml). Si no puede asegurarlo, la duda sigue y el chequeo avisa"
     },
     {
       "id": "d-reactivar-flujos",
@@ -313,12 +328,13 @@
       "titulo": "Reactivar un flujo programado que GitHub apagó por falta de actividad",
       "frecuencia": "eventual",
       "clase": "automatizable",
-      "estado": "abierta",
+      "estado": "resuelta",
       "veces_por_mes": 0.1,
       "veces_con_regla": 0,
       "construible": true,
       "por_que": "GitHub puede desactivar los flujos programados de un repositorio público sin actividad (no lo verifiqué con la documentación vigente).",
-      "como_se_reduce": "Que la rutina de los lunes compruebe con `gh` que los flujos programados estén activos y los reactive; avisar solo si no se pudo."
+      "como_se_reduce": "Que la rutina de los lunes compruebe con `gh` que los flujos programados estén activos y los reactive; avisar solo si no se pudo.",
+      "resuelta_por": "Cubierto desde el 19 de noviembre de 2026: el paso «Latido» de la tarea diaria del administrador reactiva los flujos que GitHub apague por inactividad. `administrador flujos --reactivar` es la herramienta comprobada (usa la API, confirma que el flujo quedó activo y no toca uno apagado a mano)"
     },
     {
       "id": "u-aprobar-reserva",
@@ -352,12 +368,13 @@
       "titulo": "Aprobar el despliegue del sitio con analítica y privacidad (huella 392b7acd88e5a855)",
       "frecuencia": "una-vez",
       "clase": "obligatoria",
-      "estado": "abierta",
+      "estado": "resuelta",
       "ancla": "legal",
       "desbloquea": [
         "f-metricas-cloudflare"
       ],
-      "por_que": "Cambia lo que el sitio le dice al jugador; sin ese despliegue la analítica no cuenta nada."
+      "por_que": "Cambia lo que el sitio le dice al jugador; sin ese despliegue la analítica no cuenta nada.",
+      "resuelta_por": "Max aprobó el despliegue el 19 de noviembre de 2026 (huella 392b7acd88e5a855); el flujo «Publicar» lo ejecutó y el libro lo anota como desplegado y comprobado"
     },
     {
       "id": "u-cuenta-crazygames",

@@ -95,12 +95,12 @@ class Bluesky:
         try:
             r = ent.http('POST', pds + '/xrpc/com.atproto.repo.createRecord', dict(aut, **{'Content-Type': 'application/json'}), cuerpo)
         except Exception as e:   # sin respuesta: el post pudo haberse creado; no se reintenta
-            raise ErrorPublicacion('Bluesky no respondió al crear el post (%s): mira la cuenta antes de repetir' % e, incierto=True)
+            raise ErrorPublicacion('Bluesky no respondió al crear el post (%s): mira la cuenta antes de repetir' % e, incierto=True, extra={'did': did})
         if r.status == 200:
             uri = r.json().get('uri', '')
             return {'detalle': 'post creado', 'ref': uri, 'url': 'https://bsky.app/profile/%s/post/%s' % (did, uri.rsplit('/', 1)[-1])}
         if r.status >= 500:
-            raise ErrorPublicacion('Bluesky respondió %d al crear el post: mira la cuenta antes de repetir' % r.status, incierto=True)
+            raise ErrorPublicacion('Bluesky respondió %d al crear el post: mira la cuenta antes de repetir' % r.status, incierto=True, extra={'did': did})
         raise ErrorPublicacion('Bluesky rechazó el post (HTTP %d: %s)' % (r.status, r.texto(160)))
 
 

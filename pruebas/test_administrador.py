@@ -105,9 +105,16 @@ class Chequeo(unittest.TestCase):
         self.assertIn('motor probar', x['accion'])
 
     def test_lo_automatizable_pendiente_es_trabajo_del_administrador(self):
-        x = [y for y in self.chequeo() if y['id'] == 'autonomia-por-construir']
+        pendiente = {'prioridad': 3, 'tipo': 'autonomia', 'titulo': 'Automatizar: algo que hoy hace Max', 'por_que': 'x'}
+        with mock.patch.object(autonomia, 'cola_items', return_value=[pendiente]):         # hoy no queda ningún paso abierto: se simula uno
+            x = [y for y in self.chequeo() if y['id'] == 'autonomia-por-construir']
         self.assertEqual(len(x), 1)
         self.assertEqual(x[0]['nivel'], 'resolver')
+        self.assertIn('algo que hoy hace Max', x[0]['texto'])
+
+    def test_sin_pasos_automatizables_abiertos_el_administrador_no_inventa_trabajo(self):
+        with mock.patch.object(autonomia, 'cola_items', return_value=[]):
+            self.assertEqual([y for y in self.chequeo() if y['id'] == 'autonomia-por-construir'], [])
 
     def test_un_inventario_roto_se_nota(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -135,9 +142,12 @@ class Chequeo(unittest.TestCase):
 
     def test_el_resumen_agrupa_y_dice_cuando_todo_esta_en_orden(self):
         self.assertEqual(administrador.resumen([]), ['Todo en orden: nada que arreglar ni que avisar.'])
-        texto = '\n'.join(administrador.resumen(self.chequeo([linea('hecha', '2026-11-10')])))
+        pendiente = {'prioridad': 3, 'tipo': 'autonomia', 'titulo': 'Automatizar: algo que hoy hace Max', 'por_que': 'x'}
+        with mock.patch.object(autonomia, 'cola_items', return_value=[pendiente]):
+            texto = '\n'.join(administrador.resumen(self.chequeo([linea('hecha', '2026-11-10')])))
         self.assertIn('Para avisar a Max', texto)
         self.assertIn('Para resolver sin Max', texto)
+        self.assertIn('Solo para saber', texto)
 
 
 class Bitacora(unittest.TestCase):
@@ -237,6 +247,108 @@ class Carta(unittest.TestCase):
 
     def test_el_orden_de_la_corrida_no_manda_mensaje_si_no_hay_nada(self):
         self.assertIn('Una corrida sin hallazgos no manda nada', self.carta)
+
+
+class GhFalso:
+    """`gh` simulado: responde a la lista de flujos y a «enable», y guarda cada llamada. Los flujos que se reactivan pasan a «active»."""
+
+    def __init__(self, flujos, falla_al_listar=False, falla_enable=(), enable_no_surte_efecto=()):
+        self.flujos = [dict(f) for f in flujos]
+        self.llamadas = []
+        self.falla_al_listar = falla_al_listar
+        self.falla_enable = set(falla_enable)
+        self.no_surte = set(enable_no_surte_efecto)
+
+    def __call__(self, argv):
+        self.llamadas.append(list(argv))
+        if argv[:2] == ['api', 'repos/o/r/actions/workflows?per_page=100']:
+            if self.falla_al_listar:
+                return 1, '', 'HTTP 403'
+            return 0, json.dumps({'total_count': len(self.flujos), 'workflows': self.flujos}), ''
+        if argv[:3] == ['api', '-X', 'PUT'] and argv[3].endswith('/enable'):
+            ident = int(argv[3].split('/')[-2])
+            if ident in self.falla_enable:
+                return 1, '', 'HTTP 422'
+            if ident not in self.no_surte:
+                for f in self.flujos:
+                    if f['id'] == ident:
+                        f['state'] = 'active'
+            return 0, '', ''
+        raise AssertionError('llamada a gh no prevista: %r' % (argv,))
+
+    def puts(self):
+        return [a for a in self.llamadas if a[:3] == ['api', '-X', 'PUT']]
+
+
+def wf(ident, nombre, estado):
+    return {'id': ident, 'name': nombre, 'path': '.github/workflows/%s.yml' % nombre.lower(), 'state': estado}
+
+
+class Flujos(unittest.TestCase):
+    """GitHub apaga los flujos programados de un repositorio sin actividad. El administrador los vuelve a encender, y solo esos."""
+
+    def revisar(self, gh, reactivar=False):
+        return administrador.revisar_flujos(gh, 'o/r', reactivar)
+
+    def resultados(self, informe):
+        return {r['nombre']: r['resultado'] for r in informe}
+
+    def test_sin_pedir_reactivar_solo_mira(self):
+        gh = GhFalso([wf(1, 'Calendario', 'active'), wf(2, 'Ciclo', 'disabled_inactivity')])
+        r = self.resultados(self.revisar(gh))
+        self.assertEqual(r, {'Calendario': 'activo', 'Ciclo': 'apagado-por-inactividad'})
+        self.assertEqual(gh.puts(), [])
+
+    def test_reactiva_solo_lo_que_github_apago_por_inactividad(self):
+        gh = GhFalso([wf(1, 'Calendario', 'disabled_inactivity'), wf(2, 'Ciclo', 'disabled_manually'), wf(3, 'Pruebas', 'active'), wf(4, 'Viejo', 'deleted')])
+        r = self.resultados(self.revisar(gh, True))
+        self.assertEqual(r, {'Calendario': 'reactivado', 'Ciclo': 'apagado-a-mano', 'Pruebas': 'activo'})      # el borrado ni aparece
+        self.assertEqual(gh.puts(), [['api', '-X', 'PUT', 'repos/o/r/actions/workflows/1/enable']])             # el apagado a mano no se toca
+        self.assertEqual([f['state'] for f in gh.flujos if f['id'] == 2], ['disabled_manually'])
+
+    def test_un_flujo_apagado_a_mano_se_cuenta_como_sin_resolver_para_avisar(self):
+        informe = self.revisar(GhFalso([wf(2, 'Ciclo', 'disabled_manually'), wf(3, 'Pruebas', 'active')]), True)
+        self.assertEqual([r['nombre'] for r in administrador.flujos_sin_resolver(informe)], ['Ciclo'])
+
+    def test_si_la_orden_falla_se_dice_y_no_se_da_por_reactivado(self):
+        informe = self.revisar(GhFalso([wf(1, 'Calendario', 'disabled_inactivity')], falla_enable=[1]), True)
+        self.assertEqual(self.resultados(informe), {'Calendario': 'no-se-pudo'})
+        self.assertIn('422', informe[0]['detalle'])
+        self.assertEqual(len(administrador.flujos_sin_resolver(informe)), 1)
+
+    def test_reactivado_solo_si_github_lo_muestra_activo_despues(self):
+        informe = self.revisar(GhFalso([wf(1, 'Calendario', 'disabled_inactivity')], enable_no_surte_efecto=[1]), True)
+        self.assertEqual(self.resultados(informe), {'Calendario': 'no-se-pudo'})
+        self.assertIn('no figura activo', informe[0]['detalle'])
+
+    def test_con_todo_activo_no_hace_nada_mas_que_mirar(self):
+        gh = GhFalso([wf(1, 'Calendario', 'active'), wf(2, 'Ciclo', 'active')])
+        informe = self.revisar(gh, True)
+        self.assertEqual(administrador.flujos_sin_resolver(informe), [])
+        self.assertEqual(len(gh.llamadas), 1)
+
+    def test_si_no_se_puede_listar_es_un_error_claro(self):
+        with self.assertRaises(administrador.ErrorAdministrador) as c:
+            self.revisar(GhFalso([], falla_al_listar=True))
+        self.assertIn('no pude listar los flujos de o/r', str(c.exception))
+        sin_forma = lambda argv: (0, '{"otra": 1}', '')
+        with self.assertRaises(administrador.ErrorAdministrador):
+            administrador.listar_flujos(sin_forma, 'o/r')
+
+    def test_el_repositorio_sale_del_remoto_o_de_la_variable_de_los_flujos(self):
+        for url in ('https://github.com/JellyCreator25/taller-gelatina-fabrica', 'https://github.com/JellyCreator25/taller-gelatina-fabrica.git',
+                    'git@github.com:JellyCreator25/taller-gelatina-fabrica.git', 'https://github.com/JellyCreator25/taller-gelatina-fabrica/\n'):
+            self.assertEqual(administrador.repo_de_remoto(url), 'JellyCreator25/taller-gelatina-fabrica', url)
+        with self.assertRaises(administrador.ErrorAdministrador):
+            administrador.repo_de_remoto('https://ejemplo.org/otro.git')
+        self.assertEqual(administrador.repo_actual(RAIZ, {'GITHUB_REPOSITORY': 'a/b'}), 'a/b')
+
+    def test_usa_solo_la_api_rest_de_gh(self):
+        gh = GhFalso([wf(1, 'Calendario', 'disabled_inactivity')])
+        self.revisar(gh, True)
+        for argv in gh.llamadas:
+            self.assertEqual(argv[0], 'api', argv)        # nunca `gh workflow ...`, que en estas sesiones pide GraphQL y se rechaza
+            self.assertNotIn('graphql', ' '.join(argv))
 
 
 if __name__ == '__main__':

@@ -6,11 +6,13 @@ import copy
 import datetime
 import json
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
@@ -63,6 +65,7 @@ class Inventario(unittest.TestCase):
         cat = copy.deepcopy(self.cat)
         p = {x['id']: x for x in cat['pasos']}
         p['d-aprobar-lote']['estado'] = 'resuelta'            # su regla «reserva perenne» sí está autorizada
+        p['d-aprobar-lote']['resuelta_por'] = 'prueba'
         self.assertEqual(autonomia.problemas_de_catalogo(cat), [])
         p['d-aprobar-lote']['regla'] = ['lotes-de-4-semanas']   # esta no
         self.assertIn('solo queda «resuelta» si Max autorizó', ' | '.join(autonomia.problemas_de_catalogo(cat)))
@@ -119,12 +122,50 @@ class Medicion(unittest.TestCase):
         self.assertNotIn('f-metricas-cloudflare', despues['detenidos_por_dueno'])
 
     def test_automatizar_un_paso_baja_los_toques(self):
-        antes = autonomia.medir(self.cat)
+        """El paso «d-resolver-envio-incierto» ya se automatizó (19 de noviembre de 2026): se reabre en una copia y se vuelve a cerrar."""
+        abierto = copy.deepcopy(self.cat)
+        for x in abierto['pasos']:
+            if x['id'] == 'd-resolver-envio-incierto':
+                x['estado'] = 'abierta'
+                x.pop('resuelta_por')
+        self.assertEqual(autonomia.problemas_de_catalogo(abierto), [])
+        self.assertLess(autonomia.medir(self.cat)['toques_mes'], autonomia.medir(abierto)['toques_mes'])
+
+    def test_un_paso_resuelto_dice_como_y_cuando(self):
         cat = copy.deepcopy(self.cat)
         for x in cat['pasos']:
-            if x['id'] == 'd-resolver-envio-incierto':
-                x['estado'] = 'resuelta'
-        self.assertLess(autonomia.medir(cat)['toques_mes'], antes['toques_mes'])
+            if x['id'] == 'u-desplegar-sitio':
+                x.pop('resuelta_por')
+        self.assertIn('u-desplegar-sitio: un paso «resuelta» dice cómo y cuándo', ' | '.join(autonomia.problemas_de_catalogo(cat)))
+
+    def test_lo_que_el_inventario_dice_que_corre_solo_existe(self):
+        for x in self.cat['pasos']:
+            if x['quien'] == 'fabrica' and str(x.get('donde', '')).startswith('.github/workflows/'):
+                self.assertTrue((RAIZ / x['donde'].split(' ')[0]).exists(), '%s: %s' % (x['id'], x['donde']))
+
+    def test_aclarar_envios_en_duda_corre_cada_dia_antes_del_calendario_sin_claves_ni_publicar(self):
+        """La comprobación vive en su propio flujo: los que publican (calendario.yml, publicar.yml) son de Max y no se tocan."""
+        paso = next(x for x in self.cat['pasos'] if x['id'] == 'f-resolver-envio-incierto')
+        flujo = (RAIZ / '.github' / 'workflows' / 'comprobar.yml').read_text(encoding='utf-8')
+        cal = (RAIZ / '.github' / 'workflows' / 'calendario.yml').read_text(encoding='utf-8')
+        self.assertIn('resolver --auto', flujo)
+        self.assertIn('resolver --verificar', flujo, 'la corrida manual «verificar» no anota nada')
+        self.assertIn('comprobar.yml', paso['donde'])
+        self.assertNotIn('secrets.', flujo, 'solo lee la cuenta pública: no recibe ninguna clave')
+        self.assertNotIn('environment:', flujo.replace('«environment»', ''), 'sin el entorno de producción no ve las claves')
+        self.assertNotIn('--ejecutar', flujo, 'no publica nada')
+        self.assertNotIn('resolver', cal, 'el flujo del calendario no cambió')
+        grupo = 'group: publicar'
+        self.assertIn(grupo, flujo)
+        self.assertIn(grupo, cal, 'comparten grupo: nunca escriben el libro a la vez')
+        hora = lambda t: int(re.search(r"cron: '(\d+) (\d+) ", t).group(2)) * 60 + int(re.search(r"cron: '(\d+) (\d+) ", t).group(1))
+        self.assertLess(hora(flujo), hora(cal), 'primero se aclara la duda, después corre el calendario')
+
+    def test_el_latido_de_los_flujos_esta_en_el_inventario_en_la_carta_y_en_los_avisos(self):
+        paso = next(x for x in self.cat['pasos'] if x['id'] == 'a-reactivar-flujos')
+        self.assertIn('administrador flujos --reactivar', paso['donde'])
+        self.assertIn('Mantener el latido', (RAIZ / 'motor' / 'ADMINISTRADOR.md').read_text(encoding='utf-8'))      # la carta (de Max) ya lo manda
+        self.assertIn('flujos --reactivar', (RAIZ / 'herramientas' / 'administrador.py').read_text(encoding='utf-8'))
 
     def test_dias_aprobados_solo_cuenta_lo_vigente(self):
         lineas = [linea('hecha', '2026-11-18'), linea('lista', '2026-11-19'), linea('aún no es su fecha', '2026-11-25'),
@@ -152,13 +193,24 @@ class ColaDelMotor(unittest.TestCase):
     def test_solo_entra_lo_que_se_puede_construir_sin_max(self):
         cat = autonomia.catalogo(RAIZ)
         titulos = [i['titulo'] for i in autonomia.cola_items(RAIZ)]
-        self.assertTrue(titulos, 'mientras haya algo automatizable por construir, la cola lo trae')
         for x in cat['pasos']:
             if x['quien'] != 'dueno':
                 continue
             en_cola = ('Automatizar: ' + x['titulo']) in titulos
             esperado = x['clase'] == 'automatizable' and x['estado'] == 'abierta' and bool(x.get('construible'))
             self.assertEqual(en_cola, esperado, x['id'])
+
+    def test_un_paso_nuevo_automatizable_y_construible_entra_a_la_cola(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            (pathlib.Path(tmp) / 'motor').mkdir()
+            cat = autonomia.catalogo(RAIZ)
+            cat['pasos'].append({'id': 'd-nuevo', 'quien': 'dueno', 'titulo': 'Algo repetitivo', 'frecuencia': 'eventual', 'clase': 'automatizable', 'estado': 'abierta',
+                                 'veces_por_mes': 1, 'veces_con_regla': 0, 'construible': True, 'por_que': 'x', 'como_se_reduce': 'un comando'})
+            (pathlib.Path(tmp) / 'motor' / 'autonomia.json').write_text(json.dumps(cat), encoding='utf-8')
+            self.assertEqual([i['titulo'] for i in autonomia.cola_items(tmp)], ['Automatizar: Algo repetitivo'])
+            cat['pasos'][-1]['construible'] = False
+            (pathlib.Path(tmp) / 'motor' / 'autonomia.json').write_text(json.dumps(cat), encoding='utf-8')
+            self.assertEqual(autonomia.cola_items(tmp), [], 'lo que no se puede construir sin Max no entra')
 
     def test_lo_reducible_nunca_entra_a_la_cola(self):
         for x in autonomia.catalogo(RAIZ)['pasos']:
@@ -170,7 +222,9 @@ class ColaDelMotor(unittest.TestCase):
         entradas = [{'juego': j, 'lanzamiento': True, 'resultado': 'ok'} for j in piso.get('lanzados', [])] or []
         juegos = [json.loads((RAIZ / 'juegos' / d.name / 'juego.json').read_text(encoding='utf-8')) for d in sorted((RAIZ / 'juegos').iterdir()) if (d / 'juego.json').exists()]
         sola = motor.cola(RAIZ, entradas, juegos)
-        con = motor.cola_con_autonomia(RAIZ, entradas, juegos)
+        pendiente = {'prioridad': 3, 'tipo': 'autonomia', 'titulo': 'Automatizar: algo que hoy hace Max', 'por_que': 'x'}
+        with mock.patch.object(autonomia, 'cola_items', return_value=[pendiente]):        # hoy ya no queda nada automatizable abierto: se simula uno
+            con = motor.cola_con_autonomia(RAIZ, entradas, juegos)
         self.assertFalse([i for i in sola if i['tipo'] == 'autonomia'], 'la cola de calidad no cambia')
         extra = [i for i in con if i['tipo'] == 'autonomia']
         self.assertTrue(extra)
