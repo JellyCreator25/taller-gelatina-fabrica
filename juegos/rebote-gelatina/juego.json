@@ -1,0 +1,215 @@
+{
+  "id": "rebote-gelatina",
+  "plantilla": "rebote",
+  "version": "0.1.0",
+  "idiomas": ["es", "en", "zh"],
+  "paquetes": [],
+  "fuentes": ["Fredoka", "Nunito Sans"],
+  "apoyo_url": "",
+  "motor": ["bots"],
+  "necesidades_motor": [],
+  "parametros": {
+    "gravedad": 900,
+    "radio": 14,
+    "tiros": 5,
+    "v_min": 150,
+    "v_max": 760,
+    "niveles": [
+      {
+        "lanzador": { "x": 60, "y": 356 },
+        "meta": { "x": 520, "y": 340, "w": 70, "h": 30 },
+        "bloques": [
+          { "x": 0, "y": 370, "w": 640, "h": 30, "m": "suelo" }
+        ]
+      },
+      {
+        "lanzador": { "x": 60, "y": 356 },
+        "meta": { "x": 520, "y": 340, "w": 70, "h": 30 },
+        "bloques": [
+          { "x": 0, "y": 370, "w": 640, "h": 30, "m": "suelo" },
+          { "x": 300, "y": 210, "w": 26, "h": 160, "m": "suelo" }
+        ]
+      },
+      {
+        "lanzador": { "x": 60, "y": 356 },
+        "meta": { "x": 540, "y": 170, "w": 70, "h": 30 },
+        "bloques": [
+          { "x": 0, "y": 370, "w": 640, "h": 30, "m": "suelo" },
+          { "x": 250, "y": 360, "w": 90, "h": 10, "m": "resorte" },
+          { "x": 480, "y": 200, "w": 160, "h": 20, "m": "suelo" }
+        ]
+      },
+      {
+        "lanzador": { "x": 60, "y": 356 },
+        "meta": { "x": 520, "y": 340, "w": 70, "h": 30 },
+        "bloques": [
+          { "x": 0, "y": 370, "w": 640, "h": 30, "m": "suelo" },
+          { "x": 230, "y": 362, "w": 200, "h": 8, "m": "pegajoso" }
+        ]
+      },
+      {
+        "lanzador": { "x": 60, "y": 356 },
+        "meta": { "x": 500, "y": 340, "w": 100, "h": 30 },
+        "bloques": [
+          { "x": 0, "y": 370, "w": 640, "h": 30, "m": "suelo" },
+          { "x": 440, "y": 230, "w": 20, "h": 140, "m": "suelo" }
+        ]
+      },
+      {
+        "lanzador": { "x": 60, "y": 356 },
+        "meta": { "x": 560, "y": 200, "w": 60, "h": 30 },
+        "bloques": [
+          { "x": 0, "y": 370, "w": 640, "h": 30, "m": "suelo" },
+          { "x": 150, "y": 0, "w": 300, "h": 120, "m": "suelo" },
+          { "x": 330, "y": 360, "w": 80, "h": 10, "m": "resorte" },
+          { "x": 520, "y": 230, "w": 120, "h": 20, "m": "suelo" }
+        ]
+      }
+    ]
+  },
+  "textos": {
+    "es": {
+      "titulo": "Rebote Gelatina",
+      "aria_juego": "Zona de juego: arrastra hacia atrás desde la gelatina para apuntar",
+      "jugar": "Jugar",
+      "siguiente": "Siguiente nivel",
+      "reintentar": "Reintentar",
+      "de_nuevo": "Jugar de nuevo",
+      "nivel": "Nivel {n}: {nombre}",
+      "tiros": "Tiros: {n}",
+      "estrellas": "Estrellas: {n}",
+      "ayuda": "Arrastra hacia atrás desde la gelatina para apuntar y suelta para lanzar. Con teclado: flechas arriba y abajo para el ángulo, izquierda y derecha para la potencia, espacio para lanzar.",
+      "nivel_ok": "¡Llegó!",
+      "nivel_ok_estrellas": "¡Llegó! Estrellas ganadas: {n}",
+      "sin_tiros": "Sin tiros. Prueba otra vez.",
+      "fin_juego": "¡Pasaste todos los niveles!",
+      "angulo": "Ángulo: {n}°",
+      "potencia": "Potencia: {n} %",
+      "nivel_1": "Primer salto",
+      "nivel_2": "El muro",
+      "nivel_3": "Trampolín",
+      "nivel_4": "Miel pegajosa",
+      "nivel_5": "El pozo",
+      "nivel_6": "Doble rebote"
+    },
+    "en": {
+      "titulo": "Jelly Bounce",
+      "aria_juego": "Play area: drag back from the jelly to aim",
+      "jugar": "Play",
+      "siguiente": "Next level",
+      "reintentar": "Try again",
+      "de_nuevo": "Play again",
+      "nivel": "Level {n}: {nombre}",
+      "tiros": "Shots: {n}",
+      "estrellas": "Stars: {n}",
+      "ayuda": "Drag back from the jelly to aim and let go to launch. Keyboard: up and down arrows for the angle, left and right for the power, space to launch.",
+      "nivel_ok": "Made it!",
+      "nivel_ok_estrellas": "Made it! Stars earned: {n}",
+      "sin_tiros": "Out of shots. Try again.",
+      "fin_juego": "You cleared every level!",
+      "angulo": "Angle: {n}°",
+      "potencia": "Power: {n}%",
+      "nivel_1": "First hop",
+      "nivel_2": "The wall",
+      "nivel_3": "Trampoline",
+      "nivel_4": "Sticky honey",
+      "nivel_5": "The pit",
+      "nivel_6": "Double bounce"
+    },
+    "zh": {
+      "titulo": "弹跳果冻",
+      "aria_juego": "游戏区域：从果冻向后拖动来瞄准",
+      "jugar": "开始",
+      "siguiente": "下一关",
+      "reintentar": "再试一次",
+      "de_nuevo": "重新开始",
+      "nivel": "第{n}关：{nombre}",
+      "tiros": "次数：{n}",
+      "estrellas": "星星：{n}",
+      "ayuda": "从果冻向后拖动来瞄准，松手发射。键盘：上下键调角度，左右键调力度，空格发射。",
+      "nivel_ok": "到达！",
+      "nivel_ok_estrellas": "到达！获得星星：{n}",
+      "sin_tiros": "次数用完了，再试一次。",
+      "fin_juego": "你通关了！",
+      "angulo": "角度：{n}°",
+      "potencia": "力度：{n}%",
+      "nivel_1": "第一跳",
+      "nivel_2": "高墙",
+      "nivel_3": "弹床",
+      "nivel_4": "粘蜜",
+      "nivel_5": "深坑",
+      "nivel_6": "双重弹跳"
+    }
+  },
+  "portada": {
+    "color_a": "#2f6bdc",
+    "color_b": "#e04a34",
+    "lema": { "es": "PENDIENTE", "en": "PENDIENTE", "zh": "PENDIENTE" },
+    "selector": "#cv"
+  },
+  "ia": { "codigo": true, "graficos": true, "texto": true, "sonido": false },
+  "precio": { "modo": "donar", "sugerido_usd": 2 },
+  "etiquetas": ["PENDIENTE"],
+  "clasificacion": "PENDIENTE",
+  "ficha": {
+    "es": { "titulo": "PENDIENTE", "corta": "PENDIENTE", "larga": "PENDIENTE", "controles": "PENDIENTE" },
+    "en": { "titulo": "PENDIENTE", "corta": "PENDIENTE", "larga": "PENDIENTE", "controles": "PENDIENTE" },
+    "zh": { "titulo": "PENDIENTE", "corta": "PENDIENTE", "larga": "PENDIENTE", "controles": "PENDIENTE" }
+  },
+  "difusion": {
+    "es": {
+      "post_corto": "PENDIENTE",
+      "post_comunidad_titulo": "PENDIENTE",
+      "post_comunidad": "PENDIENTE",
+      "guion_video": ["PENDIENTE"],
+      "mensaje_clase": "PENDIENTE",
+      "devlog_titulo": "PENDIENTE",
+      "devlog": "PENDIENTE",
+      "descripcion_video": "PENDIENTE"
+    },
+    "en": {
+      "post_corto": "PENDIENTE",
+      "post_comunidad_titulo": "PENDIENTE",
+      "post_comunidad": "PENDIENTE",
+      "guion_video": ["PENDIENTE"],
+      "mensaje_clase": "PENDIENTE",
+      "devlog_titulo": "PENDIENTE",
+      "devlog": "PENDIENTE",
+      "descripcion_video": "PENDIENTE"
+    },
+    "zh": {
+      "post_corto": "PENDIENTE",
+      "post_comunidad_titulo": "PENDIENTE",
+      "post_comunidad": "PENDIENTE",
+      "guion_video": ["PENDIENTE"],
+      "mensaje_clase": "PENDIENTE",
+      "devlog_titulo": "PENDIENTE",
+      "devlog": "PENDIENTE",
+      "descripcion_video": "PENDIENTE"
+    }
+  },
+  "lanzamiento": { "orden": 4, "despues_de": "compas-gelatina", "espera_semanas": "2 a 4" },
+  "originalidad": {
+    "riesgo_portales": "medio",
+    "referencias": [],
+    "motivo": "Beta: la mecánica de lanzar y rebotar se parece a juegos de lanzamiento conocidos; lo propio es la física blanda de la gelatina y los materiales del nivel.",
+    "diferenciador": { "es": "PENDIENTE", "en": "PENDIENTE", "zh": "PENDIENTE" }
+  },
+  "mecanica": {
+    "genero": "puzzle-fisico",
+    "verbo": "apuntar",
+    "objetivo": "llegar-a-la-meta",
+    "entrada": ["apuntar-y-disparar"],
+    "progresion": "niveles-fijos",
+    "ambientacion": "Un mundo de gelatina: cielo claro, bloques de gelatina firme, trampolines rosa y miel pegajosa.",
+    "arte": "Dibujado en canvas con el código del juego; la gelatina de la casa es el proyectil.",
+    "sistemas": []
+  },
+  "creacion": {
+    "herramientas": ["Claude (Anthropic): programación, gráficos y textos del juego, y sus pruebas automáticas."],
+    "decisiones_dueno": ["PENDIENTE"],
+    "decisiones_claude": ["PENDIENTE"]
+  },
+  "prueba": { "escenario": "rebote" },
+  "estado": "beta"
+}

@@ -2,3 +2,9 @@ __pycache__/
 .venv/
 dist/
 *.pyc
+
+# Betas: prototipos que no se publican; sus medios y su informe de pruebas se regeneran (quitar estas líneas al promover una beta a juego)
+salida/rebote-gelatina/medios/
+salida/rebote-gelatina/informe-pruebas.txt
+salida/arena-gelatina/medios/
+salida/arena-gelatina/informe-pruebas.txt

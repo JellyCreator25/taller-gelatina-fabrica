@@ -65,6 +65,19 @@
         "apagado por defecto"
       ],
       "desde": "2026-11-18"
+    },
+    "bots": {
+      "version": "1.0.0",
+      "archivo": "bots.js",
+      "pide": [],
+      "aporta": [
+        "interfaz estándar para que un bot o una plataforma juegue el juego (?bot=1)",
+        "episodios reproducibles con tiempo simulado",
+        "políticas que corren dentro de la página",
+        "reglas que no deben romperse (invariantes)",
+        "inerte para el jugador normal"
+      ],
+      "desde": "2026-11-22"
     }
   }
 }

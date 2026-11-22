@@ -35,6 +35,8 @@ python3 fabrica.py novedad [id|todos]     # ¿es un juego distinto o una variant
 python3 fabrica.py ideas                  # el cuaderno de ideas frente a los juegos que ya existen
 python3 fabrica.py nueva-plantilla NOMBRE --genero G --verbo V --objetivo O   # andamio de un género nuevo
 python3 fabrica.py nuevo ID PLANTILLA     # ficha nueva sobre una plantilla existente (lo que falte dice PENDIENTE)
+python3 fabrica.py nuevo ID PLANTILLA --beta   # ficha de prueba: se construye y se prueba con bots, pero nunca se publica
+python3 fabrica.py bots [ID|todos]        # pruebas con bots: ¿se puede ganar?, ¿qué tan difícil es?, ¿falla?, ¿es determinista? (informe en metricas/bots/)
 python3 fabrica.py sitio                  # genera dist/sitio (es/en/zh) con los juegos de publicacion/sitio.json
 python3 fabrica.py sitio --zip            # además deja dist/sitio.zip para arrastrarlo a Cloudflare Pages (se niega con datos de ejemplo)
 python3 fabrica.py perfiles             # avatar, banner y textos (es/en/zh) de las cuentas de bot en difusion/perfiles/ (--texto: sin navegador)
@@ -105,6 +107,16 @@ Cada juego nuevo debe sentirse con más presupuesto que el anterior, y el motor 
 - **Cola de mejoras** (`python3 fabrica.py motor`, y sección «Motor» de `PENDIENTE.md`): se calcula sola — pruebas vencidas, juegos por debajo de su nivel, módulos que faltan para el siguiente nivel, pedidos de los juegos (`necesidades_motor`) y, al llegar al techo, la primera idea sin construir de `motor/ideas.json`. Subir una actualización de calidad a un juego ya publicado es también una novedad que anunciar.
 
 Un juego nuevo (`nuevo ID PLANTILLA`) parte con todos los módulos declarados; declararlos no basta para subir de nivel.
+
+## Pruebas con bots (y betas)
+
+El motor tiene un órgano para que algo que no es una persona juegue un juego del Taller, de forma reproducible y mucho más rápido que el tiempo real: el módulo `bots` (`motor/modulos/bots.js`, inerte salvo que la dirección lleve `?bot=1`). El contrato completo, para quien quiera conectar una plataforma externa que simule jugadores, está en `motor/BOTS.md`.
+
+- **Qué dicen los bots y qué no**: dicen si un juego se puede ganar, qué tan difícil es, cuánto tarda cada paso y si falla o es determinista. **No dicen** si a la gente le gustará ni cuántos vendrán: eso lo dicen las visitas y los jugadores. Por eso el resultado se muestra junto a cada idea en el ranking de `rumbo` pero **no cambia su puntaje**, hasta que haya datos reales para calibrarlo.
+- **Betas**: un juego con `"estado": "beta"` en su ficha (`nuevo ID PLANTILLA --beta`) se construye, se prueba con `probar` y con `bots`, y **nunca se publica**: la compuerta de publicación lo frena, el sitio se niega a listarlo, el kit y la revisión de lanzamiento lo saltan y no cuenta para la novedad ni para la cola del motor. Su idea se queda en el ranking con una línea que dice cuál es su beta y cómo le fue con los bots.
+- **Cada plantilla trae sus políticas** (`plantillas/NOMBRE/bots.js`): una débil (si gana casi siempre, es trivial), una solucionadora (demuestra que se puede ganar) y una humana con imprecisión (su tasa es la dificultad que sentiría alguien). `python3 fabrica.py bots ID` las juega en un Chromium real, escribe `metricas/bots/ID.json` y sale con error si algo está roto (no determinista, errores de página, reglas violadas, imposible de ganar).
+- **Hoy** hay dos betas: `rebote-gelatina` (puzzle de física) y `arena-gelatina` (sandbox de materiales). Sus carpetas `salida/ID/medios/` y `informe-pruebas.txt` no se guardan en el repositorio (`.gitignore`); al promover una beta a juego hay que quitar esas líneas.
+- **Plataforma externa**: necesita una dirección a la que pueda llegar. Publicar una beta es publicar, así que lo decide Max con su aprobación y su huella; mientras tanto la fábrica corre las mismas pruebas en su propio navegador.
 
 ## Autonomía y el administrador del motor
 

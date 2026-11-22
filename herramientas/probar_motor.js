@@ -356,16 +356,104 @@ async function anuncios(browser) {
   await ctx.close();
 }
 
+async function bots(browser) {
+  const M = 'bots';
+  // sin ?bot=1 el módulo está inerte: no expone nada ni cambia la página
+  let { ctx, page, errores } = await abrir(browser);
+  const inerte = await page.evaluate(() => {
+    const ok = GGX.bots.registrar({ reiniciar() {}, estado: () => ({}), actuar: () => ({ valida: true }), avanzar() {}, terminado: () => ({ fin: false }) });
+    return { activo: GGX.bots.activo, ok, expuesto: typeof window.__bot, marca: document.documentElement.hasAttribute('data-bot') };
+  });
+  chequear(M, inerte.activo === false && inerte.ok === true && inerte.expuesto === 'undefined' && inerte.marca === false, 'sin ?bot=1 el módulo no expone window.__bot ni marca la página');
+  await ctx.close();
+
+  // con ?bot=1: un juego de mentira (cuenta hasta 10) para probar la maquinaria
+  ({ ctx, page, errores } = await abrir(browser, {}, '?bot=1&semilla=7'));
+  const r = await page.evaluate(() => {
+    const out = {};
+    let n = 0, t = 0, rr = null, sem = 0;
+    GGX.bots.registrar({
+      juego: 'prueba', version: '0.0.1',
+      reiniciar(semilla) { sem = semilla; rr = GGX.rng(semilla); n = 0; t = 0; return { n }; },
+      estado: () => ({ n, t, objetivo: 10 }),
+      acciones: () => [{ tipo: 'sumar', rango: [1, 3] }],
+      actuar(a) { if (a && a.tipo === 'sumar' && a.v >= 1 && a.v <= 3) { n += a.v + (rr() < 0.2 ? 1 : 0); return { valida: true }; } return { valida: false, motivo: 'acción desconocida' }; },
+      avanzar(ms) { t += ms; },
+      terminado: () => ({ fin: n >= 10 || t >= 5000, exito: n >= 10, motivo: n >= 10 ? 'meta' : t >= 5000 ? 'tiempo' : '' }),
+      puntaje: () => n,
+      simular: (a) => ({ exito: n + a.v >= 10 }),
+      invariantes: () => (n > 12 ? ['n se pasó de 12'] : []),
+      resumen: () => ({ n }),
+    });
+    out.expuesto = typeof window.__bot; out.marca = document.documentElement.getAttribute('data-bot');
+    out.info = __bot.info();
+    out.url = GGX.bots.api === window.__bot;
+    const buena = '(api, rng) => ({ tipo: "sumar", v: 3, info: { nota: 7 } })';
+    const mala = '(api, rng) => ({ tipo: "romper", v: 9 })';
+    const quieta = '(api, rng) => ({ tipo: "esperar" })';
+    const rinde = '(api, rng, ctx) => ctx.paso >= 2 ? null : { tipo: "esperar" }';
+    const explota = '(api, rng, ctx) => { throw new Error("política rota"); }';
+    const quitaDeUnaVez = (a) => { delete a.ms_reales; return JSON.stringify(a); };
+    const a1 = __bot.correr(buena, 7), a2 = __bot.correr(buena, 7), a3 = __bot.correr(buena, 8);
+    out.buena = a1; out.determinista = quitaDeUnaVez(Object.assign({}, a1)) === quitaDeUnaVez(Object.assign({}, a2));
+    out.otraSemilla = a3.semilla;
+    out.ms_reales = typeof a1.ms_reales;
+    out.mala = __bot.correr(mala, 7, { max_pasos: 5 });
+    out.quieta = __bot.correr(quieta, 7);
+    out.rinde = __bot.correr(rinde, 7);
+    out.explota = __bot.correr(explota, 7);
+    out.limite = __bot.correr(quieta, 7, { max_pasos: 3 });
+    out.dt = __bot.correr(quieta, 7, { dt: 1000, max_pasos: 100 });
+    __bot.reiniciar(7); out.antes = JSON.stringify(__bot.estado());
+    out.simular = __bot.simular({ v: 12 }); out.simularNo = __bot.simular({ v: 1 });
+    out.despues = JSON.stringify(__bot.estado());
+    out.registro = GGX.bots.estado();
+    let falla = null; try { GGX.bots.registrar({ estado() {} }); } catch (e) { falla = e.message; }
+    out.rechazo = falla;
+    return out;
+  });
+  chequear(M, r.expuesto === 'object' && r.marca === '1' && r.url, 'con ?bot=1 existe window.__bot y la página queda marcada con data-bot');
+  chequear(M, r.info.juego === 'prueba' && r.info.contrato === 1 && r.info.semilla_url === 7 && r.info.capacidades.simular === true, 'info() dice qué juego es, la versión del contrato y qué capacidades tiene');
+  chequear(M, r.buena.exito === true && r.buena.motivo === 'meta' && r.buena.pasos >= 3 && r.buena.pasos <= 4 && r.buena.puntaje >= 10, 'correr() juega un episodio entero dentro de la página y devuelve su resultado');
+  chequear(M, r.buena.politica_info && r.buena.politica_info.nota === 7, 'la «info» que deja una política queda en el resultado (politica_info)');
+  chequear(M, r.determinista === true && r.otraSemilla === 8, 'misma semilla y misma política dan exactamente el mismo resultado (ms_reales aparte)');
+  chequear(M, r.ms_reales === 'number', 'ms_reales es lo único que depende del reloj de la computadora');
+  chequear(M, r.mala.invalidas === 5 && r.mala.exito === false, 'las acciones inválidas se cuentan y no rompen el episodio');
+  chequear(M, r.quieta.motivo === 'tiempo' && r.quieta.exito === false && r.quieta.ms_simulados === 5000, 'el tiempo es simulado: esperar lo hace correr hasta el límite del juego');
+  chequear(M, r.rinde.motivo === 'abandono' && r.rinde.terminado === false, 'una política que devuelve null se rinde y queda anotado');
+  chequear(M, r.explota.motivo === 'error-de-politica' && r.explota.errores.length === 1, 'una política que lanza un error no tumba la página: queda anotado');
+  chequear(M, r.limite.motivo === 'limite' && r.limite.pasos === 3, 'max_pasos corta el episodio con el motivo «limite»');
+  chequear(M, r.dt.ms_simulados === 5000 && r.dt.pasos === 5, 'dt manda cuánto avanza el juego entre decisiones');
+  chequear(M, r.simular.exito === true && r.simularNo.exito === false && r.antes === r.despues, 'simular() contesta sin tocar el estado real');
+  chequear(M, r.registro.registrado === true && r.registro.expuesto === true && Array.isArray(r.registro.errores), 'GGX.bots.estado() informa del registro');
+  chequear(M, typeof r.rechazo === 'string' && /faltan/.test(r.rechazo), 'un adaptador al que le faltan funciones obligatorias se rechaza con un motivo claro');
+  chequear(M, errores.length === 0, 'sin errores de consola ni de página' + (errores.length ? ': ' + errores.join(' || ') : ''));
+  await ctx.close();
+
+  // las reglas rotas (invariantes) y los errores del juego se anotan sin tumbar a quien juega
+  ({ ctx, page, errores } = await abrir(browser, {}, '?bot=1'));
+  const v = await page.evaluate(() => {
+    let n = 0;
+    GGX.bots.registrar({ reiniciar() { n = 0; }, estado: () => ({ n }), actuar: () => { n += 5; return { valida: true }; }, avanzar() { if (n > 20) throw new Error('el juego se rompió'); },
+      terminado: () => ({ fin: false }), invariantes: () => (n > 10 ? ['n pasó de 10'] : []) });
+    const a = __bot.correr('(api) => ({ tipo: "x" })', 1, { max_pasos: 30, cada_invariantes: 1 });
+    return { a, errores: __bot.metricas().errores };
+  });
+  chequear(M, v.a.violaciones.length === 1 && v.a.violaciones[0] === 'n pasó de 10', 'invariantes(): una regla rota queda en el informe, sin repetirse');
+  chequear(M, v.a.motivo === 'error-del-juego' && v.errores.some((x) => /se rompió/.test(x)), 'un error dentro del juego termina el episodio con «error-del-juego» y queda anotado');
+  await ctx.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  const pasos = { nucleo, accesible, efectos, musica, marca, anuncios };
+  const pasos = { nucleo, accesible, efectos, musica, marca, anuncios, bots };
   for (const [nombre, f] of Object.entries(pasos)) {
-    const hay = nombre === 'nucleo' || (await (async () => { const { ctx, page } = await abrir(browser); const v = await page.evaluate((n) => (n === 'accesible' ? !!GGX.a11y : n === 'efectos' ? !!GGX.fx : n === 'musica' ? !!GGX.music : n === 'marca' ? !!GGX.marca : !!GGX.ads), nombre); await ctx.close(); return v; })());
+    const hay = nombre === 'nucleo' || (await (async () => { const { ctx, page } = await abrir(browser); const v = await page.evaluate((n) => (n === 'accesible' ? !!GGX.a11y : n === 'efectos' ? !!GGX.fx : n === 'musica' ? !!GGX.music : n === 'marca' ? !!GGX.marca : n === 'bots' ? !!GGX.bots : !!GGX.ads), nombre); await ctx.close(); return v; })());
     if (!hay) { chequear(nombre, false, 'el módulo «' + nombre + '» no está en la página de prueba'); continue; }
     try { await f(browser); } catch (e) { chequear(nombre, false, 'la prueba se detuvo: ' + e.message); }
   }
   await browser.close();
   const fallas = Object.values(resultado).reduce((n, g) => n + g.fallas, 0);
-  console.log(JSON.stringify({ nucleo: resultado.nucleo, modulos: { accesible: resultado.accesible, efectos: resultado.efectos, musica: resultado.musica, marca: resultado.marca, anuncios: resultado.anuncios }, fallas }));
+  console.log(JSON.stringify({ nucleo: resultado.nucleo, modulos: { accesible: resultado.accesible, efectos: resultado.efectos, musica: resultado.musica, marca: resultado.marca, anuncios: resultado.anuncios, bots: resultado.bots }, fallas }));
   process.exit(fallas ? 1 : 0);
 })().catch((e) => { console.error('FALLO GENERAL', e); process.exit(1); });

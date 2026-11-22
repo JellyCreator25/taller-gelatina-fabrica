@@ -256,6 +256,8 @@ def compuertas(ctx, plan, plan_problemas, ahora):
     sys.path.insert(0, str(ctx.raiz / 'herramientas'))
     import novedad
     import revisar_kit
+    if novedad.es_beta(ctx.spec):
+        p.append('es una beta (estado «beta» en su ficha): un prototipo para probar con bots no se publica; hay que promoverla primero')
     nov = novedad.evaluar(ctx.raiz, ctx.id)
     p += nov['errores']
     for cat in sorted({a['categoria'] for a in plan['acciones']}):

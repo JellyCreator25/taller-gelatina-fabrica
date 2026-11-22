@@ -216,6 +216,13 @@
       "donde": "rutina de los lunes"
     },
     {
+      "id": "a-pruebas-con-bots",
+      "quien": "agente",
+      "titulo": "Jugar las betas y los juegos con bots (¿se puede ganar?, ¿falla?, ¿es determinista?) y dejar el informe en metricas/bots/; las banderas se muestran en el ranking pero no cambian el puntaje",
+      "frecuencia": "semanal",
+      "donde": "rutina de los lunes"
+    },
+    {
       "id": "a-avanzar-juegos",
       "quien": "agente",
       "titulo": "Avanzar el siguiente juego y dejar listo el plan de lanzamiento con su huella",

@@ -1,0 +1,11 @@
+{
+  "nombre": "arena",
+  "genero": "sandbox-creativo",
+  "verbo": "dibujar",
+  "objetivo": "descubrir",
+  "entrada": [
+    "arrastrar"
+  ],
+  "progresion": "desbloqueos",
+  "descripcion": "Sandbox de materiales que caen (arena, agua, piedra, gelatina): cada uno se comporta distinto y mezclarlos desbloquea materiales nuevos; el objetivo es descubrirlo todo."
+}

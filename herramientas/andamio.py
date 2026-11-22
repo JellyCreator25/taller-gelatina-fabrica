@@ -238,7 +238,7 @@ TEXTOS_BASE = {
 }
 
 
-def nuevo_juego(raiz, juego_id, plantilla):
+def nuevo_juego(raiz, juego_id, plantilla, beta=False):
     raiz = pathlib.Path(raiz)
     _comprobar_nombre(juego_id, 'Id del juego')
     base = raiz / 'plantillas' / plantilla
@@ -255,7 +255,7 @@ def nuevo_juego(raiz, juego_id, plantilla):
     p = 'PENDIENTE'
     spec = {
         'id': juego_id, 'plantilla': plantilla, 'version': '0.1.0', 'idiomas': idiomas, 'paquetes': [], 'fuentes': ['Fredoka', 'Nunito Sans'], 'apoyo_url': '',
-        'motor': _modulos_del_motor(raiz), 'necesidades_motor': [],
+        'motor': _modulos_del_motor(raiz, plantilla), 'necesidades_motor': [],
         'parametros': {}, 'textos': TEXTOS_BASE,
         'portada': {'color_a': '#2f6bdc', 'color_b': '#e04a34', 'lema': {i: p for i in idiomas}, 'selector': '#cv'},
         'ia': {'codigo': True, 'graficos': True, 'texto': True, 'sonido': False},
@@ -269,17 +269,22 @@ def nuevo_juego(raiz, juego_id, plantilla):
         'creacion': {'herramientas': ['Claude (Anthropic): programación, gráficos y textos del juego, y sus pruebas automáticas.'], 'decisiones_dueno': [p], 'decisiones_claude': [p]},
         'prueba': {'escenario': plantilla},
     }
+    if beta:
+        spec['estado'] = 'beta'           # prototipo para probar con bots: se construye, nunca se publica (ver novedad.es_beta)
+        spec['motor'] = ['bots']
     destino.mkdir(parents=True)
     json_fmt.guardar(destino / 'juego.json', spec)
     return destino
 
 
-def _modulos_del_motor(raiz):
+def _modulos_del_motor(raiz, plantilla=None):
     """Un juego nuevo parte con TODOS los módulos del motor declarados: cada juego debe sentirse mejor que el anterior. Quitar uno exige una razón, y
-    declararlo no basta: el nivel de calidad solo cuenta lo que el código del juego llama (python3 fabrica.py calidad ID)."""
+    declararlo no basta: el nivel de calidad solo cuenta lo que el código del juego llama (python3 fabrica.py calidad ID).
+    Excepción: «bots» (el laboratorio de pruebas) solo viene si la plantilla trae sus políticas (plantillas/NOMBRE/bots.js); si no, sería peso muerto en cada juego."""
     sys.path.insert(0, str(pathlib.Path(raiz) / 'herramientas'))
     import motor
-    return list(motor.manifiesto(raiz))
+    con_bots = bool(plantilla) and (pathlib.Path(raiz) / 'plantillas' / plantilla / 'bots.js').exists()
+    return [m for m in motor.manifiesto(raiz) if m != 'bots' or con_bots]
 
 
 pendientes = novedad.pendientes

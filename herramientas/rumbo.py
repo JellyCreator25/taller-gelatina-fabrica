@@ -29,6 +29,7 @@ import datetime
 import math
 import pathlib
 
+import bots
 import metricas as met
 import novedad as nov
 
@@ -186,7 +187,9 @@ def candidatas(raiz, specs, pts, modo, pol):
         f_nov = r['factor_novedad'][ev['veredicto']]
         ranking.append({'id': iid, 'titulo': idea.get('titulo', ''), 'mecanica': idea['mecanica'], 'puntaje': base * f_riesgo * f_costo * f_nov, 'base': base,
                         'ejes': ejes, 'riesgo': riesgo or '?', 'costo': costo or '?', 'novedad': ev['veredicto'],
-                        'factores': {'riesgo': f_riesgo, 'costo': f_costo, 'novedad': f_nov}})
+                        'factores': {'riesgo': f_riesgo, 'costo': f_costo, 'novedad': f_nov}, 'beta': nov.beta_de(raiz, idea)})
+    for c in ranking:                                   # las banderas de los bots se muestran, pero NO entran al puntaje (hay que calibrarlas con datos reales)
+        c['bots'] = bots.resumen_corto(bots.leer(raiz, c['beta'])) if c['beta'] else None
     ranking.sort(key=lambda x: (-round(x['puntaje'], 9), x['id']))
     return ranking, en_espera, excluidas
 
@@ -196,7 +199,7 @@ def recomendar(raiz, hoy=None, libro=None):
     raiz = pathlib.Path(raiz)
     hoy = hoy or met.hoy_utc()
     pol = met.cargar_politica(raiz)
-    specs = {i: s for i, s in nov.cargar_juegos(raiz).items() if not s.get('_ilegible') and isinstance(s.get('mecanica'), dict)}
+    specs = {i: s for i, s in nov.cargar_juegos(raiz).items() if not s.get('_ilegible') and not nov.es_beta(s) and isinstance(s.get('mecanica'), dict)}
     filas = met.leer(raiz, set(nov.cargar_juegos(raiz)))
     if libro is None:
         import json
@@ -261,7 +264,12 @@ def informe(r, detalle=False, n=3):
             razones = [_razon_eje(e) for e in c['ejes'][:3 if not detalle else len(c['ejes'])]]
             L.append('%d. `%s` · %s · puntaje %.2f · riesgo de clon %s · costo %s%s' % (
                 i, c['id'], c['titulo'], c['puntaje'], c['riesgo'], c['costo'], ' · se parece a un juego existente (no apta para portales)' if c['novedad'] == 'parecido' else ''))
-            L.append('   Por qué: %s. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero %s --verbo %s --objetivo %s`' % ('; '.join(razones), mec['genero'], mec['verbo'], mec['objetivo']))
+            if c.get('beta'):
+                L.append('   Beta: `%s` (prototipo que no se publica)%s' % (c['beta'], ' · ' + c['bots'] if c.get('bots') else ' · sin pruebas con bots todavía'))
+            if c.get('beta'):
+                L.append('   Por qué: %s. Ya existe la beta; falta pulirla y promoverla a juego (publicarla sigue necesitando tu aprobación con la huella).' % '; '.join(razones))
+            else:
+                L.append('   Por qué: %s. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero %s --verbo %s --objetivo %s`' % ('; '.join(razones), mec['genero'], mec['verbo'], mec['objetivo']))
     if r['en_espera']:
         L += ['', 'En espera (algo que solo una persona puede resolver):']
         L += ['- `%s`: %s' % (e['id'], e['motivo']) for e in r['en_espera']]

@@ -37,6 +37,17 @@ def cargar_juegos(raiz):
     return juegos
 
 
+def es_beta(spec):
+    """Una beta es un prototipo jugable (juego.json → «estado»: «beta») para probar con bots: se construye y se prueba, pero nunca se publica, no cuenta
+    como juego de la fábrica frente a la novedad ni al rumbo, y su idea sigue en el ranking hasta que se decida promoverla o descartarla."""
+    return isinstance(spec, dict) and spec.get('estado') == 'beta'
+
+
+def betas(raiz):
+    """{id: ficha} de los juegos que son beta."""
+    return {i: s for i, s in cargar_juegos(raiz).items() if es_beta(s)}
+
+
 def pendientes(spec):
     """Rutas de los campos de la ficha que todavía dicen PENDIENTE (los dejó el andamio para que el autor los complete)."""
     salida = []
@@ -143,7 +154,7 @@ def evaluar(raiz, juego_id=None, spec=None):
         return resultado
     peor, padre = 'distinto', None
     for oid, o in juegos.items():
-        if oid == spec.get('id') or o.get('_ilegible') or not isinstance(o.get('mecanica'), dict):
+        if oid == spec.get('id') or o.get('_ilegible') or es_beta(o) or not isinstance(o.get('mecanica'), dict):
             continue
         c = comparar(spec, o)
         c['anterior'] = es_idea or _orden(o) < _orden(spec)   # el que salió antes es el original
@@ -209,7 +220,22 @@ def cargar_ideas(raiz):
 
 def ya_construida(raiz, idea):
     """Una idea del cuaderno ya está construida cuando existe un juego o una plantilla con su mismo id (frente a ese juego sería, claro, una variante)."""
-    return (pathlib.Path(raiz) / 'juegos' / idea['id']).exists() or (pathlib.Path(raiz) / 'plantillas' / idea['id']).exists()
+    raiz = pathlib.Path(raiz)
+    juegos = cargar_juegos(raiz)
+    if (raiz / 'juegos' / idea['id']).exists() and not es_beta(juegos.get(idea['id'])):
+        return True
+    if (raiz / 'plantillas' / idea['id']).exists():
+        usan = [s for s in juegos.values() if s.get('plantilla') == idea['id']]
+        return not (usan and all(es_beta(s) for s in usan))        # una plantilla que solo usan betas todavía no es un juego construido
+    return False
+
+
+def beta_de(raiz, idea):
+    """El id de la beta que prueba esta idea (el juego beta cuya plantilla es el id de la idea), o None."""
+    for i, s in sorted(betas(raiz).items()):
+        if s.get('plantilla') == idea['id'] or i == idea['id']:
+            return i
+    return None
 
 
 def evaluar_ideas(raiz):

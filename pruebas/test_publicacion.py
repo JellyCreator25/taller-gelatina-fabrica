@@ -395,6 +395,18 @@ class PruebasCompuertas(Base):
     def test_en_orden_no_hay_razones(self):
         self.assertEqual(self.razones(), [])
 
+    def test_una_beta_no_se_publica(self):
+        self.p.editar('juegos/%s/juego.json' % JUEGO, lambda s: s.update(estado='beta'))
+        r = ' | '.join(self.razones())
+        self.assertIn('es una beta', r)
+
+    def test_el_sitio_se_niega_a_listar_una_beta(self):
+        self.p.editar('juegos/torre-gelatina/juego.json', lambda s: s.update(estado='beta'))
+        self.p.editar('publicacion/sitio.json', lambda d: d['juegos'].append('torre-gelatina'))
+        with self.assertRaises(gen.ErrorSitio) as e:
+            self.p.regenerar_sitio()
+        self.assertIn('es una beta', str(e.exception))
+
     def test_sitio_de_ejemplo_o_sin_contacto_no_se_publica(self):
         self.p.editar('publicacion/sitio.json', lambda d: d.update(url_base='https://CAMBIA-ESTE-NOMBRE.pages.dev', proyecto='CAMBIA-ESTE-NOMBRE', contacto=''))
         self.p.regenerar_sitio()

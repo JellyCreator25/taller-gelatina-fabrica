@@ -1,0 +1,11 @@
+{
+  "nombre": "rebote",
+  "genero": "puzzle-fisico",
+  "verbo": "apuntar",
+  "objetivo": "llegar-a-la-meta",
+  "entrada": [
+    "apuntar-y-disparar"
+  ],
+  "progresion": "niveles-fijos",
+  "descripcion": "Puzzle de física: lanzas una gelatina con una resortera; se aplasta, rebota y debe llegar a la meta. Cada material del nivel (gelatina firme, trampolín, miel pegajosa) la trata distinto."
+}

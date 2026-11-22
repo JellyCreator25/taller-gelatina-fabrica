@@ -175,6 +175,8 @@ class Sitio:
             ruta = self.raiz / 'juegos' / jid / 'juego.json'
             if not ruta.exists():
                 raise ErrorSitio('sitio.json → juegos: no existe la ficha de «%s»' % jid)
+            if json.loads(ruta.read_text(encoding='utf-8')).get('estado') == 'beta':
+                raise ErrorSitio('sitio.json → juegos: «%s» es una beta (prototipo para probar con bots) y no puede aparecer en el sitio' % jid)
             if not (self.raiz / 'salida' / jid / 'index.html').exists():
                 raise ErrorSitio('«%s» todavía no está construido: corre «python3 fabrica.py construir %s»' % (jid, jid))
             self.juegos.append({'id': jid, 'spec': json.loads(ruta.read_text(encoding='utf-8')), 'medios': self._medios(jid)})

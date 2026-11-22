@@ -16,7 +16,7 @@ Uso:
   python3 fabrica.py novedad   [id|todos] [--estricto]   (¿es un juego distinto o una variante? ver herramientas/novedad.py)
   python3 fabrica.py ideas                    (el cuaderno de ideas frente a los juegos que ya hay)
   python3 fabrica.py nueva-plantilla NOMBRE --genero G --verbo V --objetivo O [--entrada a,b] [--progresion P]   (un género nuevo)
-  python3 fabrica.py nuevo ID PLANTILLA       (ficha de juego nueva sobre una plantilla; lo que falte dice PENDIENTE)
+  python3 fabrica.py nuevo ID PLANTILLA [--beta]   (ficha de juego nueva sobre una plantilla; lo que falte dice PENDIENTE. --beta: prototipo para probar con bots, nunca se publica)
   python3 fabrica.py ciclo [--probar]         (el latido semanal: reconstruye, revisa, genera el sitio y deja en publicacion/PENDIENTE.md qué hay listo para aprobar)
   python3 fabrica.py sitio                    (genera dist/sitio: el sitio propio en es/en/zh con los juegos de publicacion/sitio.json)
   python3 fabrica.py sitio --zip              (además deja dist/sitio.zip para arrastrarlo a Cloudflare Pages; se niega con datos de ejemplo)
@@ -24,6 +24,7 @@ Uso:
   python3 fabrica.py metricas ver [JUEGO]     (lo que hay en metricas/registro.csv por juego y semana)
   python3 fabrica.py metricas anotar JUEGO METRICA VALOR [--semana esta|pasada|AAAA-MM-DD] [--fuente F] [--nota T]   (agrega un dato al registro)
   python3 fabrica.py metricas cloudflare [--dias N] [--opcional]   (importa las vistas de Cloudflare Web Analytics; --opcional: sin claves, se omite)
+  python3 fabrica.py bots [ID|todos] [--partidas F] [--semilla N] [--politica P] [--sin-fallar]   (hace jugar a los juegos con bots y guarda metricas/bots/ID.json; no publica nada)
   python3 fabrica.py rumbo [--detalle]        (qué construir después, según las métricas; con pocos datos explora; no construye ni publica nada)
   python3 fabrica.py huella ID [--solo canal,canal]       (la huella del plan de publicación, para aprobarlo)
   python3 fabrica.py publicar ID [--solo canal,canal]     (muestra el plan y las compuertas; no publica nada)
@@ -254,21 +255,60 @@ def probar(juego_id):
     print('[probar] %s: todo en orden' % spec['id'])
 
 
+def _es_beta(juego_id):
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import novedad
+    return novedad.es_beta(cargar(juego_id))
+
+
 def kit(juego_id):
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import kit_lanzamiento
+    if _es_beta(juego_id):
+        print('[kit] %s: es una beta; el kit se arma cuando se promueva a juego' % juego_id)
+        return
     kit_lanzamiento.generar(RAIZ, cargar(juego_id))
 
 
 def revisar(juego_id):
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import revisar_kit
+    if _es_beta(juego_id):
+        print('[revisar] %s: es una beta; no tiene kit que revisar' % juego_id)
+        return
     errores, avisos = revisar_kit.revisar(RAIZ, juego_id)
     for a in avisos:
         print('[revisar] %s: AVISO %s' % (juego_id, a))
     if errores:
         sys.exit('[revisar] %s: %s' % (juego_id, '; '.join(errores)))
     print('[revisar] %s: kit coherente' % juego_id)
+
+
+def bots_cmd(args):
+    """bots [ID|todos] [--partidas FACTOR] [--semilla N] [--politica NOMBRE] [--sin-fallar]: hace jugar a los juegos con bots y guarda metricas/bots/ID.json."""
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import bots
+    objetivo = next((a for a in args if not a.startswith('--') and (args.index(a) == 0 or not args[args.index(a) - 1].startswith('--') or args[args.index(a) - 1] == '--sin-fallar')), 'todos')
+    factor = float(_opcion('--partidas', '1'))
+    semilla = int(_opcion('--semilla', '1000'))
+    politicas = [_opcion('--politica')] if _opcion('--politica') else None
+    ids_ = bots.juegos_con_bots(RAIZ) if objetivo == 'todos' else [objetivo]
+    if not ids_:
+        sys.exit('[bots] ningún juego tiene plantilla con bots.js')
+    hubo_fallas = False
+    for i in ids_:
+        cargar(i)
+        construir(i)                                            # siempre sobre la versión más reciente del juego
+        try:
+            rep, lineas = bots.correr(RAIZ, i, factor, semilla, politicas)
+        except bots.ErrorBots as e:
+            sys.exit('[bots] %s: %s' % (i, e))
+        ruta = bots.guardar(RAIZ, rep)
+        print('\n'.join(lineas))
+        print('[bots] guardado en %s' % ruta.relative_to(RAIZ))
+        hubo_fallas = hubo_fallas or any(b['nivel'] == 'falla' for b in rep['banderas'])
+    if hubo_fallas and '--sin-fallar' not in args:
+        sys.exit(1)
 
 
 def mapa():
@@ -329,10 +369,13 @@ def nueva_plantilla(nombre):
     print('[nueva-plantilla] %s creada en %s\n  Siguiente: completa DISENO.md, reemplaza el juego de ejemplo de plantilla.html y prueba.js, y crea el juego con `nuevo ID %s`.' % (nombre, d, nombre))
 
 
-def nuevo(juego_id, plantilla):
+def nuevo(juego_id, plantilla, beta=False):
     sys.path.insert(0, str(RAIZ / 'herramientas'))
     import andamio
-    d = andamio.nuevo_juego(RAIZ, juego_id, plantilla)
+    d = andamio.nuevo_juego(RAIZ, juego_id, plantilla, beta)
+    if beta:
+        print('[nuevo] %s creado como BETA en %s: se construye y se prueba con bots, pero no se publica, no tiene kit y no cuenta como juego de la fábrica hasta que se promueva (quitar «estado»: «beta» de su ficha).' % (juego_id, d))
+        return
     print('[nuevo] %s creado en %s\n  Completa los campos PENDIENTE y declara mecanica.ambientacion y mecanica.arte; después `python3 fabrica.py todo %s`.' % (juego_id, d, juego_id))
 
 
@@ -607,8 +650,13 @@ def ciclo():
     L = ['# Estado de la fábrica', '', 'Lo escribe `python3 fabrica.py ciclo`. No contiene claves; las únicas fechas son las del calendario aprobado (sección «Autonomía»). Lo que sale en el libro está en `publicacion/libro.jsonl`.', '']
     if errores:
         L += ['## Pasos que fallaron', ''] + ['- ' + x for x in errores] + ['']
+    betas = [i for i in ids() if _es_beta(i)]
+    if betas:
+        L += ['## Betas (prototipos para probar con bots; no se publican)', ''] + ['- `%s` (v%s): `python3 fabrica.py bots %s`' % (i, cargar(i)['version'], i) for i in betas] + ['']
     for i in ids():
         spec = cargar(i)
+        if i in betas:
+            continue
         L += ['## %s (v%s)' % (i, spec['version']), '']
         ctx = nucleo.Contexto(RAIZ, i)
         r = nov.evaluar(RAIZ, i)
@@ -687,7 +735,7 @@ def ciclo():
 def _juegos_y_libro():
     nucleo, _ = _publicacion()
     libro = nucleo.Libro(RAIZ / 'publicacion' / 'libro.jsonl')
-    return [cargar(i) for i in ids()], libro.entradas()
+    return [s for s in (cargar(i) for i in ids()) if s.get('estado') != 'beta'], libro.entradas()      # las betas no son juegos de la fábrica para el motor
 
 
 def motor_cmd(args):
@@ -884,7 +932,8 @@ def lista():
     print('Fichas:')
     for i in ids():
         s = cargar(i)
-        print('  %-24s plantilla=%-10s v%-7s idiomas=%s paquetes=%s motor=%s' % (i, s['plantilla'], s['version'], ','.join(s['idiomas']), ','.join(s.get('paquetes', [])) or '-', ','.join(s.get('motor', [])) or '-'))
+        print('  %-24s plantilla=%-10s v%-7s idiomas=%s paquetes=%s motor=%s%s' % (i, s['plantilla'], s['version'], ','.join(s['idiomas']), ','.join(s.get('paquetes', [])) or '-', ','.join(s.get('motor', [])) or '-',
+                                                                                '  [BETA: no se publica]' if s.get('estado') == 'beta' else ''))
     print('Plantillas:', ', '.join(sorted(p.name for p in (RAIZ / 'plantillas').iterdir() if p.is_dir())))
 
 
@@ -902,9 +951,11 @@ if __name__ == '__main__':
     elif orden == 'nueva-plantilla' and len(sys.argv) > 2:
         nueva_plantilla(sys.argv[2])
     elif orden == 'nuevo' and len(sys.argv) > 3:
-        nuevo(sys.argv[2], sys.argv[3])
+        nuevo(sys.argv[2], sys.argv[3], '--beta' in sys.argv)
     elif orden == 'sitio':
         generar_sitio('--zip' in sys.argv)
+    elif orden == 'bots':
+        bots_cmd(sys.argv[2:])
     elif orden == 'ciclo':
         ciclo()
     elif orden == 'perfiles':

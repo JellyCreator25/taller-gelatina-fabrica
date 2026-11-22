@@ -1,0 +1,137 @@
+{
+  "banderas": [],
+  "descripcion": "Sandbox de materiales: ¿se puede descubrir todo?, ¿cuánto tarda cada descubrimiento?, ¿la materia se conserva y la simulación es estable?",
+  "determinista": true,
+  "escenas": {
+    "mundo": {
+      "aleatorio": {
+        "errores": [],
+        "exitos": 1,
+        "motivos": {
+          "limite": 11,
+          "todo-descubierto": 1
+        },
+        "ms_simulados_p50": 120000.0,
+        "partidas": 12,
+        "pasos_p50": 1200.0,
+        "puntaje_prom": 0.333,
+        "resumen": {
+          "colocadas": {
+            "n": 12,
+            "p50": 20501.5
+          },
+          "cuando.barro": {
+            "n": 1,
+            "p50": 515
+          },
+          "cuando.estanque": {
+            "n": 1,
+            "p50": 1580
+          },
+          "cuando.isla": {
+            "n": 1,
+            "p50": 1785
+          },
+          "cuando.montana": {
+            "n": 1,
+            "p50": 275
+          },
+          "descubrimientos": {
+            "n": 12,
+            "p50": 0.0
+          }
+        },
+        "tasa": 0.0833,
+        "violaciones": []
+      },
+      "explorador": {
+        "errores": [],
+        "exitos": 1,
+        "motivos": {
+          "todo-descubierto": 1
+        },
+        "ms_simulados_p50": 12500,
+        "partidas": 1,
+        "pasos_p50": 125,
+        "puntaje_prom": 4.0,
+        "resumen": {
+          "colocadas": {
+            "n": 1,
+            "p50": 4679
+          },
+          "cuando.barro": {
+            "n": 1,
+            "p50": 350
+          },
+          "cuando.estanque": {
+            "n": 1,
+            "p50": 510
+          },
+          "cuando.isla": {
+            "n": 1,
+            "p50": 745
+          },
+          "cuando.montana": {
+            "n": 1,
+            "p50": 100
+          },
+          "descubrimientos": {
+            "n": 1,
+            "p50": 4
+          }
+        },
+        "tasa": 1.0,
+        "violaciones": []
+      },
+      "torpe": {
+        "errores": [],
+        "exitos": 12,
+        "motivos": {
+          "todo-descubierto": 12
+        },
+        "ms_simulados_p50": 33200.0,
+        "partidas": 12,
+        "pasos_p50": 332.0,
+        "puntaje_prom": 4.0,
+        "resumen": {
+          "colocadas": {
+            "n": 12,
+            "p50": 9732.5
+          },
+          "cuando.barro": {
+            "n": 12,
+            "p50": 415.0
+          },
+          "cuando.estanque": {
+            "n": 12,
+            "p50": 1777.5
+          },
+          "cuando.isla": {
+            "n": 12,
+            "p50": 1990.0
+          },
+          "cuando.montana": {
+            "n": 12,
+            "p50": 140.0
+          },
+          "descubrimientos": {
+            "n": 12,
+            "p50": 4.0
+          }
+        },
+        "tasa": 1.0,
+        "violaciones": []
+      }
+    }
+  },
+  "factor": 1,
+  "huella_html": "d50e789ef42ef2d4e09fc9041f1ada20ddfaba3bd329db44ec35b00fe13943b3",
+  "juego": "arena-gelatina",
+  "politicas": {
+    "base": "aleatorio",
+    "humano": "torpe",
+    "solucionador": "explorador"
+  },
+  "semilla_base": 1000,
+  "version": "0.1.0"
+}

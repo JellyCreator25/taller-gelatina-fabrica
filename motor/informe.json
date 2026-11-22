@@ -1,5 +1,5 @@
 {
- "fuente": "20f027515303eeaf",
+ "fuente": "a88c77cb87055c2e",
  "modulos": {
   "accesible": {
    "fallas": 0,
@@ -11,6 +11,12 @@
    "fallas": 0,
    "fallos": [],
    "pruebas": 25,
+   "version": "1.0.0"
+  },
+  "bots": {
+   "fallas": 0,
+   "fallos": [],
+   "pruebas": 19,
    "version": "1.0.0"
   },
   "efectos": {

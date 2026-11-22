@@ -1,0 +1,333 @@
+<style>
+/* Plantilla «rebote» (puzzle de física): lanzas una gelatina que se aplasta y rebota hasta la meta; cada material del nivel la trata distinto.
+   Lo que conserva del andamio:
+   · colores como variables, con tema claro y oscuro (el fondo del body siempre explícito)
+   · todo texto visible sale de X.t('clave') y se rellena de nuevo con X.onLang (los textos viven en juego.json → textos, en cada idioma)
+   · números con X.num; fuente del lienzo con FONT() (trae la tipografía china del sistema)
+   · el estado para las pruebas se expone en window.__rebote
+   · sin conexiones externas, sin Google Fonts: la fábrica incrusta las tipografías */
+:root {
+  --bg: #f1f5ff; --surface: #ffffff; --ink: #15203b; --ink-soft: #4a5a7e; --line: #cfd9f0; --accent: #2f6bdc; --accent-ink: #ffffff; --focus: #1b5fe0;
+  --cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", "WenQuanYi Micro Hei";
+  --font-display: 'Fredoka', var(--cjk), 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Nunito Sans', var(--cjk), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0b1020; --surface: #141b33; --ink: #e6ecff; --ink-soft: #9fb0d9; --line: #29345c; --focus: #8db0ff; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0b1020; --surface: #141b33; --ink: #e6ecff; --ink-soft: #9fb0d9; --line: #29345c; --focus: #8db0ff; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); min-height: 100vh; }
+.app { box-sizing: border-box; max-width: 760px; margin: 0 auto; padding-block: 12px 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+h1 { margin: 0; font: 700 1.5rem/1.1 var(--font-display); text-wrap: balance; }
+.tools { display: flex; gap: 8px; }
+canvas { display: block; width: 100%; height: auto; margin-top: 12px; border-radius: 18px; background: var(--surface); border: 2px solid var(--line); touch-action: none; cursor: crosshair; }
+canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.ayuda { margin: 8px 0 0; color: var(--ink-soft); font-size: .92rem; line-height: 1.35; }
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+#marcador { margin: 0; color: var(--ink-soft); }
+.btn { font: 700 1.05rem var(--font-display); border: 0; border-radius: 14px; padding: .7em 1.5em; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+.btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+</style>
+
+<div class="app">
+  <header>
+    <h1 id="titulo"></h1>
+    <div class="tools" id="tools"></div>
+  </header>
+  <canvas id="cv" width="640" height="400" role="img" tabindex="0"></canvas>
+  <p class="ayuda" id="ayuda"></p>
+  <div class="bar">
+    <p id="marcador"></p>
+    <button class="btn" id="btnJugar" type="button"></button>
+  </div>
+  <p class="sr" id="aviso" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+const X = window.GGX, P = (window.JUEGO && window.JUEGO.parametros) || {};
+const $ = (id) => document.getElementById(id);
+const cv = $('cv'), g = cv.getContext('2d');
+const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BOT = !!(X.bots && X.bots.activo);
+const FONT = (px, w) => w + ' ' + px + 'px Fredoka, ' + X.cjk + ', "Trebuchet MS", sans-serif';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+// ---- el mundo: física determinista de paso fijo, sin DOM (la usan el juego, la vista previa del tiro y los bots) -------------------------------------
+const W = 640, H = 400, DT = 1 / 120, MS_PASO = DT * 1000;
+const GRAV = P.gravedad || 900, R = P.radio || 14, TIROS = P.tiros || 5, V_MIN = P.v_min || 150, V_MAX = P.v_max || 760, VTOPE = 1000;
+const NIVELES = P.niveles || [];
+const MAT = { suelo: { rest: 0.55, color: '#5b6fd6', arriba: '#8da0ff' }, resorte: { rest: 1.15, color: '#ff7fb0', arriba: '#ffc2da' }, pegajoso: { rest: 0, color: '#d9a21b', arriba: '#ffc247' } };
+
+function mundo(n) {
+  const nv = NIVELES[n];
+  return { n, nv, bola: { x: nv.lanzador.x, y: nv.lanzador.y, vx: 0, vy: 0 }, t: 0, quieto: 0, rebotes: 0, golpe: 0, res: 'vuelo' };
+}
+function disparo(m, angulo, potencia) {
+  const a = angulo * Math.PI / 180, v = V_MIN + (V_MAX - V_MIN) * potencia;
+  m.bola.vx = Math.cos(a) * v; m.bola.vy = -Math.sin(a) * v;
+}
+function paso(m) {
+  if (m.res !== 'vuelo') return;
+  const b = m.bola;
+  b.vy += GRAV * DT; b.x += b.vx * DT; b.y += b.vy * DT; m.t += DT;
+  if (m.golpe > 0) m.golpe = Math.max(0, m.golpe - DT);
+  if (b.x < R) { b.x = R; if (b.vx < 0) { b.vx = -b.vx * 0.6; m.rebotes++; m.golpe = 0.14; } }
+  else if (b.x > W - R) { b.x = W - R; if (b.vx > 0) { b.vx = -b.vx * 0.6; m.rebotes++; m.golpe = 0.14; } }
+  let toca = false;
+  for (const r of m.nv.bloques) {
+    const cx = Math.max(r.x, Math.min(b.x, r.x + r.w)), cy = Math.max(r.y, Math.min(b.y, r.y + r.h));
+    const dx = b.x - cx, dy = b.y - cy, d2 = dx * dx + dy * dy;
+    if (d2 >= R * R) continue;
+    let nx, ny, pen;
+    if (d2 > 1e-9) { const d = Math.sqrt(d2); nx = dx / d; ny = dy / d; pen = R - d; }
+    else {                                                     // el centro quedó dentro del bloque: se saca por el lado más cercano
+      const izq = b.x - r.x, der = r.x + r.w - b.x, arr = b.y - r.y, aba = r.y + r.h - b.y, mn = Math.min(izq, der, arr, aba);
+      if (mn === arr) { nx = 0; ny = -1; pen = arr + R; } else if (mn === aba) { nx = 0; ny = 1; pen = aba + R; }
+      else if (mn === izq) { nx = -1; ny = 0; pen = izq + R; } else { nx = 1; ny = 0; pen = der + R; }
+    }
+    b.x += nx * pen; b.y += ny * pen;
+    const vn = b.vx * nx + b.vy * ny;
+    if (vn < 0) {
+      if (r.m === 'pegajoso') { b.vx = 0; b.vy = 0; m.res = 'pegada'; m.golpe = 0.2; return; }
+      const e = MAT[r.m].rest;
+      b.vx -= (1 + e) * vn * nx; b.vy -= (1 + e) * vn * ny;
+      const tx = -ny, ty = nx, vt = b.vx * tx + b.vy * ty;     // un poco de fricción a lo largo de la superficie
+      b.vx -= vt * 0.02 * tx; b.vy -= vt * 0.02 * ty;
+      if (-vn > 60) { m.rebotes++; m.golpe = 0.14; m.ultimo = r.m; }
+    }
+    toca = true;
+  }
+  const v = Math.hypot(b.vx, b.vy);
+  if (v > VTOPE) { b.vx *= VTOPE / v; b.vy *= VTOPE / v; }
+  const mt = m.nv.meta;
+  if (b.x > mt.x - 4 && b.x < mt.x + mt.w + 4 && b.y > mt.y - 4 && b.y < mt.y + mt.h + 4) { m.res = 'meta'; return; }
+  if (b.y > H + 80) { m.res = 'caida'; return; }
+  m.quieto = toca && v < 18 ? m.quieto + DT : 0;
+  if (m.quieto > 0.5) { m.res = 'quieta'; return; }
+  if (m.t > 14) m.res = 'tiempo';
+}
+function simularTiro(n, angulo, potencia) {
+  const m = mundo(n);
+  disparo(m, angulo, potencia);
+  for (let i = 0; i < 3000 && m.res === 'vuelo'; i++) paso(m);
+  return { resultado: m.res, exito: m.res === 'meta', segundos: Math.round(m.t * 1000) / 1000, rebotes: m.rebotes, x: Math.round(m.bola.x * 10) / 10, y: Math.round(m.bola.y * 10) / 10 };
+}
+function trayectoria(n, angulo, potencia, pasos) {
+  const m = mundo(n), pts = [];
+  disparo(m, angulo, potencia);
+  for (let i = 0; i < pasos && m.res === 'vuelo'; i++) { paso(m); if (i % 6 === 5) pts.push([m.bola.x, m.bola.y]); }
+  return pts;
+}
+
+// ---- la partida ------------------------------------------------------------------------------------------------------------------------------
+const S = { fase: 'inicio', nivel: 0, usados: 0, ang: 45, pot: 0.6, m: null, acc: 0, estrellas: [], aviso: '' };
+const guardadas = X.store.get('estrellas', []);
+S.estrellas = Array.isArray(guardadas) ? guardadas.slice(0, NIVELES.length).map((v) => Number(v) || 0) : [];
+while (S.estrellas.length < NIVELES.length) S.estrellas.push(0);
+S.m = mundo(0);
+const totalEstrellas = () => S.estrellas.reduce((a, b) => a + b, 0);
+
+function anunciar(txt) { S.aviso = txt; $('aviso').textContent = txt; }
+function nombreNivel() { return X.t('nivel_' + (S.nivel + 1)); }
+function textos() {
+  document.title = X.t('titulo');
+  $('titulo').textContent = X.t('titulo');
+  cv.setAttribute('aria-label', X.t('aria_juego'));
+  $('ayuda').textContent = X.t('ayuda');
+  boton();
+  marcador();
+}
+function boton() {
+  const b = $('btnJugar');
+  const clave = { inicio: 'jugar', 'nivel-ok': S.nivel + 1 < NIVELES.length ? 'siguiente' : 'de_nuevo', 'sin-tiros': 'reintentar', fin: 'de_nuevo' }[S.fase];
+  b.hidden = !clave;
+  if (clave) b.textContent = X.t(clave);
+}
+function marcador() {
+  $('marcador').textContent = X.t('nivel', { n: S.nivel + 1, nombre: nombreNivel() }) + ' · ' + X.t('tiros', { n: X.num(TIROS - S.usados) }) + ' · ' + X.t('estrellas', { n: X.num(totalEstrellas()) });
+}
+function cargarNivel(n) {
+  S.nivel = n; S.m = mundo(n); S.usados = 0; S.fase = 'apuntando'; S.ang = 45; S.pot = 0.6; S.acc = 0;
+  boton(); marcador();
+  anunciar(X.t('nivel', { n: n + 1, nombre: nombreNivel() }));
+}
+function disparar(angulo, potencia) {
+  if (S.fase !== 'apuntando') return { valida: false, motivo: 'ahora no se puede disparar (' + S.fase + ')' };
+  S.ang = clamp(angulo, 0, 90); S.pot = clamp(potencia, 0.1, 1);
+  S.m = mundo(S.nivel); disparo(S.m, S.ang, S.pot);
+  S.fase = 'volando'; S.acc = 0;
+  X.sfx('whoosh', 0);
+  return { valida: true };
+}
+function terminarTiro() {
+  const r = S.m.res;
+  S.usados++;
+  if (r === 'meta') {
+    const e = S.usados <= 1 ? 3 : S.usados <= 2 ? 2 : 1;
+    S.estrellas[S.nivel] = Math.max(S.estrellas[S.nivel] || 0, e);
+    X.store.set('estrellas', S.estrellas);
+    S.fase = 'nivel-ok'; X.sfx('win', 0);
+    anunciar(S.nivel + 1 < NIVELES.length ? X.t('nivel_ok_estrellas', { n: e }) : X.t('fin_juego') + ' ' + X.t('nivel_ok_estrellas', { n: e }));
+  } else if (S.usados >= TIROS) {
+    S.fase = 'sin-tiros'; X.sfx('lose', 0);
+    anunciar(X.t('sin_tiros'));
+  } else {
+    S.m = mundo(S.nivel); S.fase = 'apuntando'; X.sfx('land', 0);
+    anunciar(X.t('tiros', { n: TIROS - S.usados }));
+  }
+  boton(); marcador();
+}
+function pasos(n) {
+  for (let i = 0; i < n && S.fase === 'volando'; i++) {
+    paso(S.m);
+    if (S.m.res !== 'vuelo') terminarTiro();
+  }
+}
+function avanzarMs(ms) { pasos(Math.max(1, Math.round(ms / MS_PASO))); }       // tiempo simulado (lo usan los bots)
+function accion() {
+  if (S.fase === 'inicio') cargarNivel(0);
+  else if (S.fase === 'nivel-ok' && S.nivel + 1 < NIVELES.length) cargarNivel(S.nivel + 1);
+  else if (S.fase === 'sin-tiros') cargarNivel(S.nivel);
+  else if (S.fase === 'nivel-ok' || S.fase === 'fin') cargarNivel(0);
+  X.sfx('click', 0);
+}
+
+// ---- dibujo ----------------------------------------------------------------------------------------------------------------------------------
+function rect(r) {
+  const c = MAT[r.m];
+  g.fillStyle = c.color; g.fillRect(r.x, r.y, r.w, r.h);
+  g.fillStyle = c.arriba; g.fillRect(r.x, r.y, r.w, Math.min(5, r.h));
+  if (r.m === 'resorte') {
+    g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath();
+    for (let x = r.x + 6; x < r.x + r.w - 4; x += 12) { g.moveTo(x, r.y + r.h - 2); g.lineTo(x + 4, r.y + 2); g.lineTo(x + 8, r.y + r.h - 2); }
+    g.stroke();
+  } else if (r.m === 'pegajoso') {
+    g.fillStyle = c.arriba;
+    for (let x = r.x + 8; x < r.x + r.w - 4; x += 22) { g.beginPath(); g.arc(x, r.y + r.h, 4, 0, Math.PI * 2); g.fill(); }
+  }
+}
+function draw() {
+  const gr = g.createLinearGradient(0, 0, 0, H);
+  gr.addColorStop(0, '#bfe3ff'); gr.addColorStop(1, '#eef8ff');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  const nv = S.m.nv;
+  const mt = nv.meta;
+  g.fillStyle = '#31b86b'; g.beginPath(); g.roundRect(mt.x, mt.y, mt.w, mt.h, 10); g.fill();
+  g.fillStyle = '#c8f5d9'; g.beginPath(); g.roundRect(mt.x + 6, mt.y + 6, mt.w - 12, mt.h - 12, 8); g.fill();
+  for (const r of nv.bloques) rect(r);
+  const b = S.m.bola;
+  if (S.fase === 'apuntando') {
+    g.fillStyle = 'rgba(21,32,59,.55)';
+    for (const [x, y] of trayectoria(S.nivel, S.ang, S.pot, 110)) { g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill(); }
+    const a = S.ang * Math.PI / 180, l = 24 + 56 * S.pot;
+    g.strokeStyle = '#e04a34'; g.lineWidth = 4; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(b.x - Math.cos(a) * 10, b.y + Math.sin(a) * 10); g.lineTo(b.x - Math.cos(a) * l, b.y + Math.sin(a) * l); g.stroke();
+  }
+  const aplasta = reduce ? 0 : Math.min(1, S.m.golpe / 0.14);
+  const sx = 1 + 0.28 * aplasta, sy = 1 - 0.22 * aplasta;
+  X.draw.jelly(g, b.x, b.y + R * 0.05, R * 1.08, '#3dbd7d', { sx, sy, look: clamp(b.vx / 400, -1, 1) });
+  g.fillStyle = 'rgba(21,32,59,.78)'; g.font = FONT(16, 700); g.textAlign = 'left'; g.textBaseline = 'top';
+  g.fillText(X.t('nivel', { n: S.nivel + 1, nombre: nombreNivel() }), 12, 10);
+  if (S.fase === 'nivel-ok' || S.fase === 'sin-tiros') {
+    g.fillStyle = 'rgba(255,255,255,.82)'; g.fillRect(0, H / 2 - 44, W, 88);
+    g.fillStyle = S.fase === 'nivel-ok' ? '#1f8f50' : '#c0392b'; g.font = FONT(38, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(S.fase === 'nivel-ok' ? X.t('nivel_ok') + ' ' + '★'.repeat(S.estrellas[S.nivel]) : X.t('sin_tiros'), W / 2, H / 2);
+  }
+}
+let ultimo = 0;
+function bucle(ts) {
+  const ms = Math.min(50, ts - (ultimo || ts)); ultimo = ts;
+  if (S.fase === 'volando') {
+    S.acc += ms;
+    const n = Math.floor(S.acc / MS_PASO);
+    S.acc -= n * MS_PASO;
+    pasos(n);
+  } else if (S.m.golpe > 0) S.m.golpe = Math.max(0, S.m.golpe - ms / 1000);
+  draw();
+  requestAnimationFrame(bucle);
+}
+
+// ---- entrada: arrastrar hacia atrás desde la gelatina (como una resortera), o el teclado -----------------------------------------------------
+let arrastre = false;
+function pos(e) { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; }
+function apuntarA(p) {
+  const b = S.m.bola, dx = p.x - b.x, dy = p.y - b.y, d = Math.hypot(dx, dy) || 1;
+  S.ang = clamp(Math.atan2(dy, -dx) * 180 / Math.PI, 0, 90);
+  S.pot = clamp(d / 140, 0.1, 1);
+}
+cv.addEventListener('pointerdown', (e) => {
+  if (S.fase !== 'apuntando') return;
+  const p = pos(e), b = S.m.bola;
+  if (Math.hypot(p.x - b.x, p.y - b.y) > 90) return;
+  arrastre = true; apuntarA(p); cv.setPointerCapture(e.pointerId); e.preventDefault();
+});
+cv.addEventListener('pointermove', (e) => { if (arrastre) apuntarA(pos(e)); });
+cv.addEventListener('pointerup', (e) => {
+  if (!arrastre) return;
+  arrastre = false;
+  const p = pos(e), b = S.m.bola;
+  if (Math.hypot(p.x - b.x, p.y - b.y) >= 14) disparar(S.ang, S.pot);
+});
+cv.addEventListener('pointercancel', () => { arrastre = false; });
+addEventListener('keydown', (e) => {
+  if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT')) return;
+  if (S.fase !== 'apuntando') { if ((e.code === 'Enter' || e.code === 'Space') && S.fase !== 'volando') { e.preventDefault(); accion(); } return; }
+  const paso5 = e.shiftKey ? 5 : 1;
+  if (e.code === 'ArrowUp') { S.ang = clamp(S.ang + paso5, 0, 90); e.preventDefault(); anunciar(X.t('angulo', { n: Math.round(S.ang) })); }
+  else if (e.code === 'ArrowDown') { S.ang = clamp(S.ang - paso5, 0, 90); e.preventDefault(); anunciar(X.t('angulo', { n: Math.round(S.ang) })); }
+  else if (e.code === 'ArrowRight') { S.pot = clamp(S.pot + 0.02 * paso5, 0.1, 1); e.preventDefault(); anunciar(X.t('potencia', { n: Math.round(S.pot * 100) })); }
+  else if (e.code === 'ArrowLeft') { S.pot = clamp(S.pot - 0.02 * paso5, 0.1, 1); e.preventDefault(); anunciar(X.t('potencia', { n: Math.round(S.pot * 100) })); }
+  else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); disparar(S.ang, S.pot); }
+});
+$('btnJugar').addEventListener('click', accion);
+X.ui.muteButton($('tools')); X.ui.langButton($('tools')); X.ui.supportLink($('tools'));
+X.onLang(() => { textos(); });
+textos();
+if (!BOT) requestAnimationFrame(bucle); else draw();
+
+// ---- interfaz para pruebas y bots ------------------------------------------------------------------------------------------------------------
+const r2 = (v) => Math.round(v * 100) / 100;
+window.__rebote = {
+  estado: () => ({ fase: S.fase, nivel: S.nivel, niveles: NIVELES.length, tiros: TIROS - S.usados, usados: S.usados, angulo: Math.round(S.ang * 100) / 100, potencia: Math.round(S.pot * 1000) / 1000,
+    estrellas: S.estrellas.slice(), total: totalEstrellas(), resultado: S.m.res, aviso: S.aviso, bola: { x: r2(S.m.bola.x), y: r2(S.m.bola.y) } }),
+  simular: (angulo, potencia, nivel) => simularTiro(Number.isInteger(nivel) ? nivel : S.nivel, clamp(angulo, 0, 90), clamp(potencia, 0.1, 1)),
+  disparar: (angulo, potencia) => disparar(angulo, potencia),
+  avanzar: (ms) => avanzarMs(ms),
+};
+if (X.bots) {
+  X.bots.registrar({
+    juego: (window.JUEGO && window.JUEGO.id) || 'rebote', version: (window.JUEGO && window.JUEGO.version) || '',
+    reiniciar(semilla, o) {
+      const n = NIVELES.length;
+      cargarNivel(Number.isInteger(o && o.nivel) ? clamp(o.nivel, 0, n - 1) : (((semilla - 1) % n) + n) % n);
+      return {};
+    },
+    estado() {
+      const b = S.m.bola, nv = S.m.nv;
+      return { fase: S.fase, nivel: S.nivel, niveles: NIVELES.length, tiros_restantes: TIROS - S.usados, usados: S.usados, bola: { x: r2(b.x), y: r2(b.y), vx: r2(b.vx), vy: r2(b.vy) },
+        lanzador: nv.lanzador, meta: nv.meta, bloques: nv.bloques, gravedad: GRAV, radio: R, ultimo: S.m.res };
+    },
+    acciones: () => [{ tipo: 'disparar', angulo: { min: 0, max: 90, unidad: 'grados' }, potencia: { min: 0.1, max: 1 } }, { tipo: 'esperar' }],
+    actuar(a) {
+      if (!a || a.tipo !== 'disparar') return { valida: false, motivo: 'acción desconocida' };
+      if (!Number.isFinite(a.angulo) || !Number.isFinite(a.potencia)) return { valida: false, motivo: 'faltan angulo y potencia' };
+      return disparar(a.angulo, a.potencia);
+    },
+    avanzar: (ms) => avanzarMs(ms),
+    terminado: () => ({ fin: S.fase === 'nivel-ok' || S.fase === 'sin-tiros', exito: S.fase === 'nivel-ok', motivo: S.fase }),
+    puntaje: () => (S.fase === 'nivel-ok' ? (S.usados <= 1 ? 3 : S.usados <= 2 ? 2 : 1) : 0),
+    simular: (a) => simularTiro(S.nivel, clamp(Number(a && a.angulo), 0, 90), clamp(Number(a && a.potencia), 0.1, 1)),
+    invariantes() {
+      const v = [], b = S.m.bola;
+      if (![b.x, b.y, b.vx, b.vy].every(Number.isFinite)) { v.push('la bola tiene un valor que no es un número'); return v; }
+      if (b.x < -1 || b.x > W + 1) v.push('la bola salió por los lados');
+      if (Math.hypot(b.vx, b.vy) > VTOPE * 1.01) v.push('la bola superó la velocidad máxima');
+      if (S.m.nv.bloques.some((r) => b.x > r.x && b.x < r.x + r.w && b.y > r.y && b.y < r.y + r.h)) v.push('la bola quedó dentro de un bloque');
+      return v;
+    },
+    resumen: () => ({ nivel: S.nivel, usados: S.usados, resultado: S.m.res, rebotes: S.m.rebotes }),
+  });
+}
+</script>
