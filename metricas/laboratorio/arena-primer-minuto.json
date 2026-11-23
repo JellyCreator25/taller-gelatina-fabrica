@@ -1,0 +1,3195 @@
+{
+  "banderas": [
+    {
+      "codigo": "a11y-objetivo-chico",
+      "donde": "actual",
+      "nivel": "aviso",
+      "texto": "en 2 perfil(es): escritorio-rapido, teclado-solo · ejemplo: input 129×16"
+    },
+    {
+      "codigo": "a11y-objetivo-chico-tactil",
+      "donde": "actual",
+      "nivel": "aviso",
+      "texto": "en 4 perfil(es): cartero-en-ruta, mama-ocupada, pantalla-pequena, telefono-medio · ejemplo: button.ggx-btn 46×40"
+    },
+    {
+      "codigo": "a11y-texto-chico",
+      "donde": "actual",
+      "nivel": "aviso",
+      "texto": "en 4 perfil(es): cartero-en-ruta, mama-ocupada, pantalla-pequena, telefono-medio · ejemplo: p#ayuda.ayuda 13.6px"
+    },
+    {
+      "codigo": "a11y-objetivo-chico",
+      "donde": "sostener-60",
+      "nivel": "aviso",
+      "texto": "en 2 perfil(es): escritorio-rapido, teclado-solo · ejemplo: input 129×16"
+    },
+    {
+      "codigo": "a11y-objetivo-chico-tactil",
+      "donde": "sostener-60",
+      "nivel": "aviso",
+      "texto": "en 4 perfil(es): cartero-en-ruta, mama-ocupada, pantalla-pequena, telefono-medio · ejemplo: button.ggx-btn 46×40"
+    },
+    {
+      "codigo": "a11y-texto-chico",
+      "donde": "sostener-60",
+      "nivel": "aviso",
+      "texto": "en 4 perfil(es): cartero-en-ruta, mama-ocupada, pantalla-pequena, telefono-medio · ejemplo: p#ayuda.ayuda 13.6px"
+    }
+  ],
+  "contrastes": [
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "escritorio-rapido",
+      "prueba": "auditoria",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "escritorio-rapido",
+      "prueba": "primer-minuto",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "telefono-medio",
+      "prueba": "auditoria",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "telefono-medio",
+      "prueba": "primer-minuto",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "mama-ocupada",
+      "prueba": "auditoria",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "mama-ocupada",
+      "prueba": "primer-minuto",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "cartero-en-ruta",
+      "prueba": "auditoria",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "cartero-en-ruta",
+      "prueba": "primer-minuto",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "pantalla-pequena",
+      "prueba": "auditoria",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": -0.1667,
+      "delta_tasa": 0.1667,
+      "perfil": "pantalla-pequena",
+      "prueba": "primer-minuto",
+      "tasa_control": 0.8333,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "teclado-solo",
+      "prueba": "auditoria",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    },
+    {
+      "a11y_nuevos": [],
+      "a11y_resueltos": [],
+      "claro": false,
+      "contra": "actual",
+      "delta_abandono": 0.0,
+      "delta_tasa": 0.0,
+      "perfil": "teclado-solo",
+      "prueba": "primer-minuto",
+      "tasa_control": 1.0,
+      "tasa_variante": 1.0,
+      "variante": "sostener-60"
+    }
+  ],
+  "experimento": "arena-primer-minuto",
+  "factor": 1.0,
+  "formato": 1,
+  "grupos": [
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 88,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2088,
+      "perfil": "escritorio-rapido",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 88,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1100
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 90
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 88
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 2848
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 2848
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3068
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 6728
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 6728,
+      "perfil": "escritorio-rapido",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 2848,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "actual"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 0,
+            "motivos": {
+              "limite": 2
+            },
+            "ms_simulados_p50": 120000.0,
+            "partidas": 2,
+            "pasos_p50": 1200.0,
+            "puntaje_prom": 0.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 20626.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 0.0
+              }
+            },
+            "tasa": 0.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 12500,
+            "partidas": 1,
+            "pasos_p50": 125,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4679
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 350
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 510
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 745
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 100
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 13000.0,
+            "partidas": 2,
+            "pasos_p50": 162.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 4873.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 380.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 587.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 812.5
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 130.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "escritorio-rapido",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2265,
+      "perfil": "telefono-medio",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1102
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 90
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 265
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3165
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 3165
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3535
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 7635
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 7635,
+      "perfil": "telefono-medio",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 3165,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "actual"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 0,
+            "motivos": {
+              "limite": 2
+            },
+            "ms_simulados_p50": 120000.0,
+            "partidas": 2,
+            "pasos_p50": 1200.0,
+            "puntaje_prom": 0.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 20626.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 0.0
+              }
+            },
+            "tasa": 0.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 12500,
+            "partidas": 1,
+            "pasos_p50": 125,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4679
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 350
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 510
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 745
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 100
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 32150.0,
+            "partidas": 2,
+            "pasos_p50": 321.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 9492.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 412.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1742.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1925.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 165.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "telefono-medio",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2265,
+      "perfil": "mama-ocupada",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1100
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 90
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 265
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3040
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 3040
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3285
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 27060
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 27060,
+      "perfil": "mama-ocupada",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 3040,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "actual"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 0,
+            "motivos": {
+              "limite": 2
+            },
+            "ms_simulados_p50": 120000.0,
+            "partidas": 2,
+            "pasos_p50": 1200.0,
+            "puntaje_prom": 0.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 20626.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 0.0
+              }
+            },
+            "tasa": 0.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 12500,
+            "partidas": 1,
+            "pasos_p50": 125,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4679
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 350
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 510
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 745
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 100
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "limite": 1,
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 61670.0,
+            "partidas": 2,
+            "pasos_p50": 881.0,
+            "puntaje_prom": 2.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 14352.5
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 445
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 2110
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 2245
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 225
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 2.0
+              }
+            },
+            "tasa": 0.5,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "mama-ocupada",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 2296,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 4296,
+      "perfil": "cartero-en-ruta",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 2296,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1091
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 90
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 2296
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 5281
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 5281
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 5736
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 9821
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 9821,
+      "perfil": "cartero-en-ruta",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 5281,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "actual"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 0,
+            "motivos": {
+              "limite": 2
+            },
+            "ms_simulados_p50": 120000.0,
+            "partidas": 2,
+            "pasos_p50": 1200.0,
+            "puntaje_prom": 0.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 20626.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 0.0
+              }
+            },
+            "tasa": 0.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 12500,
+            "partidas": 1,
+            "pasos_p50": 125,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4679
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 350
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 510
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 745
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 100
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 18260.000000000004,
+            "partidas": 2,
+            "pasos_p50": 166.0,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 4962.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 472.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 957.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1160.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 235.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "cartero-en-ruta",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 585,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2585,
+      "perfil": "pantalla-pequena",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 1,
+      "abandonos_en": {
+        "barro: paciencia": 1
+      },
+      "carga_modelada_ms": 585,
+      "completaron": 5,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1089
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 5,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 5,
+          "p50": 90
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": {
+        "abandono": {
+          "condicion": "window.__arena.estado().descubiertos.indexOf('barro') >= 0",
+          "motivo": "paciencia",
+          "paso": "barro"
+        },
+        "estado": "abandono",
+        "eventos": [
+          {
+            "paso": "ve-el-lienzo",
+            "t": 585,
+            "tipo": "visto"
+          },
+          {
+            "etapa": "ve-el-lienzo",
+            "t": 585,
+            "tipo": "embudo"
+          },
+          {
+            "paso": "empieza-vacio",
+            "t": 585,
+            "tipo": "verificado"
+          },
+          {
+            "ms": 2600,
+            "paso": "vierte-arena",
+            "t": 3515,
+            "tipo": "mantenido"
+          },
+          {
+            "etapa": "vierte-arena",
+            "t": 3515,
+            "tipo": "embudo"
+          },
+          {
+            "paso": "montana",
+            "t": 3515,
+            "tipo": "cumplido"
+          },
+          {
+            "etapa": "descubre-montana",
+            "t": 3515,
+            "tipo": "embudo"
+          },
+          {
+            "paso": "elige-agua",
+            "t": 3915,
+            "tipo": "toque"
+          },
+          {
+            "paso": "agua-elegida",
+            "t": 3915,
+            "tipo": "verificado"
+          },
+          {
+            "etapa": "elige-agua",
+            "t": 3915,
+            "tipo": "embudo"
+          },
+          {
+            "ms": 1800,
+            "paso": "vierte-agua",
+            "t": 6045,
+            "tipo": "mantenido"
+          },
+          {
+            "id": "descubiertos",
+            "t": 6045,
+            "tipo": "leido"
+          },
+          {
+            "id": "arena_puesta",
+            "t": 6045,
+            "tipo": "leido"
+          },
+          {
+            "motivo": "paciencia",
+            "paso": "barro",
+            "t": 12045,
+            "tipo": "abandono"
+          }
+        ],
+        "falla": null,
+        "semilla": 1001
+      },
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 585
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3515
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 3515
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3915
+        },
+        {
+          "alcanzaron": 5,
+          "etapa": "descubre-barro",
+          "p50_ms": 7945
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 7945,
+      "perfil": "pantalla-pequena",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 3515,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.1667,
+      "tasa_completa": 0.8333,
+      "tasa_ic": [
+        0.4365,
+        0.9699
+      ],
+      "tipo": "guion",
+      "variante": "actual"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 0,
+            "motivos": {
+              "limite": 2
+            },
+            "ms_simulados_p50": 120000.0,
+            "partidas": 2,
+            "pasos_p50": 1200.0,
+            "puntaje_prom": 0.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 20626.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 0.0
+              }
+            },
+            "tasa": 0.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 12500,
+            "partidas": 1,
+            "pasos_p50": 125,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4679
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 350
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 510
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 745
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 100
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 17325.000000000004,
+            "partidas": 2,
+            "pasos_p50": 157.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 4804.5
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 460.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 902.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1100.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 182.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "pantalla-pequena",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 149,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2149,
+      "perfil": "teclado-solo",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 149,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1734
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 90
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 149
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3549
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 7809
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 8429
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 12289
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 12289,
+      "perfil": "teclado-solo",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 769,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "actual"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 0,
+            "motivos": {
+              "limite": 2
+            },
+            "ms_simulados_p50": 120000.0,
+            "partidas": 2,
+            "pasos_p50": 1200.0,
+            "puntaje_prom": 0.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 20626.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 0.0
+              }
+            },
+            "tasa": 0.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 12500,
+            "partidas": 1,
+            "pasos_p50": 125,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4679
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 350
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 510
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 745
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 100
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 19950.0,
+            "partidas": 2,
+            "pasos_p50": 142.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 4534.5
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 472.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 922.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1137.5
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 105.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "teclado-solo",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "actual"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 88,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2088,
+      "perfil": "escritorio-rapido",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 88,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1098
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 60
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 88
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 2848
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 2848
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3068
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 6328
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 6328,
+      "perfil": "escritorio-rapido",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 2848,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "sostener-60"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26350.0,
+            "partidas": 2,
+            "pasos_p50": 263.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 8745.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 490.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1397.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1580.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 287.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 10800,
+            "partidas": 1,
+            "pasos_p50": 108,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4027
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 330
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 420
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 645
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 70
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 14240.0,
+            "partidas": 2,
+            "pasos_p50": 178.0,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 5405.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 477.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 702.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 890.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 100.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "escritorio-rapido",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2265,
+      "perfil": "telefono-medio",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1101
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 60
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 265
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3165
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 3165
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3535
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 6935
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 6935,
+      "perfil": "telefono-medio",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 3165,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "sostener-60"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26350.0,
+            "partidas": 2,
+            "pasos_p50": 263.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 8745.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 490.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1397.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1580.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 287.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 10800,
+            "partidas": 1,
+            "pasos_p50": 108,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4027
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 330
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 420
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 645
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 70
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 12950.0,
+            "partidas": 2,
+            "pasos_p50": 129.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 4318.5
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 370.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 547.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 772.5
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 135.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "telefono-medio",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2265,
+      "perfil": "mama-ocupada",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 265,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1096
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 60
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 265
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3040
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 3040
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3285
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 26460
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 26460,
+      "perfil": "mama-ocupada",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 3040,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "sostener-60"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26350.0,
+            "partidas": 2,
+            "pasos_p50": 263.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 8745.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 490.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1397.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1580.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 287.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 10800,
+            "partidas": 1,
+            "pasos_p50": 108,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4027
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 330
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 420
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 645
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 70
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26215.0,
+            "partidas": 2,
+            "pasos_p50": 374.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 9892.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 365.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1360.0
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1495.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 180.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "mama-ocupada",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 2296,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 4296,
+      "perfil": "cartero-en-ruta",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 2296,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1098
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 60
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 2296
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 5281
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 5281
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 5736
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 9421
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 9421,
+      "perfil": "cartero-en-ruta",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 5281,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "sostener-60"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26350.0,
+            "partidas": 2,
+            "pasos_p50": 263.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 8745.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 490.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1397.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1580.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 287.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 10800,
+            "partidas": 1,
+            "pasos_p50": 108,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4027
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 330
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 420
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 645
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 70
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 16335.000000000004,
+            "partidas": 2,
+            "pasos_p50": 148.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 4599.5
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 437.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 857.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1037.5
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 157.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "cartero-en-ruta",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 1
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 585,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2585,
+      "perfil": "pantalla-pequena",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico-tactil",
+          "ejemplo": "button.ggx-btn 46×40",
+          "sesiones": 6
+        },
+        {
+          "codigo": "texto-chico",
+          "ejemplo": "p#ayuda.ayuda 13.6px",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 585,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1085
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 1
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 60
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 585
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3515
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 3515
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 3915
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 7545
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 7545,
+      "perfil": "pantalla-pequena",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 3515,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "sostener-60"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26350.0,
+            "partidas": 2,
+            "pasos_p50": 263.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 8745.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 490.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1397.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1580.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 287.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 10800,
+            "partidas": 1,
+            "pasos_p50": 108,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4027
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 330
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 420
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 645
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 70
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 14080.000000000004,
+            "partidas": 2,
+            "pasos_p50": 128.0,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 3934.5
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 397.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 685.0
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 892.5
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 152.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "pantalla-pequena",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 1
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 149,
+      "completaron": 1,
+      "datos": {},
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 2149,
+      "perfil": "teclado-solo",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": null,
+      "prueba": "auditoria",
+      "sesiones": 1,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.2065,
+        1.0
+      ],
+      "tipo": "auditoria",
+      "variante": "sostener-60"
+    },
+    {
+      "a11y": [
+        {
+          "codigo": "objetivo-chico",
+          "ejemplo": "input 129×16",
+          "sesiones": 6
+        }
+      ],
+      "abandonaron": 0,
+      "abandonos_en": {},
+      "carga_modelada_ms": 149,
+      "completaron": 6,
+      "datos": {
+        "arena_puesta": {
+          "n": 6,
+          "p50": 1734
+        },
+        "descubiertos": {
+          "n": 6,
+          "p50": 2
+        },
+        "descubiertos_al_final": {
+          "n": 6,
+          "p50": 2
+        },
+        "sostener_aplicado": {
+          "n": 6,
+          "p50": 60
+        }
+      },
+      "determinista": true,
+      "ejemplo_de_fallo": null,
+      "embudo": [
+        {
+          "alcanzaron": 6,
+          "etapa": "ve-el-lienzo",
+          "p50_ms": 149
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "vierte-arena",
+          "p50_ms": 3609
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-montana",
+          "p50_ms": 7869
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "elige-agua",
+          "p50_ms": 8489
+        },
+        {
+          "alcanzaron": 6,
+          "etapa": "descubre-barro",
+          "p50_ms": 12249
+        }
+      ],
+      "errores": [],
+      "fallaron": 0,
+      "ms_simulados_p50": 12249,
+      "perfil": "teclado-solo",
+      "peso_bytes": 172565,
+      "primera_accion_p50_ms": 769,
+      "prueba": "primer-minuto",
+      "sesiones": 6,
+      "tasa_abandono": 0.0,
+      "tasa_completa": 1.0,
+      "tasa_ic": [
+        0.6097,
+        1.0
+      ],
+      "tipo": "guion",
+      "variante": "sostener-60"
+    },
+    {
+      "aislado": true,
+      "banderas_bots": [],
+      "determinista": true,
+      "errores": [],
+      "escenas": {
+        "mundo": {
+          "aleatorio": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 26350.0,
+            "partidas": 2,
+            "pasos_p50": 263.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 8745.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 490.0
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 1397.5
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 1580.0
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 287.5
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "explorador": {
+            "errores": [],
+            "exitos": 1,
+            "motivos": {
+              "todo-descubierto": 1
+            },
+            "ms_simulados_p50": 10800,
+            "partidas": 1,
+            "pasos_p50": 108,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 1,
+                "p50": 4027
+              },
+              "cuando.barro": {
+                "n": 1,
+                "p50": 330
+              },
+              "cuando.estanque": {
+                "n": 1,
+                "p50": 420
+              },
+              "cuando.isla": {
+                "n": 1,
+                "p50": 645
+              },
+              "cuando.montana": {
+                "n": 1,
+                "p50": 70
+              },
+              "descubrimientos": {
+                "n": 1,
+                "p50": 4
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          },
+          "torpe": {
+            "errores": [],
+            "exitos": 2,
+            "motivos": {
+              "todo-descubierto": 2
+            },
+            "ms_simulados_p50": 16870.0,
+            "partidas": 2,
+            "pasos_p50": 120.5,
+            "puntaje_prom": 4.0,
+            "resumen": {
+              "colocadas": {
+                "n": 2,
+                "p50": 3652.0
+              },
+              "cuando.barro": {
+                "n": 2,
+                "p50": 322.5
+              },
+              "cuando.estanque": {
+                "n": 2,
+                "p50": 760.0
+              },
+              "cuando.isla": {
+                "n": 2,
+                "p50": 962.5
+              },
+              "cuando.montana": {
+                "n": 2,
+                "p50": 75.0
+              },
+              "descubrimientos": {
+                "n": 2,
+                "p50": 4.0
+              }
+            },
+            "tasa": 1.0,
+            "violaciones": []
+          }
+        }
+      },
+      "perfil": "teclado-solo",
+      "prueba": "partidas-bots",
+      "tipo": "bots",
+      "variante": "sostener-60"
+    }
+  ],
+  "huella_resultado": "a7a721aa96ab3158",
+  "huellas": {
+    "actual": "4c23c07402f5c9ce",
+    "sostener-60": "cf431675d093292f"
+  },
+  "objeto": {
+    "juego": "arena-gelatina",
+    "version": "0.1.0"
+  },
+  "perfiles": [
+    "escritorio-rapido",
+    "telefono-medio",
+    "mama-ocupada",
+    "cartero-en-ruta",
+    "pantalla-pequena",
+    "teclado-solo"
+  ],
+  "pregunta": "¿Una persona nueva descubre sola que se vierte arena, encuentra la montaña y desbloquea el agua antes de perder la paciencia, según su aparato, su ritmo y sus interrupciones? ¿Ayuda que los descubrimientos se sostengan 60 ticks en vez de 90?",
+  "pruebas": [
+    {
+      "id": "auditoria",
+      "semillas": 1,
+      "tipo": "auditoria"
+    },
+    {
+      "id": "primer-minuto",
+      "semillas": 6,
+      "tipo": "guion"
+    },
+    {
+      "id": "partidas-bots",
+      "semillas": null,
+      "tipo": "bots"
+    }
+  ],
+  "semilla_base": 1000,
+  "titulo": "Arena Gelatina: el primer minuto de alguien que nunca la vio",
+  "variantes": [
+    "actual",
+    "sostener-60"
+  ]
+}

@@ -21,7 +21,8 @@
    Con ?bot=1 (y opcionalmente &semilla=N) existe window.__bot con: info() reiniciar(semilla, opciones) estado() acciones() actuar(a) avanzar(ms) terminado()
    puntaje() simular(a) metricas() y correr(politica, semilla, opciones), que juega un episodio entero DENTRO de la página:
      politica(api, rng, ctx) → una acción, {tipo:'esperar'} para dejar pasar el tiempo, o null para rendirse. api = {estado, acciones, simular, puntaje, terminado}.
-     opciones: {max_pasos: 2000, dt: 50 (ms de juego entre decisiones), max_ms: 600000, cada_invariantes: 25} y lo demás va a reiniciar().
+     opciones: {max_pasos: 2000, dt: 50 (ms de juego entre decisiones), max_ms: 600000, cada_invariantes: 25, perfil: null} y lo demás va a reiniciar().
+     «perfil» (datos simples, p. ej. {temblor: 1.5, ritmo: 2}) llega a la política en ctx.perfil: el laboratorio de betas lo usa para que la misma política juegue con el temple de cada persona simulada.
      Una acción puede traer una propiedad «info» (datos simples): la última queda en el resultado como politica_info (p. ej. cuántas soluciones encontró un bot que planea).
      Devuelve {semilla, pasos, ms_simulados, exito, terminado, motivo, puntaje, invalidas, violaciones, errores, resumen, politica_info, ms_reales}.
      ms_reales es lo único que no es reproducible (es el reloj de la computadora); todo lo demás es idéntico si la semilla y la política lo son.
@@ -96,7 +97,7 @@
           const t = api.terminado();
           if (t.fin) { fin = t; break; }
           let a;
-          try { a = pol(vista, rng, { paso: pasos, ms, dt: o.dt }); } catch (e) { nota('politica: ' + (e && e.message ? e.message : e)); fin = { fin: true, exito: false, motivo: 'error-de-politica' }; break; }
+          try { a = pol(vista, rng, { paso: pasos, ms, dt: o.dt, perfil: o.perfil === undefined ? null : o.perfil }); } catch (e) { nota('politica: ' + (e && e.message ? e.message : e)); fin = { fin: true, exito: false, motivo: 'error-de-politica' }; break; }
           if (a === null || a === undefined || a === 'fin') { fin = { fin: false, exito: false, motivo: 'abandono' }; break; }
           if (typeof a === 'object' && a.info !== undefined) nota_politica = a.info;
           if (!(typeof a === 'object' && a.tipo === 'esperar')) api.actuar(a);

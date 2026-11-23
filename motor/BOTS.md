@@ -72,6 +72,10 @@ Banderas (nivel `falla` = algo está roto y el comando termina con error; `aviso
 - `aviso` · `dificil`: el solucionador gana, pero la política humana casi nunca.
 - `aviso` · `se-corta`: muchos episodios (de una política que no sea la débil) terminan por límite o abandono en vez de ganar o perder (¿se atasca?).
 
+## Bots con temple (cuando los corre el laboratorio)
+
+`laboratorio` (ver `motor/LABORATORIO.md`) corre estas mismas políticas dentro de un perfil de persona. En ese caso la política recibe además `ctx.perfil = {temblor, ritmo, id}` (fuera del laboratorio es `null`): el temblor escala la imprecisión de la política humana (`ctx.perfil.temblor`, 1 si no hay perfil) y, **solo para la política humana**, el ritmo multiplica `dt` (la débil y la solucionadora conservan su cadencia: miden el juego, no a la persona). Una política nueva debe leerlo con cuidado (`ctx.perfil && ctx.perfil.temblor != null ? … : 1`); ignorarlo es válido y deja a esa política sin temple.
+
 ## Betas
 
 Una **beta** es un juego con `"estado": "beta"` en su ficha: se construye y se prueba con bots (y con `probar`), pero **nunca se publica**. La compuerta de publicación la

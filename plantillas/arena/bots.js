@@ -35,7 +35,8 @@ module.exports = {
       const s = (window.__arena_bot = window.__arena_bot || {});
       if (ctx.paso === 0) s.k = 0;
       const e = api.estado(), d = e.descubrimientos, u = e.desbloqueados;
-      const ruido = (v, a) => Math.max(0, Math.min(159, Math.round(v + (rng() * 2 - 1) * a)));
+      const T = ctx.perfil && ctx.perfil.temblor != null ? ctx.perfil.temblor : 1;                 // el temple de la persona simulada (laboratorio de betas); sin perfil, 1
+      const ruido = (v, a) => Math.max(0, Math.min(159, Math.round(v + (rng() * 2 - 1) * a * T)));
       const r = rng();
       if (r < 0.25) return { tipo: 'esperar' };                                                    // se distrae
       if (r < 0.32) return { tipo: 'poner', material: u[Math.floor(rng() * u.length)], x: ruido(80, 80), y: 4, radio: 1 + Math.floor(rng() * 5) };    // se equivoca de material o de lugar

@@ -8,3 +8,7 @@ salida/rebote-gelatina/medios/
 salida/rebote-gelatina/informe-pruebas.txt
 salida/arena-gelatina/medios/
 salida/arena-gelatina/informe-pruebas.txt
+
+# Laboratorio de betas: lo medido son tiempos reales de esta computadora (ruido); lo determinista sí se guarda
+metricas/laboratorio/*.medido.json
+metricas/laboratorio/*.previo.medido.json

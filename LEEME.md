@@ -118,6 +118,21 @@ El motor tiene un órgano para que algo que no es una persona juegue un juego de
 - **Hoy** hay dos betas: `rebote-gelatina` (puzzle de física) y `arena-gelatina` (sandbox de materiales). Sus carpetas `salida/ID/medios/` y `informe-pruebas.txt` no se guardan en el repositorio (`.gitignore`); al promover una beta a juego hay que quitar esas líneas.
 - **Plataforma externa**: necesita una dirección a la que pueda llegar. Publicar una beta es publicar, así que lo decide Max con su aprobación y su huella; mientras tanto la fábrica corre las mismas pruebas en su propio navegador.
 
+## Laboratorio de betas
+
+Otro órgano del motor, hermano del de bots: prueba una beta (de un juego, una página, un texto o un cambio de interfaz) **aislada, extensa y comparable**. Se declara en un archivo de `laboratorio/experimentos/` con una pregunta obligatoria, una o más variantes (la primera es el control; A/B) y una lista de pruebas; se cruza con **perfiles de persona** (`laboratorio/perfiles.json`: la mamá ocupada, el cartero en ruta, quien solo usa teclado, el celular modesto, otros idiomas…) y cada combinación corre en un Chromium nuevo, sin almacenamiento, con la red cortada, con el azar y el reloj fijos, así que **la misma semilla da el mismo resultado**. El contrato completo (formato, pasos, aislamiento, banderas) está en `motor/LABORATORIO.md`.
+
+```
+python3 fabrica.py laboratorio listar | perfiles | validar [ID|todos]
+python3 fabrica.py laboratorio correr ID [--partidas F] [--perfil a,b] [--prueba a,b] [--sin-fallar] [--sin-guardar]
+python3 fabrica.py laboratorio comparar ID [--con RUTA]
+```
+
+- **Qué da**: por variante y perfil, cuántas sesiones completan, dónde se rinden y por qué, el embudo, el tiempo hasta la primera acción, la carga modelada con esa red, errores de página, problemas de accesibilidad y de uso (objetivos chicos, contraste, texto chico, sin alternativa de teclado…) y si el resultado es determinista. Compara variantes (A/B, con intervalos que dicen cuándo una diferencia es clara) y una versión contra la anterior.
+- **Qué no da**: si a la gente le va a gustar ni cuántos van a venir. Los perfiles son arquetipos de condiciones y de conducta, no personas ni una muestra; muestran fricción, no demanda. Por eso sus banderas se ven en el informe pero **no cambian el puntaje del ranking**.
+- **Informe**: `metricas/laboratorio/ID.json` es determinista y se guarda en el repositorio; `ID.medido.json` (tiempos reales de esta computadora) es local y nunca decide una falla.
+- **Hoy**: `rebote-primer-minuto` y `arena-primer-minuto`, con una variante cada uno. Una beta puede usar el laboratorio sin publicarse: el laboratorio solo abre archivos locales y no envía nada a ninguna plataforma.
+
 ## Autonomía y el administrador del motor
 
 Objetivo secundario del motor (después de la calidad): que la fábrica necesite cada vez menos de Max sin cruzar sus límites.

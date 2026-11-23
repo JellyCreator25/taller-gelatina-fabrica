@@ -1,0 +1,119 @@
+{
+  "nota": "Arquetipos de condiciones y de conducta, NO personas ni una muestra de la población: dicen dónde se traba, se confunde o se rinde alguien con ese aparato, esa red y ese temple. No dicen si a la gente le va a gustar. Cada perfil se puede copiar y ajustar; los campos que falten toman los valores de herramientas/laboratorio.py (PERFIL_BASE). ritmo: múltiplo de sus pausas (2 = el doble de lento). punteria_px: desviación del toque o clic en píxeles, que se multiplica por temblor. paciencia_ms: cuánto espera a que algo esté listo antes de rendirse; paciencia_carga_ms: cuánto espera a que cargue la página (con el modelo de carga declarado en motor/LABORATORIO.md).",
+  "perfiles": [
+    {
+      "id": "escritorio-rapido",
+      "nombre": "Escritorio con buena conexión",
+      "descripcion": "Computadora cómoda, ratón preciso, fibra óptica, gente que sabe lo que busca.",
+      "dispositivo": { "ancho": 1280, "alto": 720, "escala": 1, "tactil": false, "movil": false },
+      "red": { "latencia_ms": 20, "bajada_kbps": 50000 },
+      "conducta": { "ritmo": 0.8, "reaccion_ms": 200, "paciencia_ms": 10000, "paciencia_carga_ms": 8000, "temblor": 0.5, "punteria_px": 1 }
+    },
+    {
+      "id": "portatil-lenta",
+      "nombre": "Portátil vieja",
+      "descripcion": "Pantalla chica de portátil, procesador cansado, Wi-Fi de casa.",
+      "dispositivo": { "ancho": 1366, "alto": 768, "escala": 1, "tactil": false, "movil": false },
+      "cpu": 4,
+      "red": { "latencia_ms": 60, "bajada_kbps": 8000 },
+      "conducta": { "ritmo": 1.2, "reaccion_ms": 300, "paciencia_ms": 8000, "paciencia_carga_ms": 6000, "temblor": 1, "punteria_px": 2 }
+    },
+    {
+      "id": "telefono-medio",
+      "nombre": "Teléfono de gama media",
+      "descripcion": "Pantalla de 390×844, dedo, datos 4G, atención normal.",
+      "dispositivo": { "ancho": 390, "alto": 844, "escala": 3, "tactil": true, "movil": true },
+      "cpu": 2,
+      "red": { "latencia_ms": 70, "bajada_kbps": 12000 },
+      "conducta": { "ritmo": 1, "reaccion_ms": 300, "paciencia_ms": 7000, "paciencia_carga_ms": 5000, "temblor": 1, "punteria_px": 6 }
+    },
+    {
+      "id": "telefono-modesto",
+      "nombre": "Teléfono modesto con red lenta",
+      "descripcion": "Pantalla de 360×640, procesador lento, 3G.",
+      "dispositivo": { "ancho": 360, "alto": 640, "escala": 2, "tactil": true, "movil": true },
+      "cpu": 4,
+      "red": { "latencia_ms": 300, "bajada_kbps": 1600 },
+      "conducta": { "ritmo": 1.2, "reaccion_ms": 350, "paciencia_ms": 6000, "paciencia_carga_ms": 5000, "temblor": 1.2, "punteria_px": 7 }
+    },
+    {
+      "id": "mama-ocupada",
+      "nombre": "Mamá ocupada",
+      "descripcion": "Teléfono con una mano, con prisa, la interrumpen a media partida: poca paciencia, toques menos precisos.",
+      "dispositivo": { "ancho": 390, "alto": 844, "escala": 3, "tactil": true, "movil": true },
+      "cpu": 2,
+      "red": { "latencia_ms": 70, "bajada_kbps": 12000 },
+      "conducta": {
+        "ritmo": 0.7, "reaccion_ms": 250, "paciencia_ms": 3500, "paciencia_carga_ms": 3000, "temblor": 1.6, "punteria_px": 7,
+        "interrupciones": [{ "tras_acciones": 2, "ms": 20000 }]
+      }
+    },
+    {
+      "id": "cartero-en-ruta",
+      "nombre": "Cartero en ruta",
+      "descripcion": "Datos móviles flojos, pantalla bajo el sol, camina mientras toca, para unos segundos y sigue.",
+      "dispositivo": { "ancho": 360, "alto": 740, "escala": 3, "tactil": true, "movil": true },
+      "cpu": 3,
+      "red": { "latencia_ms": 450, "bajada_kbps": 800 },
+      "conducta": {
+        "ritmo": 1.1, "reaccion_ms": 350, "paciencia_ms": 5000, "paciencia_carga_ms": 4500, "temblor": 1.4, "punteria_px": 8,
+        "interrupciones": [{ "tras_acciones": 4, "ms": 8000 }]
+      }
+    },
+    {
+      "id": "tableta-con-calma",
+      "nombre": "Tableta con calma",
+      "descripcion": "Tableta, ritmo pausado, mucha paciencia, toques que se desvían más.",
+      "dispositivo": { "ancho": 768, "alto": 1024, "escala": 2, "tactil": true, "movil": true },
+      "cpu": 2,
+      "red": { "latencia_ms": 50, "bajada_kbps": 15000 },
+      "conducta": { "ritmo": 2.2, "reaccion_ms": 600, "paciencia_ms": 15000, "paciencia_carga_ms": 10000, "temblor": 1.8, "punteria_px": 8 }
+    },
+    {
+      "id": "pantalla-pequena",
+      "nombre": "Pantalla muy pequeña",
+      "descripcion": "Teléfono viejo de 320×568: lo que no cabe, no se ve.",
+      "dispositivo": { "ancho": 320, "alto": 568, "escala": 2, "tactil": true, "movil": true },
+      "cpu": 3,
+      "red": { "latencia_ms": 120, "bajada_kbps": 4000 },
+      "conducta": { "ritmo": 1.1, "reaccion_ms": 300, "paciencia_ms": 6000, "paciencia_carga_ms": 5000, "temblor": 1.2, "punteria_px": 7 }
+    },
+    {
+      "id": "teclado-solo",
+      "nombre": "Solo teclado",
+      "descripcion": "Usa únicamente el teclado (no se simula un lector de pantalla): lo que exige puntero, no lo logra.",
+      "dispositivo": { "ancho": 1280, "alto": 720, "escala": 1, "tactil": false, "movil": false },
+      "entrada": "teclado",
+      "red": { "latencia_ms": 40, "bajada_kbps": 20000 },
+      "conducta": { "ritmo": 1.4, "reaccion_ms": 400, "paciencia_ms": 10000, "paciencia_carga_ms": 8000, "temblor": 0, "punteria_px": 0 }
+    },
+    {
+      "id": "oscuro-sin-movimiento",
+      "nombre": "Tema oscuro y movimiento reducido",
+      "descripcion": "Prefiere el tema oscuro y pide reducir las animaciones.",
+      "dispositivo": { "ancho": 1024, "alto": 768, "escala": 1, "tactil": false, "movil": false },
+      "ambiente": { "tema": "oscuro", "movimiento_reducido": true },
+      "red": { "latencia_ms": 40, "bajada_kbps": 20000 },
+      "conducta": { "ritmo": 1.2, "reaccion_ms": 300, "paciencia_ms": 8000, "paciencia_carga_ms": 6000, "temblor": 1, "punteria_px": 2 }
+    },
+    {
+      "id": "ingles-escritorio",
+      "nombre": "Escritorio en inglés",
+      "descripcion": "Navegador en inglés de Estados Unidos: ¿sale el juego en inglés y se entiende?",
+      "dispositivo": { "ancho": 1440, "alto": 900, "escala": 1, "tactil": false, "movil": false },
+      "idioma": "en-US", "zona": "America/New_York",
+      "red": { "latencia_ms": 30, "bajada_kbps": 30000 },
+      "conducta": { "ritmo": 1, "reaccion_ms": 250, "paciencia_ms": 8000, "paciencia_carga_ms": 6000, "temblor": 0.8, "punteria_px": 1 }
+    },
+    {
+      "id": "chino-telefono",
+      "nombre": "Teléfono en chino simplificado",
+      "descripcion": "Navegador en zh-CN en un teléfono: ¿sale el juego en chino y cabe en la pantalla?",
+      "dispositivo": { "ancho": 390, "alto": 844, "escala": 3, "tactil": true, "movil": true },
+      "idioma": "zh-CN", "zona": "Asia/Shanghai",
+      "cpu": 2,
+      "red": { "latencia_ms": 120, "bajada_kbps": 8000 },
+      "conducta": { "ritmo": 1, "reaccion_ms": 300, "paciencia_ms": 7000, "paciencia_carga_ms": 5000, "temblor": 1, "punteria_px": 6 }
+    }
+  ]
+}

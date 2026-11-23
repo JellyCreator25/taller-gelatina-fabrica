@@ -45,12 +45,13 @@ module.exports = {
       if (!b.mejor) return { tipo: 'disparar', angulo: 45, potencia: 0.7, info };
       return { tipo: 'disparar', angulo: b.mejor.angulo, potencia: b.mejor.potencia, info };
     },
-    novato: (api, rng) => {
+    novato: (api, rng, ctx) => {
       const e = api.estado();
       if (e.fase !== 'apuntando') return { tipo: 'esperar' };
+      const T = ctx.perfil && ctx.perfil.temblor != null ? ctx.perfil.temblor : 1;                 // el temple de la persona simulada (laboratorio de betas); sin perfil, 1
       const b = window.__rebote_bot.buscar(api);
       const base = b.mejor || { angulo: 45, potencia: 0.7 };
-      return { tipo: 'disparar', angulo: base.angulo + (rng() * 2 - 1) * 6, potencia: base.potencia + (rng() * 2 - 1) * 0.08 };
+      return { tipo: 'disparar', angulo: base.angulo + (rng() * 2 - 1) * 6 * T, potencia: base.potencia + (rng() * 2 - 1) * 0.08 * T };
     },
   },
 };

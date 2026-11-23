@@ -404,6 +404,8 @@ async function bots(browser) {
     out.explota = __bot.correr(explota, 7);
     out.limite = __bot.correr(quieta, 7, { max_pasos: 3 });
     out.dt = __bot.correr(quieta, 7, { dt: 1000, max_pasos: 100 });
+    const conPerfil = '(api, rng, ctx) => (ctx.perfil && ctx.perfil.temblor === 2 ? null : { tipo: "esperar" })';
+    out.perfil = { con: __bot.correr(conPerfil, 7, { perfil: { temblor: 2 } }), sin: __bot.correr(conPerfil, 7, { max_pasos: 3 }) };
     __bot.reiniciar(7); out.antes = JSON.stringify(__bot.estado());
     out.simular = __bot.simular({ v: 12 }); out.simularNo = __bot.simular({ v: 1 });
     out.despues = JSON.stringify(__bot.estado());
@@ -424,6 +426,7 @@ async function bots(browser) {
   chequear(M, r.explota.motivo === 'error-de-politica' && r.explota.errores.length === 1, 'una política que lanza un error no tumba la página: queda anotado');
   chequear(M, r.limite.motivo === 'limite' && r.limite.pasos === 3, 'max_pasos corta el episodio con el motivo «limite»');
   chequear(M, r.dt.ms_simulados === 5000 && r.dt.pasos === 5, 'dt manda cuánto avanza el juego entre decisiones');
+  chequear(M, r.perfil.con.motivo === 'abandono' && r.perfil.sin.motivo === 'limite', 'el «perfil» de las opciones llega a la política en ctx.perfil (y es null si no se pasó)');
   chequear(M, r.simular.exito === true && r.simularNo.exito === false && r.antes === r.despues, 'simular() contesta sin tocar el estado real');
   chequear(M, r.registro.registrado === true && r.registro.expuesto === true && Array.isArray(r.registro.errores), 'GGX.bots.estado() informa del registro');
   chequear(M, typeof r.rechazo === 'string' && /faltan/.test(r.rechazo), 'un adaptador al que le faltan funciones obligatorias se rechaza con un motivo claro');

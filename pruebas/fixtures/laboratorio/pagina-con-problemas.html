@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: sans-serif; margin: 0; padding: 12px; background: #fff; color: #222; }
+  .palido { color: #bbbbbb; }
+  .diminuto { width: 16px; height: 16px; padding: 0; font-size: 9px; }
+  #ancho { width: 900px; height: 20px; background: #eee; }
+  #tapado { position: absolute; top: 200px; left: 20px; }
+  #cortina { position: absolute; top: 190px; left: 0; width: 100%; height: 60px; background: rgba(255,255,255,0.01); }
+</style>
+</head>
+<body>
+<h1 class="palido">Prueba del laboratorio</h1>
+<p class="palido" style="font-size:10px">Texto pequeño y pálido.</p>
+<img src="no-existe.png" width="20" height="20">
+<button id="sin-nombre" class="diminuto"></button>
+<button id="empezar" type="button">Empezar</button>
+<p id="mensaje">sin empezar</p>
+<div id="ancho"></div>
+<button id="tapado" type="button">Tapado</button>
+<div id="cortina"></div>
+<script>
+  window.JUEGO = { parametros: { vidas: 3 }, textos: { saludo: 'hola' } };
+  window.estado = function () { return document.body.getAttribute('data-estado') || 'inicio'; };
+  document.getElementById('empezar').addEventListener('click', function () {
+    document.body.setAttribute('data-estado', 'listo');
+    document.getElementById('mensaje').textContent = 'listo';
+  });
+  fetch('https://example.com/dato.json').catch(function () {});
+  console.error('error de ejemplo en la página');
+</script>
+</body>
+</html>

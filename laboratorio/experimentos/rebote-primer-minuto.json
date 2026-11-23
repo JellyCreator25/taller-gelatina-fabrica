@@ -1,0 +1,52 @@
+{
+  "formato": 1,
+  "id": "rebote-primer-minuto",
+  "titulo": "Rebote Gelatina: el primer minuto de alguien que nunca lo vio",
+  "pregunta": "¿Una persona nueva, con distintos aparatos, ritmos y paciencias, encuentra el botón, empieza, logra apuntar y disparar y gana el primer nivel? ¿Qué cambia si damos 3 tiros en lugar de 5?",
+  "objeto": { "juego": "rebote-gelatina" },
+  "variantes": [
+    { "id": "actual", "nota": "El juego tal como está construido (control)." },
+    { "id": "tiros-3", "nota": "Mecánica: 3 tiros por nivel en lugar de 5.", "juego": { "parametros": { "tiros": 3 } } }
+  ],
+  "perfiles": ["escritorio-rapido", "telefono-medio", "mama-ocupada", "cartero-en-ruta", "pantalla-pequena", "teclado-solo"],
+  "pruebas": [
+    { "id": "auditoria", "tipo": "auditoria", "observar_ms": 2000 },
+    {
+      "id": "primer-minuto", "tipo": "guion", "semillas": 8,
+      "pasos": [
+        { "id": "ve-jugar", "esperar": "#btnJugar", "embudo": "ve-el-boton" },
+        { "id": "empieza-en-inicio", "verificar": { "js": "window.__rebote.estado().fase === 'inicio'", "mensaje": "la partida debería esperar en la pantalla de inicio" } },
+        { "id": "toca-jugar", "si": { "entrada": ["raton", "tactil"] }, "tocar": "#btnJugar" },
+        { "id": "busca-jugar-con-tab", "si": { "entrada": "teclado" }, "repetir": { "hasta": "!!document.activeElement && document.activeElement.id === 'btnJugar'", "maximo": 14, "pasos": [{ "tecla": "Tab" }] } },
+        { "id": "enter-jugar", "si": { "entrada": "teclado" }, "tecla": "Enter" },
+        { "id": "abre-nivel-1", "verificar": { "js": "window.__rebote.estado().fase === 'apuntando'", "mensaje": "Jugar no abrió el nivel 1", "espera": 600 }, "embudo": "empieza" },
+        { "id": "foco-al-lienzo", "si": { "entrada": "teclado" }, "tecla": "Shift+Tab" },
+        {
+          "id": "tiros",
+          "repetir": {
+            "hasta": "window.__rebote.estado().fase === 'nivel-ok'", "maximo": 5,
+            "pasos": [
+              {
+                "id": "arrastra", "si": { "entrada": ["raton", "tactil"] }, "embudo": "primer-tiro",
+                "arrastrar": {
+                  "desde": { "selector": "#cv", "ref": [640, 400], "js": "(() => { const b = window.__rebote.estado().bola; return { x: b.x, y: b.y }; })()" },
+                  "hasta": { "selector": "#cv", "ref": [640, 400], "js": "(() => { const b = window.__rebote.estado().bola, a = (15 + Math.random() * 60) * Math.PI / 180, d = (0.35 + Math.random() * 0.65) * 140; return { x: b.x - Math.cos(a) * d, y: b.y + Math.sin(a) * d }; })()" },
+                  "pasos": 6
+                }
+              },
+              { "id": "sube-angulo", "si": { "entrada": "teclado" }, "tecla": "ArrowUp", "veces": { "min": 0, "max": 30 } },
+              { "id": "sube-potencia", "si": { "entrada": "teclado" }, "tecla": "ArrowRight", "veces": { "min": 0, "max": 25 } },
+              { "id": "dispara-con-espacio", "si": { "entrada": "teclado" }, "tecla": "Space", "embudo": "primer-tiro" },
+              { "id": "espera-el-tiro", "esperar_hasta": "window.__rebote.estado().fase !== 'volando'", "max_ms": 15000, "falla_si_no": true }
+            ]
+          }
+        },
+        { "leer": { "id": "tiros_usados", "js": "window.__rebote.estado().usados" } },
+        { "leer": { "id": "fase_final", "js": "window.__rebote.estado().fase" } },
+        { "id": "gana-el-nivel", "esperar_hasta": "window.__rebote.estado().fase === 'nivel-ok'", "max_ms": 500, "embudo": "gana-nivel-1" },
+        { "leer": { "id": "estrellas", "js": "window.__rebote.estado().total" } }
+      ]
+    },
+    { "id": "partidas-bots", "tipo": "bots", "partidas": 0.25 }
+  ]
+}

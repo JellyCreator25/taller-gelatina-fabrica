@@ -25,6 +25,7 @@ Uso:
   python3 fabrica.py metricas anotar JUEGO METRICA VALOR [--semana esta|pasada|AAAA-MM-DD] [--fuente F] [--nota T]   (agrega un dato al registro)
   python3 fabrica.py metricas cloudflare [--dias N] [--opcional]   (importa las vistas de Cloudflare Web Analytics; --opcional: sin claves, se omite)
   python3 fabrica.py bots [ID|todos] [--partidas F] [--semilla N] [--politica P] [--sin-fallar]   (hace jugar a los juegos con bots y guarda metricas/bots/ID.json; no publica nada)
+  python3 fabrica.py laboratorio [listar|perfiles|validar [ID|todos]|correr ID [--partidas F] [--semilla N] [--perfil a,b] [--prueba a,b] [--sin-fallar] [--sin-guardar]|comparar ID [--con RUTA]]   (el laboratorio de betas: contextos aislados, perfiles de persona, A/B y versiones comparables; metricas/laboratorio/ID.json; no publica nada; ver motor/LABORATORIO.md)
   python3 fabrica.py rumbo [--detalle]        (qué construir después, según las métricas; con pocos datos explora; no construye ni publica nada)
   python3 fabrica.py huella ID [--solo canal,canal]       (la huella del plan de publicación, para aprobarlo)
   python3 fabrica.py publicar ID [--solo canal,canal]     (muestra el plan y las compuertas; no publica nada)
@@ -348,6 +349,79 @@ def ideas():
         print('  %-9s %-16s %-14s %-13s riesgo %-5s · %s' % (idea['id'], m['genero'], m['verbo'], m['objetivo'], idea.get('riesgo_estimado', '?'), frente))
         for e in r['errores']:
             print('     ERROR', e)
+
+
+def laboratorio_cmd(args):
+    """laboratorio [listar|perfiles|validar|correr|comparar]: el laboratorio de betas (herramientas/laboratorio.py; contrato en motor/LABORATORIO.md)."""
+    sys.path.insert(0, str(RAIZ / 'herramientas'))
+    import laboratorio
+    sub = args[0] if args and not args[0].startswith('--') else 'listar'
+    resto = args[1:] if args and not args[0].startswith('--') else args
+    objetivo = next((a for i, a in enumerate(resto) if not a.startswith('--') and (i == 0 or resto[i - 1] in ('--sin-fallar', '--sin-guardar'))), None)
+    try:
+        if sub == 'perfiles':
+            for p in laboratorio.cargar_perfiles(RAIZ).values():
+                d, c = p['dispositivo'], p['conducta']
+                print('  %-26s %4dx%-4d %-7s cpu x%-4s red %5d kbps/%3d ms · ritmo x%-4s paciencia %5d ms (carga %5d) · %s' % (
+                    p['id'], d['ancho'], d['alto'], p['entrada'], p['cpu'], p['red']['bajada_kbps'], p['red']['latencia_ms'], c['ritmo'], c['paciencia_ms'], c['paciencia_carga_ms'], p['nombre']))
+        elif sub == 'listar':
+            ids_ = laboratorio.ids_de_experimentos(RAIZ)
+            if not ids_:
+                print('[laboratorio] no hay experimentos en laboratorio/experimentos/')
+            for i in ids_:
+                exp = laboratorio.cargar_experimento(RAIZ, i)
+                rep = laboratorio.leer(RAIZ, i)
+                print('  %-26s %s%s' % (i, exp.get('titulo', ''), ' · ' + laboratorio.resumen_corto(rep) if rep else ' · sin informe todavía'))
+        elif sub == 'validar':
+            ids_ = laboratorio.ids_de_experimentos(RAIZ) if objetivo in (None, 'todos') else [objetivo]
+            perfiles = laboratorio.cargar_perfiles(RAIZ)
+            malos = 0
+            for i in ids_:
+                errores = laboratorio.validar(RAIZ, laboratorio.cargar_experimento(RAIZ, i), perfiles)
+                if errores:
+                    malos += 1
+                    print('[laboratorio] %s: %d problema(s)' % (i, len(errores)))
+                    for e in errores:
+                        print('  - %s' % e)
+                else:
+                    print('[laboratorio] %s: experimento válido' % i)
+            if malos:
+                sys.exit(1)
+        elif sub == 'correr':
+            if not objetivo:
+                sys.exit('[laboratorio] uso: laboratorio correr ID [--partidas F] [--semilla N] [--perfil a,b] [--prueba a,b] [--sin-fallar] [--sin-guardar]')
+            exp = laboratorio.cargar_experimento(RAIZ, objetivo)
+            if 'juego' in exp.get('objeto', {}):
+                construir(exp['objeto']['juego'])               # siempre sobre la versión más reciente del juego
+            solo_p = _opcion('--perfil').split(',') if _opcion('--perfil') else None
+            solo_t = _opcion('--prueba').split(',') if _opcion('--prueba') else None
+            semilla = int(_opcion('--semilla')) if _opcion('--semilla') else None
+            antes = laboratorio.leer(RAIZ, objetivo)
+            rep, medido, lineas = laboratorio.correr(RAIZ, objetivo, float(_opcion('--partidas', '1')), semilla, solo_p, solo_t)
+            print('\n'.join(lineas))
+            if antes and antes.get('huella_resultado') != rep['huella_resultado']:
+                print('\n'.join(laboratorio.texto_comparacion(laboratorio.comparar(antes, rep))))
+            parcial = bool(solo_p or solo_t)
+            if '--sin-guardar' in args or parcial:
+                print('[laboratorio] %s' % ('no se guardó (corrida parcial: --perfil o --prueba)' if parcial else 'no se guardó (--sin-guardar)'))
+            else:
+                ruta = laboratorio.guardar(RAIZ, rep, medido)
+                print('[laboratorio] guardado en %s' % ruta.relative_to(RAIZ))
+            if any(b['nivel'] == 'falla' for b in rep['banderas']) and '--sin-fallar' not in args:
+                sys.exit(1)
+        elif sub == 'comparar':
+            if not objetivo:
+                sys.exit('[laboratorio] uso: laboratorio comparar ID [--con RUTA.json]')
+            nuevo_ = laboratorio.leer(RAIZ, objetivo)
+            ruta_con = _opcion('--con')
+            viejo = json.loads(pathlib.Path(ruta_con).read_text(encoding='utf-8')) if ruta_con else laboratorio.leer(RAIZ, objetivo, previo=True)
+            if not nuevo_ or not viejo:
+                sys.exit('[laboratorio] no hay dos informes que comparar de «%s» (corre el experimento dos veces con versiones distintas, o pasa --con RUTA)' % objetivo)
+            print('\n'.join(laboratorio.texto_comparacion(laboratorio.comparar(viejo, nuevo_))))
+        else:
+            sys.exit('[laboratorio] subcomandos: listar, perfiles, validar, correr, comparar')
+    except laboratorio.ErrorLaboratorio as e:
+        sys.exit('[laboratorio] %s' % e)
 
 
 def _opcion(nombre, defecto=None):
@@ -956,6 +1030,8 @@ if __name__ == '__main__':
         generar_sitio('--zip' in sys.argv)
     elif orden == 'bots':
         bots_cmd(sys.argv[2:])
+    elif orden == 'laboratorio':
+        laboratorio_cmd(sys.argv[2:])
     elif orden == 'ciclo':
         ciclo()
     elif orden == 'perfiles':

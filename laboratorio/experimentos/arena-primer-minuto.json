@@ -1,0 +1,227 @@
+{
+  "formato": 1,
+  "id": "arena-primer-minuto",
+  "titulo": "Arena Gelatina: el primer minuto de alguien que nunca la vio",
+  "pregunta": "¿Una persona nueva descubre sola que se vierte arena, encuentra la montaña y desbloquea el agua antes de perder la paciencia, según su aparato, su ritmo y sus interrupciones? ¿Ayuda que los descubrimientos se sostengan 60 ticks en vez de 90?",
+  "objeto": {
+    "juego": "arena-gelatina"
+  },
+  "variantes": [
+    {
+      "id": "actual",
+      "nota": "El juego tal como está construido (control)."
+    },
+    {
+      "id": "sostener-60",
+      "nota": "Mecánica: un descubrimiento debe mantenerse 60 ticks (1 s) en lugar de 90.",
+      "juego": {
+        "parametros": {
+          "sostener": 60
+        }
+      }
+    }
+  ],
+  "perfiles": [
+    "escritorio-rapido",
+    "telefono-medio",
+    "mama-ocupada",
+    "cartero-en-ruta",
+    "pantalla-pequena",
+    "teclado-solo"
+  ],
+  "pruebas": [
+    {
+      "id": "auditoria",
+      "tipo": "auditoria",
+      "observar_ms": 2000
+    },
+    {
+      "id": "primer-minuto",
+      "tipo": "guion",
+      "semillas": 6,
+      "pasos": [
+        {
+          "id": "ve-el-lienzo",
+          "esperar": "#cv",
+          "embudo": "ve-el-lienzo"
+        },
+        {
+          "id": "empieza-vacio",
+          "verificar": {
+            "js": "(() => { const e = window.__arena.estado(); return e.descubiertos.length === 0 && e.desbloqueados.join() === 'arena'; })()",
+            "mensaje": "al empezar solo debería haber arena y ningún descubrimiento"
+          }
+        },
+        {
+          "id": "busca-el-lienzo-con-tab",
+          "si": {
+            "entrada": "teclado"
+          },
+          "repetir": {
+            "hasta": "!!document.activeElement && document.activeElement.id === 'cv'",
+            "maximo": 14,
+            "pasos": [
+              {
+                "tecla": "Tab"
+              }
+            ]
+          }
+        },
+        {
+          "id": "cursor-arriba",
+          "si": {
+            "entrada": "teclado"
+          },
+          "tecla": "ArrowUp",
+          "veces": {
+            "min": 5,
+            "max": 9
+          }
+        },
+        {
+          "id": "empieza-a-verter",
+          "si": {
+            "entrada": "teclado"
+          },
+          "tecla": "Space",
+          "embudo": "vierte-arena"
+        },
+        {
+          "id": "deja-caer",
+          "si": {
+            "entrada": "teclado"
+          },
+          "pasar": 2600
+        },
+        {
+          "id": "deja-de-verter",
+          "si": {
+            "entrada": "teclado"
+          },
+          "tecla": "Space"
+        },
+        {
+          "id": "vierte-arena",
+          "si": {
+            "entrada": [
+              "raton",
+              "tactil"
+            ]
+          },
+          "embudo": "vierte-arena",
+          "mantener": {
+            "en": {
+              "selector": "#cv",
+              "x": 0.5,
+              "y": 0.12
+            },
+            "ms": 2600
+          }
+        },
+        {
+          "id": "montana",
+          "esperar_hasta": "window.__arena.estado().descubiertos.indexOf('montana') >= 0",
+          "embudo": "descubre-montana"
+        },
+        {
+          "id": "elige-agua-con-tecla",
+          "si": {
+            "entrada": "teclado"
+          },
+          "tecla": "Digit2"
+        },
+        {
+          "id": "elige-agua",
+          "si": {
+            "entrada": [
+              "raton",
+              "tactil"
+            ]
+          },
+          "tocar": ".mat[data-mat=\"agua\"]"
+        },
+        {
+          "id": "agua-elegida",
+          "verificar": {
+            "js": "window.__arena.estado().material === 'agua'",
+            "mensaje": "elegir el agua no cambió el material",
+            "espera": 300
+          },
+          "embudo": "elige-agua"
+        },
+        {
+          "id": "vierte-agua",
+          "si": {
+            "entrada": [
+              "raton",
+              "tactil"
+            ]
+          },
+          "mantener": {
+            "en": {
+              "selector": "#cv",
+              "x": 0.5,
+              "y": 0.12
+            },
+            "ms": 1800
+          }
+        },
+        {
+          "id": "vierte-agua-con-teclas",
+          "si": {
+            "entrada": "teclado"
+          },
+          "tecla": "Space"
+        },
+        {
+          "id": "deja-correr-el-agua",
+          "si": {
+            "entrada": "teclado"
+          },
+          "pasar": 1800
+        },
+        {
+          "id": "corta-el-agua",
+          "si": {
+            "entrada": "teclado"
+          },
+          "tecla": "Space"
+        },
+        {
+          "leer": {
+            "id": "descubiertos",
+            "js": "window.__arena.estado().descubiertos.length"
+          }
+        },
+        {
+          "leer": {
+            "id": "arena_puesta",
+            "js": "window.__arena.estado().conteos.arena"
+          }
+        },
+        {
+          "id": "barro",
+          "esperar_hasta": "window.__arena.estado().descubiertos.indexOf('barro') >= 0",
+          "embudo": "descubre-barro"
+        },
+        {
+          "leer": {
+            "id": "sostener_aplicado",
+            "js": "window.JUEGO.parametros.sostener"
+          }
+        },
+        {
+          "leer": {
+            "id": "descubiertos_al_final",
+            "js": "window.__arena.estado().descubiertos.length"
+          }
+        }
+      ]
+    },
+    {
+      "id": "partidas-bots",
+      "tipo": "bots",
+      "partidas": 0.2
+    }
+  ]
+}
