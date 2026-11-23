@@ -2,6 +2,11 @@
 
 Lo escribe `python3 fabrica.py ciclo`. No contiene claves; las únicas fechas son las del calendario aprobado (sección «Autonomía»). Lo que sale en el libro está en `publicacion/libro.jsonl`.
 
+## Betas (prototipos para probar con bots; no se publican)
+
+- `arena-gelatina` (v0.1.0): `python3 fabrica.py bots arena-gelatina`
+- `rebote-gelatina` (v0.1.0): `python3 fabrica.py bots rebote-gelatina`
+
 ## compas-gelatina (v1.0.0)
 
 - Novedad: distinto
@@ -10,8 +15,7 @@ Lo escribe `python3 fabrica.py ciclo`. No contiene claves; las únicas fechas so
 ## guerreros-gelatina (v1.4.0)
 
 - Novedad: distinto
-- **Listo para aprobar** (1 acciones pendientes: sitio-propio).
-  Lee el plan con `python3 fabrica.py publicar guerreros-gelatina` y, si está bien: `python3 fabrica.py publicar guerreros-gelatina --ejecutar --aprobar 392b7acd88e5a855`
+- Al día: todo lo del plan ya salió.
 
 ## torre-gelatina (v1.1.0)
 
@@ -32,9 +36,11 @@ Evidencia por juego (semanas completas, últimas 8):
 
 Recomendación, en orden:
 1. `rebote` · Rebote (puzzle de física con gelatina) · puntaje 1.01 · riesgo de clon medio · costo medio
-   Por qué: género «puzzle-fisico» no se ha probado; verbo «apuntar» no se ha probado; objetivo «llegar-a-la-meta» no se ha probado. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero puzzle-fisico --verbo apuntar --objetivo llegar-a-la-meta`
+   Beta: `rebote-gelatina` (prototipo que no se publica) · 6 escena(s) probadas con bots: 0 falla(s), 1 aviso(s)
+   Por qué: género «puzzle-fisico» no se ha probado; verbo «apuntar» no se ha probado; objetivo «llegar-a-la-meta» no se ha probado. Ya existe la beta; falta pulirla y promoverla a juego (publicarla sigue necesitando tu aprobación con la huella).
 2. `arena` · Arena (sandbox de materiales que caen) · puntaje 1.01 · riesgo de clon medio · costo medio
-   Por qué: género «sandbox-creativo» no se ha probado; verbo «dibujar» no se ha probado; objetivo «descubrir» no se ha probado. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero sandbox-creativo --verbo dibujar --objetivo descubrir`
+   Beta: `arena-gelatina` (prototipo que no se publica) · 1 escena(s) probadas con bots: sin banderas
+   Por qué: género «sandbox-creativo» no se ha probado; verbo «dibujar» no se ha probado; objetivo «descubrir» no se ha probado. Ya existe la beta; falta pulirla y promoverla a juego (publicarla sigue necesitando tu aprobación con la huella).
 3. `colonia` · Colonia (incremental con decisiones) · puntaje 1.00 · riesgo de clon medio · costo medio
    Por qué: género «idle-incremental» no se ha probado; verbo «elegir» no se ha probado; objetivo «construir-algo» no se ha probado. Crearla: `python3 fabrica.py nueva-plantilla NOMBRE --genero idle-incremental --verbo elegir --objetivo construir-algo`
 
@@ -56,9 +62,7 @@ Niveles: 1 Base · 2 Con sonido · 3 Con jugo y accesible · 4 Con música · 5 
 - torre-gelatina: nivel 2 (Con sonido) — falta: Módulo «accesible»: menos movimiento, alto contraste y anuncios para lector de pantalla (declarado en «motor» y llamado por el código del juego).
 
 Lo que sigue para el motor:
-1. Automatizar: Reactivar un flujo programado que GitHub apagó por falta de actividad — Hoy lo hace Max (~0.1 veces al mes, estimado). Que la rutina de los lunes compruebe con `gh` que los flujos programados estén activos y los reactive; avisar solo si no se pudo.
-2. Automatizar: Revisar la cuenta y anotar si un envío en duda salió o no — Hoy lo hace Max (~0.2 veces al mes, estimado). `resolver --auto`: busca la publicación en el registro público de la red por su referencia y anota el resultado; si la red no contesta, sigue en duda y se avisa.
-3. Actualizar «guerreros-gelatina» del nivel 2 al 5 — Una versión nueva con lo que le falta (accesible, efectos, musica, marca) mejora el juego y da una novedad que anunciar.
+1. Actualizar «guerreros-gelatina» del nivel 2 al 5 — Una versión nueva con lo que le falta (accesible, efectos, musica, marca) mejora el juego y da una novedad que anunciar.
 
 ## Monetización: qué falta para cobrar
 
@@ -99,21 +103,21 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 
 ## Autonomía: cuánto corre la fábrica sin Max
 
-- **Contenido aprobado por salir:** hasta el 2026-11-30 (11 días). Cuando se acabe, el calendario se detiene hasta que Max apruebe un lote nuevo.
-- Espera su aprobación el plan de «guerreros-gelatina» (huella 392b7acd88e5a855).
-- Pasos del ciclo que corren sin Max: 15 de 23 (65 %).
-- Toques de Max por mes (estimado del inventario, no medido): 4.1; de ellos evitables: 2.3. Con todas las reglas (las autorizadas y las propuestas) bajarían a 2.05; si solo se construye lo automatizable, a 3.8.
-- «f-metricas-cloudflare» no corre solo todavía: falta «u-token-analitica», «u-desplegar-sitio».
+- **Contenido aprobado por salir:** hasta el 2026-11-30 (7 días). Cuando se acabe, el calendario se detiene hasta que Max apruebe un lote nuevo.
+- Pasos del ciclo que corren sin Max: 19 de 25 (76 %).
+- Toques de Max por mes (estimado del inventario, no medido): 3.8; de ellos evitables: 2. Con todas las reglas (las autorizadas y las propuestas) bajarían a 2.05; si solo se construye lo automatizable, a 3.8.
+- «f-metricas-cloudflare» no corre solo todavía: falta «u-token-analitica».
 - «f-reserva-perenne» no corre solo todavía: falta «u-aprobar-reserva».
-- Lo que la fábrica puede automatizar sin pedirle nada a Max (entra a la cola del motor): Revisar la cuenta y anotar si un envío en duda salió o no; Reactivar un flujo programado que GitHub apagó por falta de actividad.
 - Detalle, reglas que Max podría autorizar y lo que solo él puede hacer: `python3 fabrica.py autonomia`.
 
 ## Bluesky: qué ha funcionado
 
-1 publicación(es) medida(s). Puntaje = likes + 3 × reposts + 2 × respuestas + 2 × citas.
+5 publicación(es) medida(s). Puntaje = likes + 3 × reposts + 2 × respuestas + 2 × citas.
 
-- Más movida: «guerreros-gelatina:1.4.0:bluesky:post» (sin formato, ?) → 3 (3 likes, 0 reposts, 0 respuestas, 0 citas, a 24 h)
+- Más movida: «guerreros-gelatina:1.4.0:bluesky:post» (sin formato, ?) → 3 (3 likes, 0 reposts, 0 respuestas, 0 citas, a 72 h)
+- Más movida: «sabado-1» (elige-uno, en) → 1 (1 likes, 0 reposts, 0 respuestas, 0 citas, a 24 h)
+- Más movida: «antes-despues» (antes-despues, es) → 0 (0 likes, 0 reposts, 0 respuestas, 0 citas, a 24 h)
 
-Todavía son pocas (1 de 8): no saco conclusiones sobre formatos, solo las anoto.
+Todavía son pocas (5 de 8): no saco conclusiones sobre formatos, solo las anoto.
 
 Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow, bluesky.
