@@ -1912,8 +1912,9 @@ class PruebasCalendarioReal(unittest.TestCase):
                     ancho, alto = im.size
                     self.assertTrue(1000 <= ancho <= 2000 and 1.2 <= ancho / alto <= 2.0, 'una imagen de publicación mide 1000–2000 px de ancho y es apaisada (hoy %dx%d)' % im.size)
                 self.assertNotIn('Hecho con ayuda de IA', l['accion']['datos']['texto'])   # ia: false (decisión del dueño); el perfil y el sitio lo dicen
-        fechas = [l['fecha'] for l in lineas]
+        fechas = [l['fecha'] for l in lineas if l['fecha']]   # las perennes no tienen fecha: su día lo decide el calendario
         self.assertEqual(fechas, sorted(fechas))
+        self.assertEqual([bool(l.get('perenne')) for l in lineas], sorted(bool(l.get('perenne')) for l in lineas))   # y van después de las que sí la tienen
 
     def test_la_tarea_diaria_existe_y_solo_publica_lo_aprobado(self):
         yml = (RAIZ / '.github' / 'workflows' / 'calendario.yml').read_text(encoding='utf-8')
