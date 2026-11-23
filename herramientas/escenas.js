@@ -41,6 +41,21 @@ const ESCENAS = {
     rojo: [...fila('campesino', 600, 110, 8, 46), ...fila('caballero', 690, 130, 5, 70), ...fila('bruja', 770, 170, 4, 65)],
     cuando: (s) => s.fx.filter((f) => f.kind === 'bolt').length >= 2,
   },
+  ranas: {   // Merlín convierte en ranas a los enemigos más fuertes
+    azul: [['merlin', 300, 270], ['merlin', 280, 200], ...fila('campesino', 350, 150, 5, 60)],
+    rojo: [['gigante', 640, 200], ['gigante', 660, 340], ['caballero', 600, 270], ['caballero', 600, 170], ['caballero', 600, 370], ...fila('campesino', 700, 130, 5, 70)],
+    cuando: (s) => s.units.filter((u) => !u.dead && u.type === 'rana').length >= 3,
+  },
+  susto: {   // el lamento de La Llorona: los enemigos cercanos huyen sin atacar
+    azul: [['llorona', 330, 270], ...fila('campesino', 280, 170, 4, 70)],
+    rojo: [...fila('caballero', 500, 140, 4, 80), ...fila('campesino', 560, 120, 6, 56), ...fila('arquero', 640, 160, 4, 70)],
+    cuando: (s) => s.units.filter((u) => !u.dead && u.fear > 0).length >= 4,
+  },
+  furia: {   // Hércules con menos de la mitad de vida entra en furia
+    azul: [['hercules', 330, 270], ['robin', 250, 230], ...fila('campesino', 280, 150, 4, 70)],
+    rojo: [['gigante', 560, 270], ...fila('caballero', 520, 150, 4, 70), ...fila('campesino', 600, 130, 6, 56)],
+    cuando: (s) => s.units.some((u) => !u.dead && u.type === 'hercules' && u.rage),
+  },
 };
 
 (async () => {
