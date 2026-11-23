@@ -50,7 +50,7 @@ module.exports = {
     assert(e.fase === 'inicio', 'la partida debería esperar en la pantalla de inicio (' + e.fase + ')');
     await sleep(modo === 'video' ? 1200 : 100);
     await tocar('#btnJugar');
-    e = await E();
+    e = await esperar(['apuntando'], 5000);                    // entre el toque y el nivel 1 está el sello de la Gelatina (≈1,4 s)
     assert(e.fase === 'apuntando' && e.nivel === 0, 'el botón Jugar no cargó el nivel 1 (' + e.fase + ', nivel ' + e.nivel + ')');
 
     if (modo === 'video') {

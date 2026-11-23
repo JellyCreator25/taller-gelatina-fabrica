@@ -6,7 +6,7 @@
   "paquetes": [],
   "fuentes": ["Fredoka", "Nunito Sans"],
   "apoyo_url": "",
-  "motor": ["bots"],
+  "motor": ["accesible", "efectos", "musica", "marca", "bots"],
   "necesidades_motor": [],
   "parametros": {
     "gravedad": 900,

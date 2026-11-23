@@ -49,6 +49,7 @@ canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 #marcador { margin: 0; color: var(--ink-soft); }
 .btn { font: 700 1.05rem var(--font-display); border: 0; border-radius: 14px; padding: .7em 1.5em; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
 .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.firma { margin-top: 10px; display: flex; justify-content: center; }
 .sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 </style>
 </head>
@@ -65,7 +66,7 @@ canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
     <p id="marcador"></p>
     <button class="btn" id="btnJugar" type="button"></button>
   </div>
-  <p class="sr" id="aviso" role="status" aria-live="polite"></p>
+  <div class="firma" id="firma"></div>
 </div>
 
 <script>window.GGX_CONFIG={"id":"rebote-gelatina","version":"0.1.0","idiomas":["es","en","zh"],"titulo":"PENDIENTE","apoyo_url":""};window.JUEGO={"parametros":{"gravedad":900,"radio":14,"tiros":5,"v_min":150,"v_max":760,"niveles":[{"lanzador":{"x":60,"y":356},"meta":{"x":520,"y":340,"w":70,"h":30},"bloques":[{"x":0,"y":370,"w":640,"h":30,"m":"suelo"}]},{"lanzador":{"x":60,"y":356},"meta":{"x":520,"y":340,"w":70,"h":30},"bloques":[{"x":0,"y":370,"w":640,"h":30,"m":"suelo"},{"x":300,"y":210,"w":26,"h":160,"m":"suelo"}]},{"lanzador":{"x":60,"y":356},"meta":{"x":540,"y":170,"w":70,"h":30},"bloques":[{"x":0,"y":370,"w":640,"h":30,"m":"suelo"},{"x":250,"y":360,"w":90,"h":10,"m":"resorte"},{"x":480,"y":200,"w":160,"h":20,"m":"suelo"}]},{"lanzador":{"x":60,"y":356},"meta":{"x":520,"y":340,"w":70,"h":30},"bloques":[{"x":0,"y":370,"w":640,"h":30,"m":"suelo"},{"x":230,"y":362,"w":200,"h":8,"m":"pegajoso"}]},{"lanzador":{"x":60,"y":356},"meta":{"x":500,"y":340,"w":100,"h":30},"bloques":[{"x":0,"y":370,"w":640,"h":30,"m":"suelo"},{"x":440,"y":230,"w":20,"h":140,"m":"suelo"}]},{"lanzador":{"x":60,"y":356},"meta":{"x":560,"y":200,"w":60,"h":30},"bloques":[{"x":0,"y":370,"w":640,"h":30,"m":"suelo"},{"x":150,"y":0,"w":300,"h":120,"m":"suelo"},{"x":330,"y":360,"w":80,"h":10,"m":"resorte"},{"x":520,"y":230,"w":120,"h":20,"m":"suelo"}]}]},"textos":{"es":{"titulo":"Rebote Gelatina","aria_juego":"Zona de juego: arrastra hacia atrás desde la gelatina para apuntar","jugar":"Jugar","siguiente":"Siguiente nivel","reintentar":"Reintentar","de_nuevo":"Jugar de nuevo","nivel":"Nivel {n}: {nombre}","tiros":"Tiros: {n}","estrellas":"Estrellas: {n}","ayuda":"Arrastra hacia atrás desde la gelatina para apuntar y suelta para lanzar. Con teclado: flechas arriba y abajo para el ángulo, izquierda y derecha para la potencia, espacio para lanzar.","nivel_ok":"¡Llegó!","nivel_ok_estrellas":"¡Llegó! Estrellas ganadas: {n}","sin_tiros":"Sin tiros. Prueba otra vez.","fin_juego":"¡Pasaste todos los niveles!","angulo":"Ángulo: {n}°","potencia":"Potencia: {n} %","nivel_1":"Primer salto","nivel_2":"El muro","nivel_3":"Trampolín","nivel_4":"Miel pegajosa","nivel_5":"El pozo","nivel_6":"Doble rebote"},"en":{"titulo":"Jelly Bounce","aria_juego":"Play area: drag back from the jelly to aim","jugar":"Play","siguiente":"Next level","reintentar":"Try again","de_nuevo":"Play again","nivel":"Level {n}: {nombre}","tiros":"Shots: {n}","estrellas":"Stars: {n}","ayuda":"Drag back from the jelly to aim and let go to launch. Keyboard: up and down arrows for the angle, left and right for the power, space to launch.","nivel_ok":"Made it!","nivel_ok_estrellas":"Made it! Stars earned: {n}","sin_tiros":"Out of shots. Try again.","fin_juego":"You cleared every level!","angulo":"Angle: {n}°","potencia":"Power: {n}%","nivel_1":"First hop","nivel_2":"The wall","nivel_3":"Trampoline","nivel_4":"Sticky honey","nivel_5":"The pit","nivel_6":"Double bounce"},"zh":{"titulo":"弹跳果冻","aria_juego":"游戏区域：从果冻向后拖动来瞄准","jugar":"开始","siguiente":"下一关","reintentar":"再试一次","de_nuevo":"重新开始","nivel":"第{n}关：{nombre}","tiros":"次数：{n}","estrellas":"星星：{n}","ayuda":"从果冻向后拖动来瞄准，松手发射。键盘：上下键调角度，左右键调力度，空格发射。","nivel_ok":"到达！","nivel_ok_estrellas":"到达！获得星星：{n}","sin_tiros":"次数用完了，再试一次。","fin_juego":"你通关了！","angulo":"角度：{n}°","potencia":"力度：{n}%","nivel_1":"第一跳","nivel_2":"高墙","nivel_3":"弹床","nivel_4":"粘蜜","nivel_5":"深坑","nivel_6":"双重弹跳"}}};</script>
@@ -331,6 +332,483 @@ canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
   };
 })();
 </script>
+<script id="mod-accesible">
+/* GGX · módulo «accesible» · lo que cualquier juego necesita para poder jugarse con otras necesidades.
+   Se activa con "motor": ["accesible"] en juego.json. Todo se guarda en el propio dispositivo (GGX.store), sin red.
+     GGX.a11y.reducedMotion()          true si el jugador (o su sistema) pidió menos movimiento; los demás módulos lo respetan
+     GGX.a11y.highContrast()           true si pidió alto contraste (la interfaz cambia sola; lo que se dibuja en canvas lo decide el juego)
+     GGX.a11y.set(clave, valor)        clave: 'reducirMovimiento' | 'altoContraste'; valor: true | false | null (null = seguir al sistema)
+     GGX.a11y.onChange(f)              avisa cuando cambia cualquiera de los dos
+     GGX.a11y.announce(texto)          lo anuncia un lector de pantalla (región «status»); úsalo para puntaje, fin de partida, errores
+     GGX.ui.accessButton(contenedor)   botón con un panel de dos casillas, con los colores de la plantilla (--ink, --surface, --line, --focus)
+   Qué NO hace: no convierte por sí solo un juego de canvas en accesible para un lector de pantalla; eso depende de lo que cada juego anuncie. */
+(function () {
+  'use strict';
+  const G = window.GGX;
+  if (!G || G.a11y) return;
+  const mqMov = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const mqCon = window.matchMedia ? window.matchMedia('(prefers-contrast: more)') : null;
+  const guardado = G.store.get('a11y', {}) || {};
+  const bool = (v) => (typeof v === 'boolean' ? v : null);
+  const ajustes = { reducirMovimiento: bool(guardado.reducirMovimiento), altoContraste: bool(guardado.altoContraste) };
+  const cbs = [];
+  const root = document.documentElement;
+  const mov = () => (ajustes.reducirMovimiento === null ? !!(mqMov && mqMov.matches) : ajustes.reducirMovimiento);
+  const con = () => (ajustes.altoContraste === null ? !!(mqCon && mqCon.matches) : ajustes.altoContraste);
+
+  const css = document.createElement('style');
+  css.id = 'ggx-a11y-css';
+  css.textContent =
+    'html[data-reducir-movimiento] *,html[data-reducir-movimiento] *::before,html[data-reducir-movimiento] *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}' +
+    'html[data-alto-contraste]{--ink:#000;--surface:#fff;--line:#000;--focus:#0033cc}' +
+    '.ggx-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}' +
+    '.ggx-a11y{position:relative;display:inline-block}' +
+    '.ggx-a11y-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:12px;border:1px solid var(--line,#bbb);background:var(--surface,#fff);color:var(--ink,#111);font:inherit;cursor:pointer;box-sizing:border-box}' +
+    '.ggx-a11y-btn:focus-visible{outline:3px solid var(--focus,#1b5fe0);outline-offset:2px}' +
+    '.ggx-a11y-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:60;min-width:14em;padding:10px 12px;border-radius:12px;border:1px solid var(--line,#bbb);background:var(--surface,#fff);color:var(--ink,#111);box-shadow:0 6px 20px rgba(0,0,0,.25);display:grid;gap:8px;font-size:.9rem}' +
+    '.ggx-a11y-panel[hidden]{display:none}.ggx-a11y-panel label{display:flex;align-items:center;gap:8px;cursor:pointer}' +
+    '.ggx-a11y-panel input{width:18px;height:18px;accent-color:var(--focus,#1b5fe0)}';
+  document.head.appendChild(css);
+
+  function aplicar() {
+    root.toggleAttribute('data-reducir-movimiento', mov());
+    root.toggleAttribute('data-alto-contraste', con());
+  }
+  const avisar = () => cbs.forEach((f) => { try { f({ reducirMovimiento: mov(), altoContraste: con() }); } catch (e) { console.error('[GGX.a11y]', e); } });
+  aplicar();
+
+  const A = (G.a11y = { version: '1.0.0' });
+  A.reducedMotion = mov;
+  A.highContrast = con;
+  A.get = (k) => ajustes[k];
+  A.set = (k, v) => {
+    if (!(k in ajustes)) return;
+    ajustes[k] = bool(v);
+    G.store.set('a11y', Object.assign({}, ajustes));
+    aplicar(); avisar();
+  };
+  A.onChange = (f) => { cbs.push(f); };
+  [mqMov, mqCon].forEach((m) => { if (m && m.addEventListener) m.addEventListener('change', () => { aplicar(); avisar(); }); });
+
+  let live = null;
+  function region() {
+    if (live) return live;
+    live = document.createElement('div');
+    live.id = 'ggx-live'; live.className = 'ggx-sr';
+    live.setAttribute('role', 'status'); live.setAttribute('aria-live', 'polite'); live.setAttribute('aria-atomic', 'true');
+    (document.body || root).appendChild(live);
+    return live;
+  }
+  A.announce = (texto) => {
+    const el = region();
+    el.textContent = '';
+    setTimeout(() => { el.textContent = String(texto); }, 30);   // vaciar y volver a escribir: así el lector repite aunque el texto sea el mismo
+  };
+
+  /* Textos comunes (el juego puede sobrescribirlos en su juego.json → textos) */
+  const base = {
+    es: { a11y_titulo: 'Accesibilidad', a11y_reducir: 'Reducir movimiento', a11y_contraste: 'Alto contraste' },
+    en: { a11y_titulo: 'Accessibility', a11y_reducir: 'Reduce motion', a11y_contraste: 'High contrast' },
+    zh: { a11y_titulo: '无障碍', a11y_reducir: '减少动态效果', a11y_contraste: '高对比度' },
+  };
+  window.JUEGO = window.JUEGO || {};
+  const textos = (window.JUEGO.textos = window.JUEGO.textos || {});   // el mismo objeto que lee GGX.t
+  for (const l of Object.keys(base)) textos[l] = Object.assign({}, base[l], textos[l] || {});
+
+  const ICONO = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="1.8"/><path d="M5 8.5h14"/><path d="M12 8.5v5"/><path d="m8.5 20 3.5-6.5 3.5 6.5"/></svg>';
+  let n = 0;
+  G.ui = G.ui || {};
+  G.ui.accessButton = (parent) => {
+    const id = 'ggx-a11y-' + (++n);
+    const caja = document.createElement('span'); caja.className = 'ggx-a11y';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'ggx-a11y-btn ggx-btn'; b.innerHTML = ICONO;
+    b.setAttribute('aria-haspopup', 'true'); b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', id);
+    const panel = document.createElement('div'); panel.id = id; panel.className = 'ggx-a11y-panel'; panel.hidden = true; panel.setAttribute('role', 'group');
+    const filas = [['reducirMovimiento', 'a11y_reducir', mov], ['altoContraste', 'a11y_contraste', con]].map(([clave, texto, leer]) => {
+      const l = document.createElement('label'), i = document.createElement('input'), s = document.createElement('span');
+      i.type = 'checkbox'; i.checked = leer();
+      i.addEventListener('change', () => A.set(clave, i.checked));
+      l.appendChild(i); l.appendChild(s); panel.appendChild(l);
+      return () => { s.textContent = G.t(texto); i.checked = leer(); };
+    });
+    const pintar = () => { b.setAttribute('aria-label', G.t('a11y_titulo')); b.title = G.t('a11y_titulo'); panel.setAttribute('aria-label', G.t('a11y_titulo')); filas.forEach((f) => f()); };
+    const abrir = (si) => { panel.hidden = !si; b.setAttribute('aria-expanded', String(si)); };
+    b.addEventListener('click', () => abrir(panel.hidden));
+    caja.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) { abrir(false); b.focus(); } });
+    document.addEventListener('pointerdown', (e) => { if (!panel.hidden && !caja.contains(e.target)) abrir(false); }, true);
+    G.onLang(pintar); A.onChange(pintar); pintar();
+    caja.appendChild(b); caja.appendChild(panel);
+    if (parent) parent.appendChild(caja);
+    return caja;
+  };
+})();
+</script>
+<script id="mod-efectos">
+/* GGX · módulo «efectos» · el «jugo» que hace que un golpe, un acierto o una victoria se sientan.
+   Se activa con "motor": ["accesible", "efectos"] en juego.json (necesita «accesible»: con menos movimiento pedido no hay partículas, sacudidas ni destellos).
+   Es un sistema de partículas y de efectos de pantalla SIN dibujo propio: el juego lo actualiza y lo dibuja en SU canvas.
+     GGX.fx.burst(x, y, {n, color|[colores], vel, vida, tam, gravedad, arco:[a0,a1], forma:'circulo'|'cuadro'})   chorro de partículas; devuelve cuántas creó
+     GGX.fx.preset('chispas'|'confeti'|'polvo'|'burbujas', x, y)                                                    chorros ya afinados
+     GGX.fx.text(x, y, 'texto', {color, borde, px, vida, sube})                                                     texto flotante (puntos, «¡Perfecto!»)
+     GGX.fx.shake(magnitud_px, ms) · GGX.fx.flash(color, ms, alfa)                                                  sacudida y destello de pantalla
+     GGX.fx.update(dt_segundos)   avanza todo (llámalo una vez por cuadro) · GGX.fx.offset() → {x, y}: desplazamiento de la sacudida (aplícalo con translate)
+     GGX.fx.draw(ctx, ancho, alto)   dibuja partículas, textos y destello encima del juego
+     GGX.fx.count() · GGX.fx.clear() · GGX.fx.semilla(n)   cuántos efectos hay vivos · vaciar · aleatorio reproducible (pruebas)
+   Con «reducir movimiento»: no hay partículas, sacudida ni destello; los textos flotantes se quedan quietos un instante. */
+(function () {
+  'use strict';
+  const G = window.GGX;
+  if (!G || G.fx) return;
+  const MAX = 400;           // tope de partículas vivas: un celular modesto no debe sufrir por un chorro grande
+  const P = [], T = [];
+  let rnd = G.rng(20260101), sac = null, des = null, ox = 0, oy = 0;
+  const quieto = () => !!(G.a11y && G.a11y.reducedMotion());
+  const fx = (G.fx = { version: '1.0.0', creadas: 0, maximo: MAX });
+  fx.semilla = (n) => { rnd = G.rng(n); };
+  fx.quieto = quieto;
+
+  fx.burst = (x, y, o) => {
+    if (quieto()) return 0;
+    o = o || {};
+    const n = Math.max(0, Math.min(o.n == null ? 12 : o.n | 0, MAX - P.length));
+    const cols = Array.isArray(o.color) && o.color.length ? o.color : [o.color || '#ffffff'];
+    for (let i = 0; i < n; i++) {
+      const a = o.arco ? o.arco[0] + rnd() * (o.arco[1] - o.arco[0]) : rnd() * Math.PI * 2;
+      const v = (o.vel == null ? 120 : o.vel) * (0.4 + rnd() * 0.8);
+      P.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: o.gravedad == null ? 260 : o.gravedad, vida: (o.vida || 0.7) * (0.7 + rnd() * 0.6), t: 0,
+        r: (o.tam || 4) * (0.6 + rnd() * 0.8), c: cols[(rnd() * cols.length) | 0], forma: o.forma || 'circulo', giro: (rnd() - 0.5) * 8, ang: rnd() * 6.28 });
+    }
+    fx.creadas += n;
+    return n;
+  };
+  fx.text = (x, y, texto, o) => {
+    o = o || {};
+    const q = quieto();
+    T.push({ x, y, s: String(texto), vida: q ? 0.6 : o.vida || 0.9, t: 0, c: o.color || '#ffffff', borde: o.borde || 'rgba(0,0,0,.45)', px: o.px || 18, sube: q ? 0 : o.sube == null ? 40 : o.sube });
+    if (T.length > 40) T.shift();
+  };
+  fx.shake = (mag, ms) => {
+    if (quieto()) return;
+    const m = Math.max(0, +mag || 0);
+    sac = { mag: sac ? Math.max(m, sac.mag * (1 - sac.t / sac.dur)) : m, t: 0, dur: Math.max(0.05, (ms || 250) / 1000) };
+  };
+  fx.flash = (color, ms, alfa) => {
+    if (quieto()) return;
+    des = { c: color || '#ffffff', t: 0, dur: Math.max(0.03, (ms || 160) / 1000), a: alfa == null ? 0.5 : alfa };
+  };
+  fx.update = (dt) => {
+    dt = Math.min(Math.max(dt || 0, 0), 0.05);   // un cuadro perdido no debe lanzar las partículas al otro lado de la pantalla
+    for (let i = P.length - 1; i >= 0; i--) {
+      const p = P[i];
+      p.t += dt;
+      if (p.t >= p.vida) { P[i] = P[P.length - 1]; P.pop(); continue; }
+      p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.ang += p.giro * dt;
+    }
+    for (let i = T.length - 1; i >= 0; i--) { T[i].t += dt; if (T[i].t >= T[i].vida) T.splice(i, 1); }
+    if (sac) {
+      sac.t += dt;
+      if (sac.t >= sac.dur) { sac = null; ox = oy = 0; } else { const k = sac.mag * (1 - sac.t / sac.dur); ox = (rnd() * 2 - 1) * k; oy = (rnd() * 2 - 1) * k; }
+    }
+    if (des) { des.t += dt; if (des.t >= des.dur) des = null; }
+  };
+  fx.offset = () => ({ x: ox, y: oy });
+  fx.draw = (c, w, h) => {
+    c.save();
+    for (const p of P) {
+      c.globalAlpha = Math.max(0, 1 - p.t / p.vida);
+      c.fillStyle = p.c;
+      if (p.forma === 'cuadro') { c.save(); c.translate(p.x, p.y); c.rotate(p.ang); c.fillRect(-p.r, -p.r, p.r * 2, p.r * 1.2); c.restore(); }
+      else { c.beginPath(); c.arc(p.x, p.y, p.r, 0, Math.PI * 2); c.fill(); }
+    }
+    c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
+    for (const t of T) {
+      const k = t.t / t.vida;
+      c.globalAlpha = k < 0.7 ? 1 : Math.max(0, 1 - (k - 0.7) / 0.3);
+      c.font = '700 ' + t.px + 'px Fredoka, "Nunito Sans", ' + G.cjk + ', sans-serif';
+      const y = t.y - t.sube * k;
+      c.lineWidth = Math.max(3, t.px / 5); c.strokeStyle = t.borde; c.strokeText(t.s, t.x, y);
+      c.fillStyle = t.c; c.fillText(t.s, t.x, y);
+    }
+    if (des && w && h) { c.globalAlpha = des.a * (1 - des.t / des.dur); c.fillStyle = des.c; c.fillRect(0, 0, w, h); }
+    c.restore();
+  };
+  fx.count = () => P.length + T.length;
+  fx.clear = () => { P.length = 0; T.length = 0; sac = null; des = null; ox = oy = 0; };
+  fx.presets = ['chispas', 'confeti', 'polvo', 'burbujas'];
+  fx.preset = (nombre, x, y) => {
+    switch (nombre) {
+      case 'chispas': return fx.burst(x, y, { n: 14, color: ['#ffffff', '#ffe66b'], vel: 180, vida: 0.5, tam: 3 });
+      case 'confeti': return fx.burst(x, y, { n: 40, color: ['#5ad1ff', '#ff6bd6', '#ffe66b', '#6bff95', '#ff6b6b'], vel: 260, vida: 1.1, tam: 4, gravedad: 380, arco: [-Math.PI * 0.95, -Math.PI * 0.05], forma: 'cuadro' });
+      case 'polvo': return fx.burst(x, y, { n: 8, color: 'rgba(255,255,255,.7)', vel: 50, vida: 0.6, tam: 5, gravedad: -20 });
+      case 'burbujas': return fx.burst(x, y, { n: 10, color: 'rgba(255,255,255,.65)', vel: 40, vida: 1.2, tam: 5, gravedad: -80, arco: [-Math.PI * 0.8, -Math.PI * 0.2] });
+      default: return 0;
+    }
+  };
+})();
+</script>
+<script id="mod-musica">
+/* GGX · módulo «musica» · música de fondo que se compone sola, sin archivos de audio.
+   Se activa con "motor": ["musica"] en juego.json. Cada ánimo tiene su escala, su tempo y su progresión; la semilla fija la melodía, así el mismo juego
+   suena igual en todos los dispositivos y cada cuatro vueltas la melodía cambia un poco para no cansar.
+     GGX.music.start(animo | {animo, semilla, bpm, escala, raiz, intensidad})   empieza (llámalo desde un toque o tecla del jugador: el navegador no deja sonar antes)
+     GGX.music.stop()                    la detiene
+     GGX.music.intensidad(0..1)          0 = solo bajo y bombo; sube y entran la melodía, los platillos y la caja (úsalo con el peligro o el combo)
+     GGX.music.estado()                  {sonando, animo, bpm, compases, notas, intensidad, silencio}  (las pruebas lo leen)
+     GGX.music.plan(semilla, {animo, compases})   la partitura como datos: [{acorde, notas:[{t, midi, dur, v, voz, capa}]}] (sin sonar; reproducible)
+     GGX.music.animos                    ['alegre', 'tension', 'calma', 'aventura']
+   Respeta el botón de silencio del juego (GGX.muted) y se suspende con la pestaña oculta. Usa su propio AudioContext y un volumen bajo, para no tapar los efectos. */
+(function () {
+  'use strict';
+  const G = window.GGX;
+  if (!G || G.music) return;
+  const ESCALAS = { 'pentatonica-mayor': [0, 2, 4, 7, 9], 'pentatonica-menor': [0, 3, 5, 7, 10], dorica: [0, 2, 3, 5, 7, 9, 10], mixolidia: [0, 2, 4, 5, 7, 9, 10] };
+  const ANIMOS = {
+    alegre: { escala: 'pentatonica-mayor', bpm: 112, raiz: 60 },
+    tension: { escala: 'pentatonica-menor', bpm: 128, raiz: 57 },
+    calma: { escala: 'dorica', bpm: 84, raiz: 55 },
+    aventura: { escala: 'mixolidia', bpm: 104, raiz: 57 },
+  };
+  const PROGRESIONES = [[0, 4, 5, 3], [0, 5, 3, 4], [0, 3, 4, 3], [5, 3, 0, 4]];   // grados de la escala que sostienen el bajo en cada compás
+  const VOLUMEN = 0.16;
+  const grado = (raiz, escala, g) => { const L = escala.length, o = Math.floor(g / L), i = ((g % L) + L) % L; return raiz + 12 * o + escala[i]; };
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+
+  /* La partitura como datos: 4 tiempos por compás; t en tiempos desde el inicio del compás; capa = intensidad mínima para que suene. */
+  function plan(semilla, o) {
+    o = o || {};
+    const a = ANIMOS[o.animo] || ANIMOS.alegre;
+    const escala = ESCALAS[o.escala] || ESCALAS[a.escala];
+    const raiz = o.raiz == null ? a.raiz : o.raiz;
+    const rnd = G.rng(semilla == null ? 1 : semilla);
+    const prog = PROGRESIONES[(rnd() * PROGRESIONES.length) | 0];
+    const n = o.compases || 8;
+    const compases = [];
+    let g = prog[0] + escala.length;                // la melodía parte una octava arriba del primer acorde
+    for (let c = 0; c < n; c++) {
+      const acorde = prog[c % prog.length], notas = [];
+      const base = grado(raiz - 12, escala, acorde);
+      notas.push({ t: 0, midi: base, dur: 1.6, v: 0.9, voz: 'bajo', capa: 0 }, { t: 2, midi: base, dur: 1.6, v: 0.7, voz: 'bajo', capa: 0 });
+      notas.push({ t: 0, midi: 0, dur: 0.2, v: 1, voz: 'bombo', capa: 0 }, { t: 2, midi: 0, dur: 0.2, v: 0.9, voz: 'bombo', capa: 0 });
+      for (const t of [0.5, 1.5, 2.5, 3.5]) notas.push({ t, midi: 0, dur: 0.1, v: 0.5, voz: 'hat', capa: 0.35 });
+      for (const t of [1, 3]) notas.push({ t, midi: 0, dur: 0.2, v: 0.7, voz: 'caja', capa: 0.65 });
+      for (let t = 0; t < 4; t += 0.5) {             // melodía: paseo por la escala, que tiende a volver al acorde
+        if (rnd() < (t % 1 === 0 ? 0.8 : 0.5)) {
+          const hacia = acorde + escala.length, paso = rnd() < 0.5 ? (g < hacia ? 1 : -1) : (rnd() < 0.5 ? 1 : -1) * (1 + ((rnd() * 2) | 0));
+          g = Math.max(acorde, Math.min(acorde + escala.length * 2 - 1, g + paso));
+          notas.push({ t, midi: grado(raiz, escala, g), dur: t % 1 === 0 ? 0.9 : 0.45, v: 0.55 + rnd() * 0.25, voz: 'melodia', capa: 0.15 });
+        }
+      }
+      compases.push({ acorde, notas });
+    }
+    return { animo: o.animo in ANIMOS ? o.animo : 'alegre', bpm: o.bpm || a.bpm, raiz, escala, compases };
+  }
+
+  const M = (G.music = { version: '1.0.0', animos: Object.keys(ANIMOS), plan });
+  let ac = null, master = null, ruido = null, timer = null, voces = 0;
+  let cfg = null, vuelta = 0, compas = 0, proximo = 0, intensidad = 0.5, compasesDichos = 0, notasProgramadas = 0, sonando = false, partitura = null;
+
+  function asegurar() {
+    if (ac) return true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    try { ac = new AC(); master = ac.createGain(); master.gain.value = G.muted() ? 0 : VOLUMEN; master.connect(ac.destination); } catch (e) { ac = null; return false; }
+    return true;
+  }
+  const despertar = () => { if (sonando && ac && ac.state === 'suspended') ac.resume().catch(() => {}); };
+  ['pointerdown', 'keydown', 'touchend'].forEach((ev) => window.addEventListener(ev, despertar, { capture: true, passive: true }));
+  G.onMute((m) => { if (master) master.gain.value = m ? 0 : VOLUMEN; });
+  G.onHide((oculta) => { if (!ac || !sonando) return; (oculta ? ac.suspend() : ac.resume()).catch(() => {}); });
+
+  function tono(f, t0, d, tipo, v) {
+    if (voces > 24) return;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = tipo; o.frequency.setValueAtTime(f, t0);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, v), t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g); g.connect(master); voces++; o.onended = () => { voces--; };
+    o.start(t0); o.stop(t0 + d + 0.03);
+  }
+  function soplo(t0, d, v, hp) {
+    if (voces > 24) return;
+    if (!ruido) { ruido = ac.createBuffer(1, ac.sampleRate, ac.sampleRate); const x = ruido.getChannelData(0); for (let i = 0; i < x.length; i++) x[i] = Math.random() * 2 - 1; }
+    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    s.buffer = ruido; f.type = 'highpass'; f.frequency.value = hp;
+    g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    s.connect(f); f.connect(g); g.connect(master); voces++; s.onended = () => { voces--; };
+    s.start(t0); s.stop(t0 + d + 0.03);
+  }
+  function sonar(n, t0, seg) {
+    const d = Math.max(0.04, n.dur * seg);
+    if (n.voz === 'bajo') tono(hz(n.midi), t0, d, 'triangle', 0.5 * n.v);
+    else if (n.voz === 'melodia') tono(hz(n.midi), t0, d, 'square', 0.12 * n.v);
+    else if (n.voz === 'bombo') { const o = ac.createOscillator(), g = ac.createGain(); o.frequency.setValueAtTime(130, t0); o.frequency.exponentialRampToValueAtTime(45, t0 + 0.14); g.gain.setValueAtTime(0.7 * n.v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.18); o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + 0.2); }
+    else if (n.voz === 'hat') soplo(t0, 0.05, 0.12 * n.v, 7000);
+    else if (n.voz === 'caja') { soplo(t0, 0.14, 0.2 * n.v, 1800); tono(190, t0, 0.1, 'triangle', 0.15 * n.v); }
+  }
+
+  function programar() {                      // pone en el reloj de audio un compás completo y deja listo el siguiente
+    if (!partitura || compas >= partitura.compases.length) {
+      if (partitura) { compas = 0; vuelta++; }
+      if (!partitura || vuelta % 4 === 0) partitura = plan((cfg.semilla || 1) + (partitura ? vuelta : 0), cfg);
+    }
+    const seg = 60 / cfg.bpm, c = partitura.compases[compas++];
+    for (const n of c.notas) {
+      if (n.capa > intensidad + 1e-9) continue;
+      notasProgramadas++;
+      if (!G.muted()) sonar(n, proximo + n.t * seg, seg);
+    }
+    compasesDichos++;
+    proximo += 4 * seg;
+  }
+  function reloj() {
+    if (!ac || !sonando) return;
+    if (proximo < ac.currentTime) proximo = ac.currentTime + 0.05;
+    while (proximo < ac.currentTime + 0.25) programar();
+  }
+
+  M.start = (o) => {
+    o = typeof o === 'string' ? { animo: o } : o || {};
+    const a = ANIMOS[o.animo] || ANIMOS.alegre;
+    cfg = { animo: o.animo in ANIMOS ? o.animo : 'alegre', semilla: o.semilla == null ? 1 : o.semilla, bpm: o.bpm || a.bpm, escala: o.escala || a.escala, raiz: o.raiz == null ? a.raiz : o.raiz, compases: 8 };
+    intensidad = o.intensidad == null ? 0.5 : Math.max(0, Math.min(1, o.intensidad));
+    if (!asegurar()) return false;
+    M.stop();
+    sonando = true; partitura = null; vuelta = 0; compas = 0; proximo = ac.currentTime + 0.05;
+    if (ac.state === 'suspended') ac.resume().catch(() => {});
+    reloj();
+    timer = setInterval(reloj, 50);
+    return true;
+  };
+  M.stop = () => { if (timer) clearInterval(timer); timer = null; sonando = false; };
+  M.intensidad = (x) => { intensidad = Math.max(0, Math.min(1, +x || 0)); };
+  M.estado = () => ({ sonando, animo: cfg ? cfg.animo : null, bpm: cfg ? cfg.bpm : null, compases: compasesDichos, notas: notasProgramadas, intensidad, silencio: G.muted() });
+})();
+</script>
+<script id="mod-marca">
+/* GGX · módulo «marca» · la Gelatina como insignia del Taller: el sello que abre cada juego, su sonido y su distintivo.
+   Se activa con "motor": [..., "marca"] en juego.json (ver marca/guia.md para la idea y las reglas de uso).
+     GGX.marca.sello({al_terminar, forzar})   la Gelatina cae, se aplasta y saluda con su nombre y su «blup» (≈1,4 s); un toque o una tecla lo salta.
+                                              Úsalo cuando el jugador pulsa «Jugar» (el navegador solo deja sonar después de un gesto). Una vez por visita,
+                                              salvo forzar:true. Devuelve una promesa con {omitido, saltado}; al_terminar corre en todos los casos.
+     GGX.marca.blup()                         el sonido de marca solo (respeta el silencio del juego)
+     GGX.marca.distintivo(contenedor, {texto})  el emblema chico (y, con texto:true, el nombre) para una esquina; no es un enlace ni pide nada
+     GGX.marca.emblema(px, color)             elemento con el emblema ('verde' | 'rosa' | 'amarilla') · GGX.marca.svg(id) · GGX.marca.nombre
+     GGX.marca.estado()                       {sellos, blups, ultimo}  (las pruebas lo leen)
+   Con «reducir movimiento» el sello no se anima: se muestra quieto un instante. Es decorativo: no atrapa el foco ni oculta nada al lector de pantalla. */
+(function () {
+  'use strict';
+  const G = window.GGX;
+  if (!G || G.marca) return;
+  const NOMBRE = 'Taller Gelatina';
+  const EMBLEMAS = {   // el mismo dibujo que herramientas/marca.py (una prueba lo verifica); {id} evita que dos emblemas compartan el degradado
+    verde: "<svg xmlns='http://www.w3.org/2000/svg' viewBox='-118 -98 236 208' role='img' aria-label='Taller Gelatina'><defs><linearGradient id='g{id}' x1='0' y1='-1' x2='0' y2='1'><stop offset='0' stop-color='#6fe0a6'/><stop offset='1' stop-color='#15804f'/></linearGradient></defs><path d='M-102 62 C-114 -22 -72 -92 0 -92 C72 -92 114 -22 102 62 C99 88 70 102 0 102 C-70 102 -99 88 -102 62 Z' fill='url(#g{id})'/><path d='M-102 62 C-99 88 -70 102 0 102 C70 102 99 88 102 62 C80 80 -80 80 -102 62 Z' fill='#14251b' opacity='.10'/><ellipse cx='-48' cy='-50' rx='30' ry='14' transform='rotate(-35 -48 -50)' fill='#fff' opacity='.55'/><circle cx='-80' cy='-6' r='5' fill='#fff' opacity='.5'/><ellipse cx='-33' cy='6' rx='16' ry='19' fill='#fff'/><ellipse cx='33' cy='6' rx='16' ry='19' fill='#fff'/><circle cx='-30' cy='10' r='9' fill='#14251b'/><circle cx='36' cy='10' r='9' fill='#14251b'/><circle cx='-27' cy='6' r='3' fill='#fff'/><circle cx='39' cy='6' r='3' fill='#fff'/><ellipse cx='-58' cy='38' rx='11' ry='7' fill='#ffc2d8' opacity='.8'/><ellipse cx='58' cy='38' rx='11' ry='7' fill='#ffc2d8' opacity='.8'/><path d='M-15 42 Q0 56 15 42' fill='none' stroke='#14251b' stroke-width='5' stroke-linecap='round'/></svg>",
+    colores: { rosa: ['#ff9cc4', '#c2337a', '#ff6f9f'], amarilla: ['#ffd36b', '#e39a00', '#ff9f80'] },
+  };
+  let contador = 0;
+  const svg = (id, color) => {
+    let t = EMBLEMAS.verde.split('{id}').join(id || 'm' + (++contador));
+    const c = EMBLEMAS.colores[color];
+    if (c) t = t.split('#6fe0a6').join(c[0]).split('#15804f').join(c[1]).split('#ffc2d8').join(c[2]);
+    return t;
+  };
+
+  const M = (G.marca = { version: '1.0.0', nombre: NOMBRE, svg });
+  const est = { sellos: 0, blups: 0, ultimo: null };
+  const quieto = () => !!(G.a11y && G.a11y.reducedMotion());
+
+  M.emblema = (px, color) => {
+    const e = document.createElement('span');
+    e.style.cssText = 'display:inline-block;line-height:0;width:' + (px || 48) + 'px';
+    e.innerHTML = svg(null, color);
+    return e;
+  };
+  M.estado = () => Object.assign({}, est);
+
+  /* El «blup»: dos gotas de tono, una sube y otra se asienta. Su propio AudioContext, volumen bajo. */
+  let ac = null;
+  M.blup = () => {
+    if (G.muted()) return false;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    try {
+      if (!ac) ac = new AC();
+      if (ac.state === 'suspended') ac.resume().catch(() => {});
+      const t0 = ac.currentTime + 0.01;
+      [[300, 640, 0.1, 'triangle', 0.2, 0], [640, 380, 0.16, 'sine', 0.16, 0.09]].forEach(([f, f2, d, tipo, v, at]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = tipo; o.frequency.setValueAtTime(f, t0 + at); o.frequency.exponentialRampToValueAtTime(f2, t0 + at + d);
+        g.gain.setValueAtTime(0.0001, t0 + at); g.gain.exponentialRampToValueAtTime(v, t0 + at + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + d);
+        o.connect(g); g.connect(ac.destination); o.start(t0 + at); o.stop(t0 + at + d + 0.03);
+      });
+      est.blups++;
+      return true;
+    } catch (e) { return false; }
+  };
+
+  let estilo = null, visto = false;
+  const ponerEstilo = () => {
+    if (estilo) return;
+    estilo = document.createElement('style');
+    estilo.id = 'ggx-marca-css';
+    estilo.textContent =
+      '.ggx-sello{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;cursor:pointer;' +
+      'background:radial-gradient(circle at 30% 25%,#fff6fa 0%,#fbf8f1 45%,#f3d6e4 100%);color:#c2337a;font:700 1.7rem/1.1 Fredoka,"Nunito Sans",' + G.cjk + ',sans-serif;opacity:1;transition:opacity .25s}' +
+      '.ggx-sello.fuera{opacity:0}.ggx-sello .gel{width:min(34vmin,170px);transform-origin:50% 100%;animation:ggx-cae .9s cubic-bezier(.3,.7,.4,1) both}' +
+      '.ggx-sello .nom{opacity:0;animation:ggx-nombre .5s .55s ease-out both;letter-spacing:-.5px}' +
+      '.ggx-sello[data-quieto] .gel,.ggx-sello[data-quieto] .nom{animation:none;opacity:1}' +
+      '@keyframes ggx-cae{0%{transform:translateY(-60vh) scale(.9,1.1)}45%{transform:translateY(0) scale(1.28,.7)}62%{transform:translateY(-14%) scale(.92,1.1)}80%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}' +
+      '@keyframes ggx-nombre{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+      '.ggx-marca-d{display:inline-flex;align-items:center;gap:6px;color:var(--ink,#111);opacity:.8;font:700 .75rem/1 Fredoka,"Nunito Sans",' + G.cjk + ',sans-serif}' +
+      '.ggx-marca-d svg{width:26px;height:auto;display:block}';
+    document.head.appendChild(estilo);
+  };
+
+  M.sello = (o) => {
+    o = o || {};
+    const fin = (r) => { try { if (o.al_terminar) o.al_terminar(r); } catch (e) { console.error('[GGX.marca]', e); } return r; };
+    let guardado = false;
+    try { guardado = sessionStorage.getItem('ggx-sello') === '1'; } catch (e) { /* sin almacenamiento de sesión */ }
+    if ((visto || guardado) && !o.forzar) { est.ultimo = 'omitido'; return Promise.resolve(fin({ omitido: true, saltado: false })); }
+    visto = true;
+    try { sessionStorage.setItem('ggx-sello', '1'); } catch (e) { /* opcional */ }
+    ponerEstilo();
+    est.sellos++;
+    const q = quieto();
+    const el = document.createElement('div');
+    el.className = 'ggx-sello'; el.setAttribute('aria-hidden', 'true');
+    if (q) el.setAttribute('data-quieto', '');
+    const gel = document.createElement('div'); gel.className = 'gel'; gel.innerHTML = svg(null);
+    const nom = document.createElement('div'); nom.className = 'nom'; nom.textContent = NOMBRE;
+    el.appendChild(gel); el.appendChild(nom);
+    document.body.appendChild(el);
+    if (!q) setTimeout(M.blup, 380); else M.blup();      // el «blup» cae justo con el aplastón
+    return new Promise((resolve) => {
+      let listo = false;
+      const terminar = (saltado) => {
+        if (listo) return; listo = true;
+        window.removeEventListener('keydown', tecla, true); el.removeEventListener('pointerdown', toque);
+        est.ultimo = saltado ? 'saltado' : q ? 'estatico' : 'completo';
+        el.classList.add('fuera');
+        setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 260);
+        resolve(fin({ omitido: false, saltado }));
+      };
+      const toque = () => terminar(true), tecla = () => terminar(true);
+      el.addEventListener('pointerdown', toque); window.addEventListener('keydown', tecla, true);
+      setTimeout(() => terminar(false), q ? 700 : 1400);
+    });
+  };
+
+  M.distintivo = (parent, o) => {
+    ponerEstilo();
+    const d = document.createElement('span');
+    d.className = 'ggx-marca-d'; d.setAttribute('role', 'img'); d.setAttribute('aria-label', NOMBRE);
+    d.innerHTML = svg(null);
+    d.querySelector('svg').removeAttribute('role'); d.querySelector('svg').removeAttribute('aria-label'); d.querySelector('svg').setAttribute('aria-hidden', 'true');
+    if (o && o.texto) { const t = document.createElement('span'); t.textContent = NOMBRE; t.setAttribute('aria-hidden', 'true'); d.appendChild(t); }
+    if (parent) parent.appendChild(d);
+    return d;
+  };
+})();
+</script>
 <script id="mod-bots">
 /* GGX · módulo «bots» · el laboratorio de pruebas con bots: una interfaz estándar para que algo que no es una persona (un bot de la fábrica, un script,
    una plataforma que simula jugadores) juegue un juego del Taller, de forma reproducible y mucho más rápido que el tiempo real.
@@ -468,7 +946,8 @@ canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 const X = window.GGX, P = (window.JUEGO && window.JUEGO.parametros) || {};
 const $ = (id) => document.getElementById(id);
 const cv = $('cv'), g = cv.getContext('2d');
-const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const quieto = () => !!(GGX.a11y && GGX.a11y.reducedMotion());   // menos movimiento: sin aplastón exagerado (los efectos ya se apagan solos)
+const contraste = () => !!(GGX.a11y && GGX.a11y.highContrast());
 const BOT = !!(X.bots && X.bots.activo);
 const FONT = (px, w) => w + ' ' + px + 'px Fredoka, ' + X.cjk + ', "Trebuchet MS", sans-serif';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -541,14 +1020,14 @@ function trayectoria(n, angulo, potencia, pasos) {
 }
 
 // ---- la partida ------------------------------------------------------------------------------------------------------------------------------
-const S = { fase: 'inicio', nivel: 0, usados: 0, ang: 45, pot: 0.6, m: null, acc: 0, estrellas: [], aviso: '' };
+const S = { fase: 'inicio', nivel: 0, usados: 0, ang: 45, pot: 0.6, m: null, acc: 0, estrellas: [], aviso: '', vistos: 0 };
 const guardadas = X.store.get('estrellas', []);
 S.estrellas = Array.isArray(guardadas) ? guardadas.slice(0, NIVELES.length).map((v) => Number(v) || 0) : [];
 while (S.estrellas.length < NIVELES.length) S.estrellas.push(0);
 S.m = mundo(0);
 const totalEstrellas = () => S.estrellas.reduce((a, b) => a + b, 0);
 
-function anunciar(txt) { S.aviso = txt; $('aviso').textContent = txt; }
+function anunciar(txt) { S.aviso = txt; GGX.a11y.announce(txt); }   // el lector de pantalla lo dice; la prueba lo lee en estado().aviso
 function nombreNivel() { return X.t('nivel_' + (S.nivel + 1)); }
 function textos() {
   document.title = X.t('titulo');
@@ -568,7 +1047,8 @@ function marcador() {
   $('marcador').textContent = X.t('nivel', { n: S.nivel + 1, nombre: nombreNivel() }) + ' · ' + X.t('tiros', { n: X.num(TIROS - S.usados) }) + ' · ' + X.t('estrellas', { n: X.num(totalEstrellas()) });
 }
 function cargarNivel(n) {
-  S.nivel = n; S.m = mundo(n); S.usados = 0; S.fase = 'apuntando'; S.ang = 45; S.pot = 0.6; S.acc = 0;
+  S.nivel = n; S.m = mundo(n); S.usados = 0; S.fase = 'apuntando'; S.ang = 45; S.pot = 0.6; S.acc = 0; S.vistos = 0;
+  GGX.fx.clear(); GGX.music.intensidad(0.25);
   boton(); marcador();
   anunciar(X.t('nivel', { n: n + 1, nombre: nombreNivel() }));
 }
@@ -577,7 +1057,7 @@ function disparar(angulo, potencia) {
   S.ang = clamp(angulo, 0, 90); S.pot = clamp(potencia, 0.1, 1);
   S.m = mundo(S.nivel); disparo(S.m, S.ang, S.pot);
   S.fase = 'volando'; S.acc = 0;
-  X.sfx('whoosh', 0);
+  X.sfx('whoosh', 0); GGX.music.intensidad(0.7); S.vistos = 0;
   return { valida: true };
 }
 function terminarTiro() {
@@ -588,26 +1068,42 @@ function terminarTiro() {
     S.estrellas[S.nivel] = Math.max(S.estrellas[S.nivel] || 0, e);
     X.store.set('estrellas', S.estrellas);
     S.fase = 'nivel-ok'; X.sfx('win', 0);
+    const mt = S.m.nv.meta;
+    GGX.fx.preset('confeti', mt.x + mt.w / 2, mt.y + mt.h / 2); GGX.fx.text(mt.x + mt.w / 2, mt.y - 6, '★'.repeat(e), { color: '#ffd23f', px: 26 }); GGX.fx.flash('#c8f5d9', 260, 0.35);
+    GGX.music.intensidad(0.5);
     anunciar(S.nivel + 1 < NIVELES.length ? X.t('nivel_ok_estrellas', { n: e }) : X.t('fin_juego') + ' ' + X.t('nivel_ok_estrellas', { n: e }));
   } else if (S.usados >= TIROS) {
-    S.fase = 'sin-tiros'; X.sfx('lose', 0);
+    S.fase = 'sin-tiros'; X.sfx('lose', 0); GGX.fx.shake(5, 260); GGX.music.intensidad(0.15);
     anunciar(X.t('sin_tiros'));
   } else {
-    S.m = mundo(S.nivel); S.fase = 'apuntando'; X.sfx('land', 0);
+    if (r === 'caida') GGX.fx.shake(3, 180); else if (r === 'pegada') GGX.fx.preset('polvo', S.m.bola.x, S.m.bola.y);
+    S.m = mundo(S.nivel); S.fase = 'apuntando'; X.sfx('land', 0); GGX.music.intensidad(0.25); S.vistos = 0;
     anunciar(X.t('tiros', { n: TIROS - S.usados }));
   }
   boton(); marcador();
 }
+function chispas() {                  // un chorrito de color del material en cada rebote, y un golpecito de sonido
+  const b = S.m.bola, c = MAT[S.m.ultimo] || MAT.suelo;
+  GGX.fx.burst(b.x, b.y + R * 0.5, { n: 7, color: [c.arriba, '#ffffff'], vel: 110, vida: 0.4, tam: 3, gravedad: 320 });
+  X.sfx('click', 90, 0.8 + Math.min(S.m.rebotes, 6) * 0.05);
+}
 function pasos(n) {
   for (let i = 0; i < n && S.fase === 'volando'; i++) {
     paso(S.m);
+    if (S.m.rebotes > S.vistos) { S.vistos = S.m.rebotes; chispas(); }
     if (S.m.res !== 'vuelo') terminarTiro();
   }
 }
 function avanzarMs(ms) { pasos(Math.max(1, Math.round(ms / MS_PASO))); }       // tiempo simulado (lo usan los bots)
 function accion() {
-  if (S.fase === 'inicio') cargarNivel(0);
-  else if (S.fase === 'nivel-ok' && S.nivel + 1 < NIVELES.length) cargarNivel(S.nivel + 1);
+  if (S.fase === 'sello') return;
+  if (S.fase === 'inicio') {
+    S.fase = 'sello'; boton();
+    GGX.music.start({ animo: 'calma', semilla: 4, intensidad: 0.25 });   // el toque en «Jugar» es el gesto que deja sonar al navegador
+    GGX.marca.sello({ al_terminar: () => { if (S.fase === 'sello') cargarNivel(0); } });   // la Gelatina saluda una vez por visita; con un toque se salta
+    X.sfx('click', 0); return;
+  }
+  if (S.fase === 'nivel-ok' && S.nivel + 1 < NIVELES.length) cargarNivel(S.nivel + 1);
   else if (S.fase === 'sin-tiros') cargarNivel(S.nivel);
   else if (S.fase === 'nivel-ok' || S.fase === 'fin') cargarNivel(0);
   X.sfx('click', 0);
@@ -628,6 +1124,8 @@ function rect(r) {
   }
 }
 function draw() {
+  const hc = contraste(), of = GGX.fx.offset();
+  g.save(); g.translate(of.x, of.y);
   const gr = g.createLinearGradient(0, 0, 0, H);
   gr.addColorStop(0, '#bfe3ff'); gr.addColorStop(1, '#eef8ff');
   g.fillStyle = gr; g.fillRect(0, 0, W, H);
@@ -636,28 +1134,37 @@ function draw() {
   g.fillStyle = '#31b86b'; g.beginPath(); g.roundRect(mt.x, mt.y, mt.w, mt.h, 10); g.fill();
   g.fillStyle = '#c8f5d9'; g.beginPath(); g.roundRect(mt.x + 6, mt.y + 6, mt.w - 12, mt.h - 12, 8); g.fill();
   for (const r of nv.bloques) rect(r);
+  if (hc) {                                                          // alto contraste: contornos negros en bloques y meta
+    g.strokeStyle = '#000'; g.lineWidth = 3;
+    for (const r of nv.bloques) g.strokeRect(r.x, r.y, r.w, r.h);
+    g.beginPath(); g.roundRect(mt.x, mt.y, mt.w, mt.h, 10); g.stroke();
+  }
   const b = S.m.bola;
   if (S.fase === 'apuntando') {
-    g.fillStyle = 'rgba(21,32,59,.55)';
+    g.fillStyle = hc ? '#000' : 'rgba(21,32,59,.55)';
     for (const [x, y] of trayectoria(S.nivel, S.ang, S.pot, 110)) { g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill(); }
     const a = S.ang * Math.PI / 180, l = 24 + 56 * S.pot;
     g.strokeStyle = '#e04a34'; g.lineWidth = 4; g.lineCap = 'round';
     g.beginPath(); g.moveTo(b.x - Math.cos(a) * 10, b.y + Math.sin(a) * 10); g.lineTo(b.x - Math.cos(a) * l, b.y + Math.sin(a) * l); g.stroke();
   }
-  const aplasta = reduce ? 0 : Math.min(1, S.m.golpe / 0.14);
+  const aplasta = quieto() ? 0 : Math.min(1, S.m.golpe / 0.14);
   const sx = 1 + 0.28 * aplasta, sy = 1 - 0.22 * aplasta;
   X.draw.jelly(g, b.x, b.y + R * 0.05, R * 1.08, '#3dbd7d', { sx, sy, look: clamp(b.vx / 400, -1, 1) });
-  g.fillStyle = 'rgba(21,32,59,.78)'; g.font = FONT(16, 700); g.textAlign = 'left'; g.textBaseline = 'top';
+  if (hc) { g.strokeStyle = '#000'; g.lineWidth = 3; g.beginPath(); g.arc(b.x, b.y, R * 1.1, 0, Math.PI * 2); g.stroke(); }
+  g.fillStyle = hc ? '#000' : 'rgba(21,32,59,.78)'; g.font = FONT(16, 700); g.textAlign = 'left'; g.textBaseline = 'top';
   g.fillText(X.t('nivel', { n: S.nivel + 1, nombre: nombreNivel() }), 12, 10);
   if (S.fase === 'nivel-ok' || S.fase === 'sin-tiros') {
     g.fillStyle = 'rgba(255,255,255,.82)'; g.fillRect(0, H / 2 - 44, W, 88);
-    g.fillStyle = S.fase === 'nivel-ok' ? '#1f8f50' : '#c0392b'; g.font = FONT(38, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = hc ? '#000' : S.fase === 'nivel-ok' ? '#1f8f50' : '#c0392b'; g.font = FONT(38, 700); g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(S.fase === 'nivel-ok' ? X.t('nivel_ok') + ' ' + '★'.repeat(S.estrellas[S.nivel]) : X.t('sin_tiros'), W / 2, H / 2);
   }
+  g.restore();
+  GGX.fx.draw(g, W, H);
 }
 let ultimo = 0;
 function bucle(ts) {
   const ms = Math.min(50, ts - (ultimo || ts)); ultimo = ts;
+  GGX.fx.update(ms / 1000);
   if (S.fase === 'volando') {
     S.acc += ms;
     const n = Math.floor(S.acc / MS_PASO);
@@ -692,7 +1199,7 @@ cv.addEventListener('pointerup', (e) => {
 cv.addEventListener('pointercancel', () => { arrastre = false; });
 addEventListener('keydown', (e) => {
   if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT')) return;
-  if (S.fase !== 'apuntando') { if ((e.code === 'Enter' || e.code === 'Space') && S.fase !== 'volando') { e.preventDefault(); accion(); } return; }
+  if (S.fase !== 'apuntando') { if ((e.code === 'Enter' || e.code === 'Space') && S.fase !== 'volando' && S.fase !== 'sello') { e.preventDefault(); accion(); } return; }
   const paso5 = e.shiftKey ? 5 : 1;
   if (e.code === 'ArrowUp') { S.ang = clamp(S.ang + paso5, 0, 90); e.preventDefault(); anunciar(X.t('angulo', { n: Math.round(S.ang) })); }
   else if (e.code === 'ArrowDown') { S.ang = clamp(S.ang - paso5, 0, 90); e.preventDefault(); anunciar(X.t('angulo', { n: Math.round(S.ang) })); }
@@ -701,7 +1208,8 @@ addEventListener('keydown', (e) => {
   else if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); disparar(S.ang, S.pot); }
 });
 $('btnJugar').addEventListener('click', accion);
-X.ui.muteButton($('tools')); X.ui.langButton($('tools')); X.ui.supportLink($('tools'));
+X.ui.muteButton($('tools')); X.ui.langButton($('tools')); GGX.ui.accessButton($('tools')); X.ui.supportLink($('tools'));
+GGX.marca.distintivo($('firma'), { texto: true });
 X.onLang(() => { textos(); });
 textos();
 if (!BOT) requestAnimationFrame(bucle); else draw();

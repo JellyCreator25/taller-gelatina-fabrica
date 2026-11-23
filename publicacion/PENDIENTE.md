@@ -104,6 +104,7 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 ## Autonomía: cuánto corre la fábrica sin Max
 
 - **Contenido aprobado por salir:** hasta el 2026-11-30 (7 días). Cuando se acabe, el calendario se detiene hasta que Max apruebe un lote nuevo.
+- Esperan su aprobación 34 publicación(es) del calendario (`python3 fabrica.py calendario` muestra la huella del lote).
 - Pasos del ciclo que corren sin Max: 19 de 25 (76 %).
 - Toques de Max por mes (estimado del inventario, no medido): 3.8; de ellos evitables: 2. Con todas las reglas (las autorizadas y las propuestas) bajarían a 2.05; si solo se construye lo automatizable, a 3.8.
 - «f-metricas-cloudflare» no corre solo todavía: falta «u-token-analitica».
@@ -112,12 +113,12 @@ Hoy no se muestra ningún anuncio ni se cobra nada: todas las rutas están apaga
 
 ## Bluesky: qué ha funcionado
 
-5 publicación(es) medida(s). Puntaje = likes + 3 × reposts + 2 × respuestas + 2 × citas.
+6 publicación(es) medida(s). Puntaje = likes + 3 × reposts + 2 × respuestas + 2 × citas.
 
 - Más movida: «guerreros-gelatina:1.4.0:bluesky:post» (sin formato, ?) → 3 (3 likes, 0 reposts, 0 respuestas, 0 citas, a 72 h)
 - Más movida: «sabado-1» (elige-uno, en) → 1 (1 likes, 0 reposts, 0 respuestas, 0 citas, a 24 h)
-- Más movida: «antes-despues» (antes-despues, es) → 0 (0 likes, 0 reposts, 0 respuestas, 0 citas, a 24 h)
+- Más movida: «antes-despues» (antes-despues, es) → 0 (0 likes, 0 reposts, 0 respuestas, 0 citas, a 72 h)
 
-Todavía son pocas (5 de 8): no saco conclusiones sobre formatos, solo las anoto.
+Todavía son pocas (6 de 8): no saco conclusiones sobre formatos, solo las anoto.
 
 Canales y qué hace cada uno solo: `difusion/MAPA.md`. Canales activos hoy: sitio-propio, indexnow, bluesky.
