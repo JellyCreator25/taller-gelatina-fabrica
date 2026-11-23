@@ -176,6 +176,7 @@ python3 fabrica.py calendario                              # estado de cada publ
 python3 fabrica.py calendario --aprobar HUELLA_DEL_LOTE    # el dueño aprueba el lote: anota la huella de cada publicación en contenido/aprobaciones.json
 python3 fabrica.py calendario --ejecutar                   # publica lo que cumple las tres condiciones (lo corre a diario .github/workflows/calendario.yml)
 node herramientas/tarjetas.js <id-del-juego> [idioma]      # regenera las tarjetas de Leyenda (contenido/imagenes/), con el código del propio juego
+node herramientas/ilustraciones.js [id ...]                # ilustraciones de caricatura de las publicaciones (motor/ILUSTRACIONES.md)
 ```
 
 Sale solo lo que está aprobado **con su huella actual** (texto ya resuelto, imagen, texto alternativo y fecha), ya llegó su fecha y no pasaron más de 3 días. Si algo cambia después de aprobar, esa publicación vuelve a pedir aprobación. Pasa por las barreras de siempre: compuertas, ritmo del canal, libro de registro, «incierto» sin reintentos. Una publicación por canal y corrida. La tarea diaria nunca aprueba nada.

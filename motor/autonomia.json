@@ -230,6 +230,13 @@
       "donde": "bajo demanda con `python3 fabrica.py laboratorio correr ID`; entra a la rutina de los lunes cuando Max autorice actualizar su texto"
     },
     {
+      "id": "a-ilustraciones",
+      "quien": "agente",
+      "titulo": "Dibujar las ilustraciones de caricatura de las publicaciones nuevas y subir el arte un escalón a la vez (más trazo, animación, técnicas) según la hoja de ruta de motor/ILUSTRACIONES.md; todo lo que cambie una imagen queda sin aprobar",
+      "frecuencia": "eventual",
+      "donde": "con cada lote nuevo y, para subir de nivel, dentro del paso semanal de mejora del motor (rutina de los lunes)"
+    },
+    {
       "id": "a-avanzar-juegos",
       "quien": "agente",
       "titulo": "Avanzar el siguiente juego y dejar listo el plan de lanzamiento con su huella",

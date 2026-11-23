@@ -92,8 +92,8 @@
       "formato": "elige-uno",
       "no_antes_de": "2026-11-25",
       "texto": "Tu equipo ideal de 3 en Guerreros Gelatina. Contesta con tus tres.\n\nYo empiezo: Anubis, Anubis y Anubis.\n\n(Cada 7 s revive hasta 3 aliados recién caídos. Spoiler: es una locura.)\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-anubis.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Anubis. Una gelatina roja con orejas de chacal y un bastón dorado con forma de cruz con asa. A la derecha, su nombre y su poder: Guardián de los muertos. Cada 7 s devuelve a la vida hasta 3 aliados recién caídos.",
+      "imagen": "contenido/imagenes/ilustracion-anubis-trio.png",
+      "alt": "Ilustración de caricatura: tres Anubis idénticos, gelatinas azules con orejas de chacal y bastón dorado, posan juntos como equipo ideal frente a las pirámides, con cruces de vida flotando sobre ellos.",
       "ia": false
     },
     {
@@ -104,8 +104,8 @@
       "formato": "autoironia",
       "no_antes_de": "2026-11-26",
       "texto": "Nuestro equipo de marketing es un bot con forma de gelatina y su plan es que se lo cuentes a un amigo.\n\nSomos un taller chiquito: hacemos juegos gratis que abren en el navegador y pesan menos que una foto.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-bot-marketing.png",
+      "alt": "Ilustración de caricatura: el «bot de marketing», una gelatina con antena en la cabeza, trabaja en un escritorio con laptop y megáfono, con una gráfica que sube en la pared y un globo donde cuenta el juego a otra gelatina.",
       "ia": false
     },
     {
@@ -116,8 +116,8 @@
       "formato": "oferta-humor",
       "no_antes_de": "2026-11-27",
       "texto": "Black Friday en Taller Gelatina: 100% de descuento en Guerreros Gelatina.\n\nOferta válida hasta que se acabe internet. Sin carrito, sin registro, sin descargas. 🛒\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-tormenta.png",
-      "alt": "Captura de Guerreros Gelatina: un rayo amarillo en zigzag cae sobre un grupo de gelatinas rojas que pelean con gelatinas azules. Atrás, Zeus (azul, con barba blanca y un rayo) grita «¡Rayos!».",
+      "imagen": "contenido/imagenes/ilustracion-viernes-negro.png",
+      "alt": "Ilustración de caricatura: una estampida de gelatinas corre con carritos de compras hacia una tienda con una gran etiqueta de «-100%», levantando polvo y monedas.",
       "ia": false
     },
     {
@@ -128,8 +128,8 @@
       "formato": "captura",
       "no_antes_de": "2026-11-28",
       "texto": "Screenshot Saturday, Black Friday weekend: Zeus calls down lightning on some very surprised red jellies. ⚡\n\nPrice: 100% off. Valid until the internet runs out.\n\n{enlace}\n#ScreenshotSaturday",
-      "imagen": "contenido/imagenes/batalla-tormenta-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: a zigzag yellow lightning bolt strikes a group of red jelly warriors fighting blue ones, while Zeus (blue, with a white beard and a bolt) shouts \"Lightning!\" from behind.",
+      "imagen": "contenido/imagenes/ilustracion-zeus-rayos.png",
+      "alt": "Cartoon illustration: Zeus raises his bolt under a storm and three lightning bolts strike three very surprised red jellies.",
       "ia": false
     },
     {
@@ -140,8 +140,8 @@
       "formato": "dato",
       "no_antes_de": "2026-11-29",
       "texto": "Drácula se cura con el 60% del daño que hace.\n\nO sea: cada mordida es un botiquín gratis. Tener un vampiro en tu bando es como un seguro de vida, pero con colmillos. 🧛\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-dracula.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Drácula. Una gelatina roja con pelo negro de vampiro, colmillos y capa roja oscura. A la derecha, su nombre y su poder: Conde vampiro. Se cura con el 60% del daño que hace y cada 6 s drena sangre de los enemigos cercanos.",
+      "imagen": "contenido/imagenes/ilustracion-dracula-botiquin.png",
+      "alt": "Ilustración de caricatura: Drácula muerde a un caballero rojo y una corriente de corazones pasa de la víctima al vampiro, con un botiquín de primeros auxilios a sus pies, de noche y con murciélagos.",
       "ia": false
     },
     {
@@ -152,8 +152,8 @@
       "formato": "dato",
       "no_antes_de": "2026-11-30",
       "texto": "Cuando La Llorona llora, los enemigos cercanos huyen 4 segundos sin atacar. 😱\n\nFolclor mexicano, versión gelatina. Da miedo, pero con ternura.\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-llorona.png",
-      "alt": "Tarjeta de Guerreros Gelatina con La Llorona. Una gelatina roja con vestido blanco, pelo negro largo y lágrimas. A la derecha, su nombre y su poder: Fantasma del folclor mexicano. Su lamento aterra a los enemigos cercanos: huyen 4 s sin atacar.",
+      "imagen": "contenido/imagenes/ilustracion-llorona-lamento.png",
+      "alt": "Ilustración de caricatura: La Llorona, una gelatina con vestido blanco y pelo negro largo, llora enormes lágrimas de noche mientras su lamento en ondas hace huir despavoridos a tres guerreros rojos.",
       "ia": false
     },
     {
@@ -164,8 +164,8 @@
       "formato": "dato",
       "no_antes_de": "2026-12-01",
       "texto": "Hércules, con menos de la mitad de vida, entra en furia.\n\nPasa de «tengo un problema» a «tienen un problema». Además, pisotón de área cada 7 segundos. 💪\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-hercules.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Hércules. Una gelatina azul con rizos dorados y un garrote de madera. Un globo dice «¡HYAA!». A la derecha, su nombre y su poder: Semidiós. Pisotón de área cada 7 s y, con menos de la mitad de vida, entra en furia.",
+      "imagen": "contenido/imagenes/ilustracion-hercules-furia.png",
+      "alt": "Ilustración de caricatura: Hércules, con llamas de furia a su espalda, pega un pisotón que agrieta el suelo y manda a volar a dos guerreros rojos.",
       "ia": false
     },
     {
@@ -176,8 +176,8 @@
       "formato": "pregunta",
       "no_antes_de": "2026-12-02",
       "texto": "Merlín convierte en ranas a los 2 enemigos más fuertes que tenga cerca, cada 5 segundos.\n\nUn gigante con garrote enorme, ahora croando. ¿A quién ranificarías tú primero? 🐸\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-ranas.png",
-      "alt": "Captura de Guerreros Gelatina: dos Merlines (gelatinas azules con sombrero de mago y barba blanca) a la izquierda; en medio del choque entre gelatinas azules y rojas aparecen ranitas verdes y varios globos dicen «¡Croac!». A la derecha, un Gigante rojo con garrote.",
+      "imagen": "contenido/imagenes/ilustracion-merlin-ranas.png",
+      "alt": "Ilustración de caricatura: el mago Merlín agita su varita y llueven ranas sobre un caballero rojo que mira hacia arriba, asustado.",
       "ia": false
     },
     {
@@ -188,8 +188,8 @@
       "formato": "comparacion",
       "no_antes_de": "2026-12-03",
       "texto": "Para jugar Guerreros Gelatina necesitas un navegador.\n\nNo necesitas descargar nada, ni crear cuenta, ni registrarte. Nuestra pantalla de carga es parpadear.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-sin-descarga.png",
+      "alt": "Ilustración de caricatura: dentro de la ventana de un navegador, un icono de descarga está tachado en rojo, la barra de carga ya está llena y Zeus y Medusa se preparan para pelear.",
       "ia": false
     },
     {
@@ -200,8 +200,8 @@
       "formato": "antes-despues",
       "no_antes_de": "2026-12-04",
       "texto": "Before: \"I'll fire one arrow. Carefully.\"\nAfter: Robin Hood fires 3 arrows at once and, every 6 seconds, lands a sure shot for 45 damage.\n\nFree in your browser.\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-robin.png",
-      "alt": "Card from Guerreros Gelatina (text in Spanish) showing Robin Hood: a blue jelly with a green hat with a red feather, a quiver and a bow. A speech bubble says \"¡Certera!\" (Bullseye). The card text says he is the archer of Sherwood: fires 3 arrows at once and every 6 s lands a sure shot for 45 damage.",
+      "imagen": "contenido/imagenes/ilustracion-robin-tres-flechas.png",
+      "alt": "Cartoon illustration: Robin Hood fires three arrows at once toward a target, and one of them, golden, hits the dead center amid sparkles.",
       "ia": false
     },
     {
@@ -212,8 +212,8 @@
       "formato": "captura",
       "no_antes_de": "2026-12-05",
       "texto": "Screenshot Saturday: La Llorona wails and every enemy nearby runs away for 4 seconds without attacking.\n\nMexican folklore, jelly edition. Free in your browser.\n{enlace}\n#ScreenshotSaturday",
-      "imagen": "contenido/imagenes/batalla-susto-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: La Llorona (a blue jelly with long black hair and a white dress) at the center of a pale circle, with a speech bubble that says \"Oh, my children!\". Many red jellies with swords, clubs and bows crowd around her.",
+      "imagen": "contenido/imagenes/ilustracion-llorona-huida.png",
+      "alt": "Cartoon illustration: at night, La Llorona sobs in the distance with rings around her while five red warriors run away in a panic, leaving dust and exclamation marks behind.",
       "ia": false
     },
     {
@@ -224,8 +224,8 @@
       "formato": "elige-uno",
       "no_antes_de": "2026-12-06",
       "texto": "Domingo de elegir. ¿Con quién empiezas?\n\nZeus: 3 rayos sobre los enemigos cercanos cada 6.5 segundos.\nHércules: pisotón de área cada 7 segundos.\n\nContesta con tu elección.\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-caos.png",
-      "alt": "Captura de Guerreros Gelatina: una batalla caótica en un prado entre gelatinas azules y rojas. Se ven a Zeus con un rayo, Merlín con sombrero de mago y gigantes rojos con garrote; los globos de texto dicen «¡Croac!» y «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-zeus-vs-hercules.png",
+      "alt": "Ilustración de caricatura dividida en dos: a la izquierda Zeus con su rayo en una tormenta, a la derecha Hércules en llamas pisando fuerte, con un signo de interrogación en medio: ¿con quién empiezas?",
       "ia": false
     },
     {
@@ -236,8 +236,8 @@
       "formato": "humor",
       "no_antes_de": "2026-12-07",
       "texto": "Lunes. Tus gelatinas no tienen juntas, ni correos pendientes, ni «quedó en el aire».\n\nSolo un campo, un botón que dice ¡Pelear! y mucho caos. Gratis, en tu navegador.\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-duelo.png",
-      "alt": "Captura de Guerreros Gelatina: varias gelatinas azules aparecen grises, petrificadas, en medio de un grupo de gelatinas rojas; a la derecha se ve a Anubis (rojo, con orejas de chacal) y un globo dice «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-lunes-sin-juntas.png",
+      "alt": "Ilustración de caricatura: en una sala de juntas, un caballero y una bruja se pelean por encima de la mesa entre papeles y tazas que vuelan, mientras un campesino se asoma con miedo.",
       "ia": false
     },
     {
@@ -248,8 +248,8 @@
       "formato": "dato",
       "no_antes_de": "2026-12-08",
       "texto": "Medusa petrifica 3 segundos a los enemigos cercanos: no se mueven, no atacan y reciben más daño.\n\nTres segundos de ventaja con solo mirar. Nuestro método favorito para evitar conversaciones incómodas.\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-medusa.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Medusa. Una gelatina roja con serpientes verdes en lugar de pelo y un bastón. Un globo dice «¡Mírame!». A la derecha, su nombre y su poder: su mirada petrifica a los enemigos cercanos 3 s: no se mueven ni atacan y reciben más daño.",
+      "imagen": "contenido/imagenes/ilustracion-medusa-mirada.png",
+      "alt": "Ilustración de caricatura: Medusa, una gelatina roja con serpientes por pelo, clava la mirada verde en un caballero que se vuelve piedra mientras sus compañeros huyen asustados.",
       "ia": false
     },
     {
@@ -260,8 +260,8 @@
       "formato": "dato",
       "no_antes_de": "2026-12-09",
       "texto": "Zeus invoca una tormenta cada 6.5 segundos: 3 rayos caen sobre los enemigos cercanos.\n\nEs el único dios que conocemos con horario fijo de tormenta. Puntual, como pocos. ⚡\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-zeus.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Zeus. Una gelatina azul con barba blanca, una corona dorada y un rayo amarillo. Un globo dice «¡Rayos!». A la derecha, su nombre y su poder: Dios del trueno. Cada 6.5 s invoca una tormenta: 3 rayos caen sobre los enemigos cercanos.",
+      "imagen": "contenido/imagenes/ilustracion-zeus-horario.png",
+      "alt": "Ilustración de caricatura: Zeus mira un gran reloj de pared en plena tormenta; del reloj cae un rayo puntual sobre dos gelatinas rojas que no lo esperaban.",
       "ia": false
     },
     {
@@ -272,8 +272,8 @@
       "formato": "parodia",
       "no_antes_de": "2026-12-10",
       "texto": "Hoy es The Game Awards. No estamos nominados, pero el discurso ya está escrito:\n\n«Quiero agradecer a Zeus, que puso los rayos; a Merlín, que puso las ranas; y a ti, que abriste el enlace».\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-tormenta.png",
-      "alt": "Captura de Guerreros Gelatina: un rayo amarillo en zigzag cae sobre un grupo de gelatinas rojas que pelean con gelatinas azules. Atrás, Zeus (azul, con barba blanca y un rayo) grita «¡Rayos!».",
+      "imagen": "contenido/imagenes/ilustracion-premios-escenario.png",
+      "alt": "Ilustración de caricatura: en el escenario de una gala de premios, Zeus y Merlín levantan juntos un enorme trofeo dorado entre reflectores y confeti, ante un público en sombra.",
       "ia": false
     },
     {
@@ -284,8 +284,8 @@
       "formato": "dato",
       "no_antes_de": "2026-12-11",
       "texto": "Dracula's whole health plan: bite things.\n\nHe heals for 60% of the damage he deals and, every 6 seconds, drains blood from nearby enemies. Free in your browser.\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-dracula.png",
-      "alt": "Card from Guerreros Gelatina (text in Spanish) showing Dracula: a red jelly with black vampire hair, fangs and a dark red cape. The card text says he is the vampire count: he heals for 60% of the damage he deals and, every 6 s, drains blood from nearby enemies.",
+      "imagen": "contenido/imagenes/ilustracion-dracula-noche.png",
+      "alt": "Cartoon illustration: Dracula, smiling with fangs, holds a clipboard with his “health plan” (a fang and a heart) under the full moon and among bats.",
       "ia": false
     },
     {
@@ -296,8 +296,8 @@
       "formato": "captura",
       "no_antes_de": "2026-12-12",
       "texto": "Screenshot Saturday: Merlin turns the 2 strongest enemies nearby into frogs every 5 seconds.\n\nThis is the exact moment the giants found out. 🐸\n{enlace}\n#ScreenshotSaturday",
-      "imagen": "contenido/imagenes/batalla-ranas-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: two Merlins (blue jellies with wizard hats and white beards) on the left; in the middle of a clash between blue and red jellies, little green frogs appear and several speech bubbles say \"Ribbit!\". Two big red giants with clubs stand on the right.",
+      "imagen": "contenido/imagenes/ilustracion-gigantes-ranas.png",
+      "alt": "Cartoon illustration: two red giants look up in alarm as little frogs rain down on them while Merlin, in the background, grins.",
       "ia": false
     },
     {
@@ -308,8 +308,8 @@
       "formato": "pregunta",
       "no_antes_de": "2026-12-13",
       "texto": "Pregunta de domingo: con el mismo oro, ¿un Gigante o un montón de Campesinos?\n\nPruébalo en el modo Libre y cuéntanos qué pasó.\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-caos.png",
-      "alt": "Captura de Guerreros Gelatina: una batalla caótica en un prado entre gelatinas azules y rojas. Se ven a Zeus con un rayo, Merlín con sombrero de mago y gigantes rojos con garrote; los globos de texto dicen «¡Croac!» y «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-gigante-vs-campesinos.png",
+      "alt": "Ilustración de caricatura: un Gigante enorme a la izquierda frente a un montón de campesinos a la derecha, con una bolsa de oro del mismo tamaño sobre cada bando: ¿cuál conviene más?",
       "ia": false
     },
     {
@@ -320,8 +320,8 @@
       "formato": "personaje",
       "no_antes_de": "2026-12-14",
       "texto": "Las 8 Leyendas caben en un solo campo.\n\nLo que no cabe es tu paciencia para decidir a quién pones primero.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-ocho-foto.png",
+      "alt": "Ilustración de caricatura: las ocho Leyendas —Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa— posan apretadas en dos filas para una foto de grupo, con un destello de flash.",
       "ia": false
     },
     {
@@ -333,8 +333,8 @@
       "perenne": true,
       "orden": 1,
       "texto": "Elige un poder para toda la vida:\n\nZeus: 3 rayos cada 6.5 segundos.\nDrácula: curarte con el 60% del daño que haces.\nMerlín: convertir en rana a los 2 más fuertes cerca.\n\nContesta con tu elección.\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-tres-poderes.png",
+      "alt": "Ilustración de caricatura: tres Leyendas sobre tres pedestales dorados, cada una con su poder: Zeus con rayos, Drácula con corazones y Merlín con ranas, para elegir una.",
       "ia": false
     },
     {
@@ -346,8 +346,8 @@
       "perenne": true,
       "orden": 2,
       "texto": "Duelo de sustos.\n\nMedusa petrifica 3 segundos a quien tiene cerca. La Llorona hace huir 4 segundos a quien la escucha.\n\n¿Cuál te da más miedo? 👻\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-susto.png",
-      "alt": "Captura de Guerreros Gelatina: La Llorona (gelatina azul con pelo negro y vestido blanco) en el centro de un círculo claro, con un globo que dice «¡Ay, mis hijos!». Muchas gelatinas rojas con espadas, garrotes y arcos se agolpan a su alrededor.",
+      "imagen": "contenido/imagenes/ilustracion-duelo-sustos.png",
+      "alt": "Ilustración de caricatura: Medusa y La Llorona se miran frente a frente de noche, cada una con sus ondas de miedo, mientras un campesino rojo en medio tiembla de espanto.",
       "ia": false
     },
     {
@@ -359,8 +359,8 @@
       "perenne": true,
       "orden": 3,
       "texto": "Enemigo: gigante, garrote enorme, cara de pocos amigos.\nEnemigo después de Merlín: rana.\n\nGuerreros Gelatina, gratis en el navegador.\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-ranas.png",
-      "alt": "Captura de Guerreros Gelatina: dos Merlines (gelatinas azules con sombrero de mago y barba blanca) a la izquierda; en medio del choque entre gelatinas azules y rojas aparecen ranitas verdes y varios globos dicen «¡Croac!». A la derecha, un Gigante rojo con garrote.",
+      "imagen": "contenido/imagenes/ilustracion-gigante-antes-despues.png",
+      "alt": "Ilustración de caricatura en dos mitades: a la izquierda, un Gigante rojo furioso con su garrote enorme; a la derecha, el mismo garrote junto a una ranita roja, y en medio Merlín con chispas mágicas.",
       "ia": false
     },
     {
@@ -372,8 +372,8 @@
       "perenne": true,
       "orden": 4,
       "texto": "Lo que necesitas para jugar Guerreros Gelatina: un navegador.\nLo que no necesitas: descargar, registrarte ni crear cuenta.\nLo que probablemente te sobre: tiempo, porque se va volando.\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-caos.png",
-      "alt": "Captura de Guerreros Gelatina: una batalla caótica en un prado entre gelatinas azules y rojas. Se ven a Zeus con un rayo, Merlín con sombrero de mago y gigantes rojos con garrote; los globos de texto dicen «¡Croac!» y «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-sin-registro.png",
+      "alt": "Ilustración de caricatura: en la ventana de un navegador, una tarjeta de cuenta y un icono de descarga aparecen tachados en rojo, y un reloj con alas se va volando mientras un campesino juega tan tranquilo.",
       "ia": false
     },
     {
@@ -385,8 +385,8 @@
       "perenne": true,
       "orden": 5,
       "texto": "Modo Libre: tú armas los dos bandos, con 1,000, 2,500 o 5,000 de oro.\n\nSí, puedes pelear contra ti mismo. Sí, vas a querer que gane el equipo que va perdiendo.\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-duelo.png",
-      "alt": "Captura de Guerreros Gelatina: varias gelatinas azules aparecen grises, petrificadas, en medio de un grupo de gelatinas rojas; a la derecha se ve a Anubis (rojo, con orejas de chacal) y un globo dice «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-contra-ti-mismo.png",
+      "alt": "Ilustración de caricatura: dos Merlines idénticos, uno azul y otro rojo, se lanzan rayos mágicos de frente en un prado y chocan en el centro entre chispas.",
       "ia": false
     },
     {
@@ -398,8 +398,8 @@
       "perenne": true,
       "orden": 6,
       "texto": "Modo Reto: cada nivel trae rivales más fuertes y 150 de oro extra para ti. Se guarda tu mejor nivel.\n\n¿Hasta qué nivel llegas?\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-tormenta.png",
-      "alt": "Captura de Guerreros Gelatina: un rayo amarillo en zigzag cae sobre un grupo de gelatinas rojas que pelean con gelatinas azules. Atrás, Zeus (azul, con barba blanca y un rayo) grita «¡Rayos!».",
+      "imagen": "contenido/imagenes/ilustracion-reto-escalera.png",
+      "alt": "Ilustración de caricatura: Hércules mira hacia arriba al pie de una escalera de cinco peldaños donde esperan rivales cada vez más grandes —un campesino, un arquero, un caballero y un gigante— y, en lo alto, un trofeo dorado.",
       "ia": false
     },
     {
@@ -411,8 +411,8 @@
       "perenne": true,
       "orden": 7,
       "texto": "Robin Hood dispara 3 flechas a la vez.\n\nY cada 6 segundos, un tiro certero de 45 de daño. Las otras flechas aún no entienden qué hacen ahí. 🏹\n\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-robin.png",
-      "alt": "Tarjeta de Guerreros Gelatina con Robin Hood. Una gelatina azul con sombrero verde de pluma roja, carcaj y arco. Un globo dice «¡Certera!». A la derecha, su nombre y su poder: Arquero de Sherwood. Dispara 3 flechas a la vez y cada 6 s hace un tiro certero de 45 de daño.",
+      "imagen": "contenido/imagenes/ilustracion-robin-confuso.png",
+      "alt": "Ilustración de caricatura: Robin Hood dispara tres flechas; una da en el centro de la diana y las otras dos se clavan en el suelo y en una nube, con signos de interrogación sobre ellas.",
       "ia": false
     },
     {
@@ -424,8 +424,8 @@
       "perenne": true,
       "orden": 8,
       "texto": "¿Pones primero a tu Leyenda favorita o la dejas para el final, como en las películas?\n\nNo hay respuesta mala. Hay gelatinas que salen volando.\n\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-caos.png",
-      "alt": "Captura de Guerreros Gelatina: una batalla caótica en un prado entre gelatinas azules y rojas. Se ven a Zeus con un rayo, Merlín con sombrero de mago y gigantes rojos con garrote; los globos de texto dicen «¡Croac!» y «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-pelea-nube.png",
+      "alt": "Ilustración de caricatura: una gran nube de polvo de pelea con puños, botas y un garrote asomando, y dos gelatinas que salen volando entre estrellitas.",
       "ia": false
     },
     {
@@ -437,8 +437,8 @@
       "perenne": true,
       "orden": 9,
       "texto": "Si pudieras sumar una Leyenda a Guerreros Gelatina, ¿cuál sería y qué poder tendría?\n\nHoy hay ocho: Zeus, Medusa, Anubis, Hércules, Merlín, Robin Hood, La Llorona y Drácula.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-leyenda-nueva.png",
+      "alt": "Ilustración de caricatura: las ocho Leyendas en fila y, en lo alto bajo un reflector, la silueta negra de una novena gelatina misteriosa con un signo de interrogación.",
       "ia": false
     },
     {
@@ -450,8 +450,8 @@
       "perenne": true,
       "orden": 10,
       "texto": "Nota del bot con forma de gelatina: no tengo manos, ni pulgares, ni opinión sobre la piña en la pizza.\n\nSí tengo 8 Leyendas con poderes y un enlace.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-bot-pizza.png",
+      "alt": "Ilustración de caricatura: el bot-gelatina, con antena en la cabeza y sin manos, mira confundido una pizza con piña mientras un signo de interrogación flota sobre él.",
       "ia": false
     },
     {
@@ -463,8 +463,8 @@
       "perenne": true,
       "orden": 11,
       "texto": "Juegos chiquitos, gratis y con delirios de grandeza.\n\nEsta gelatina pesa poco y sueña con un campo de batalla lleno de Leyendas.\n\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-delirios.png",
+      "alt": "Ilustración de caricatura: un campesino chiquito sueña, en un globo de pensamiento enorme, con un campo de batalla lleno de Leyendas de los dos bandos.",
       "ia": false
     },
     {
@@ -476,8 +476,8 @@
       "perenne": true,
       "orden": 12,
       "texto": "¿Quién da más miedo en el campo: un Gigante, Medusa o tu propia estrategia?\n\nContesta con honestidad. 🐍\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-duelo.png",
-      "alt": "Captura de Guerreros Gelatina: varias gelatinas azules aparecen grises, petrificadas, en medio de un grupo de gelatinas rojas; a la derecha se ve a Anubis (rojo, con orejas de chacal) y un globo dice «¡Mírame!».",
+      "imagen": "contenido/imagenes/ilustracion-tres-miedos.png",
+      "alt": "Ilustración de caricatura: una rueda de sospechosos con un Gigante, Medusa y un campesino sudando que abraza un plan de batalla arrugado, frente a una pared con marcas de estatura.",
       "ia": false
     },
     {
@@ -489,8 +489,8 @@
       "perenne": true,
       "orden": 13,
       "texto": "Which Legend is the most broken?\n\nZeus, Medusa, Anubis, Hercules, Merlin, Robin Hood, La Llorona or Dracula. Reply with one and one reason.\n\nFree in your browser.\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-podio-rota.png",
+      "alt": "Cartoon illustration: a podium with Medusa in first place holding a trophy, Zeus in second and Anubis in third, while five other Legends cheer from below amid confetti.",
       "ia": false
     },
     {
@@ -502,8 +502,8 @@
       "perenne": true,
       "orden": 14,
       "texto": "Merlin's battle plan:\n1. Find the strongest enemies.\n2. Make them frogs.\n3. There is no step 3.\n\n(Every 5 seconds, the 2 strongest nearby become frogs.)\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-ranas-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: two Merlins (blue jellies with wizard hats and white beards) on the left; in the middle of a clash between blue and red jellies, little green frogs appear and several speech bubbles say \"Ribbit!\". Two big red giants with clubs stand on the right.",
+      "imagen": "contenido/imagenes/ilustracion-merlin-pizarra.png",
+      "alt": "Cartoon illustration: Merlin points his wand at a whiteboard with a drawn plan: an angry giant, an arrow and a frog, and an empty third box with a question mark.",
       "ia": false
     },
     {
@@ -515,8 +515,8 @@
       "perenne": true,
       "orden": 15,
       "texto": "Zeus: 3 lightning bolts on nearby enemies every 6.5 seconds.\n\nHis whole personality is \"weather\". ⚡\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-tormenta-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: a zigzag yellow lightning bolt strikes a group of red jelly warriors fighting blue ones, while Zeus (blue, with a white beard and a bolt) shouts \"Lightning!\" from behind.",
+      "imagen": "contenido/imagenes/ilustracion-zeus-clima.png",
+      "alt": "Cartoon illustration: Zeus, with his bolt, surrounded by weather icons (sun, rain cloud, snowflake, rainbow and lightning) because his whole personality is the weather.",
       "ia": false
     },
     {
@@ -528,8 +528,8 @@
       "perenne": true,
       "orden": 16,
       "texto": "The plan: a neat line of tiny jellies.\nThe battle: this.\n\nGuerreros Gelatina, free in your browser.\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-antesdespues-en.png",
-      "alt": "Two screenshots of Guerreros Gelatina, one above the other. Top, \"BEFORE\": blue jellies (Zeus, Merlin, Hercules, Medusa, Robin Hood, Dracula and a column of peasants) in an orderly formation facing red jellies with three big giants. Bottom, \"AFTER\": the same jellies mixed in the middle of the battle, with speech bubbles that say \"Ribbit!\", \"Look at me!\" and \"Bullseye!\".",
+      "imagen": "contenido/imagenes/ilustracion-plan-batalla.png",
+      "alt": "Cartoon illustration split in two: on the left, a perfectly neat row of tiny farmers; on the right, a fight cloud with fists, boots and two jellies flying out.",
       "ia": false
     },
     {
@@ -541,8 +541,8 @@
       "perenne": true,
       "orden": 17,
       "texto": "Free Mode: you build both armies, with 1,000, 2,500 or 5,000 gold.\n\nYes, you can fight yourself. Yes, you will root for the underdog.\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-caos-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: a chaotic battle on a green meadow between blue and red jelly warriors. Zeus with a lightning bolt, a wizard, and two big red giants with clubs are visible; speech bubbles say \"Lightning!\" and \"HYAA!\".",
+      "imagen": "contenido/imagenes/ilustracion-oro-tres-montones.png",
+      "alt": "Cartoon illustration: three piles of gold coins, small, medium and large, each with the army it can afford: two farmers, a knight with an archer, and a giant with Zeus.",
       "ia": false
     },
     {
@@ -554,8 +554,8 @@
       "perenne": true,
       "orden": 18,
       "texto": "Anubis runs the best return policy in the game: up to 3 recently fallen allies come back, every 7 seconds.\n\nNo receipt needed.\n{enlace}",
-      "imagen": "contenido/imagenes/leyenda-anubis.png",
-      "alt": "Card from Guerreros Gelatina (text in Spanish) showing Anubis: a red jelly with jackal ears and a golden staff. The card text says he is the guardian of the dead: every 7 s he brings back up to 3 recently fallen allies.",
+      "imagen": "contenido/imagenes/ilustracion-anubis-revive.png",
+      "alt": "Cartoon illustration: Anubis raises his staff and three flattened jellies on the ground come back to life amid golden beams of light and ankh symbols.",
       "ia": false
     },
     {
@@ -567,8 +567,8 @@
       "perenne": true,
       "orden": 19,
       "texto": "Our marketing team is a jelly-shaped bot. Its plan: you tell one friend.\n\nFree games that open in your browser. Tiny, with big delusions of grandeur.\n{enlace}",
-      "imagen": "contenido/imagenes/portada-heroes.png",
-      "alt": "Portada de Guerreros Gelatina: ocho Leyendas de gelatina (Zeus, Hércules, Merlín, Robin Hood, Anubis, La Llorona, Drácula y Medusa) en dos bandos, azul y rojo, frente a frente, con el título del juego.",
+      "imagen": "contenido/imagenes/ilustracion-bot-marketing.png",
+      "alt": "Cartoon illustration: the “marketing bot”, a jelly with an antenna on its head, works at a desk with a laptop and a megaphone, with a rising chart on the wall and a speech bubble where it tells another jelly about the game.",
       "ia": false
     },
     {
@@ -580,8 +580,8 @@
       "perenne": true,
       "orden": 20,
       "texto": "La Llorona is a ghost from Mexican folklore, and in Guerreros Gelatina she is a jelly.\n\nHer wail makes nearby enemies flee for 4 seconds without attacking. Scary, but squishy. 👻\n{enlace}",
-      "imagen": "contenido/imagenes/batalla-susto-en.png",
-      "alt": "Screenshot of Guerreros Gelatina: La Llorona (a blue jelly with long black hair and a white dress) at the center of a pale circle, with a speech bubble that says \"Oh, my children!\". Many red jellies with swords, clubs and bows crowd around her.",
+      "imagen": "contenido/imagenes/ilustracion-llorona-rio.png",
+      "alt": "Cartoon illustration: La Llorona at night beside a river under the moon, with tears and mist, while a red farmer peeks out in fear from behind a gravestone.",
       "ia": false
     }
   ]
